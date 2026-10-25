@@ -1,5 +1,7 @@
 # API
 
+Every runtime export and public type has a runnable example in [API Examples](/guide/api-examples).
+
 ## Package exports
 
 | Entry | Public values |

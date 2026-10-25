@@ -158,6 +158,7 @@ The VitePress site builds to `docs/.vitepress/dist`. A GitHub Actions workflow i
 - [Performance](docs/guide/performance.md)
 - [Server Rendering](docs/guide/ssr.md)
 - [API](docs/api.md)
+- [API Examples](docs/guide/api-examples.md)
 - [Limitations](docs/guide/limitations.md)
 
 ## Attribution

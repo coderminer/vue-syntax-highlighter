@@ -47,6 +47,7 @@ for (const file of markdown) {
 }
 
 const api = readFileSync(join(docs, 'api.md'), 'utf8')
+const examples = readFileSync(join(docs, 'guide/api-examples.md'), 'utf8')
 const index = readFileSync(join(root, 'src/index.ts'), 'utf8')
 const exported = new Set()
 for (const match of index.matchAll(/export\s+(?:type\s+)?\{([\s\S]*?)\}\s+from/g)) {
@@ -61,6 +62,44 @@ for (const match of index.matchAll(/export\s+(?:type\s+)?\{([\s\S]*?)\}\s+from/g
 for (const name of exported) {
   if (!api.includes(`\`${name}\``)) {
     failures.push(`docs/api.md is missing export ${name}`)
+  }
+  if (!examples.includes(name)) {
+    failures.push(`docs/guide/api-examples.md is missing export ${name}`)
+  }
+}
+
+const adapterExports = [
+  'createShikiEngine',
+  'ShikiEngine',
+  'ShikiEngineOptions',
+  'ShikiLanguageRegistration',
+  'ShikiLanguageLoader',
+  'languageLoaders',
+  'languageAliases',
+  'supportedLanguages',
+  'createHighlightjsEngine',
+  'HighlightjsEngine',
+  'HighlightjsEngineOptions',
+  'HighlightjsLanguageRegistration',
+  'HighlightjsLanguageLoader',
+  'createLowlightEngine',
+  'LowlightEngine',
+  'LowlightEngineOptions',
+  'LowlightLanguageRegistration',
+  'LowlightLanguageLoader',
+  'createPrismEngine',
+  'PrismEngine',
+  'PrismEngineOptions',
+  'PrismLanguageRegistration',
+  'PrismLanguageLoader',
+  'vshLight',
+  'vshDark',
+  'vshPaper',
+  'vshMidnight',
+]
+for (const name of adapterExports) {
+  if (!examples.includes(name)) {
+    failures.push(`docs/guide/api-examples.md is missing adapter/theme export ${name}`)
   }
 }
 
