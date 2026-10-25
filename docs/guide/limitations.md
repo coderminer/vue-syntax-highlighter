@@ -57,7 +57,7 @@ The fallback uses explicit light/dark/auto scheme aliases and targets roughly Ch
 | `ResizeObserver` | Chrome 64+, Firefox 69+, Safari 13.1+ (optional; fallback viewport is used) |
 | `IntersectionObserver` | Chrome 51+, Firefox 55+, Safari 12.1+ (optional; deferral starts immediately) |
 | `AbortController` | Chrome 66+, Firefox 57+, Safari 12.1+ |
-| `queueMicrotask` | Chrome 71+, Firefox 69+, Safari 12.1+ |
+| `queueMicrotask` | Chrome 71+, Firefox 69+, Safari 12.1+; a Promise-based fallback is included |
 | Clipboard API | Chrome 66+, Firefox 63+, Safari 13.1+ (optional; `copy()` resolves `false`) |
 | `:focus-visible` | Chrome 86+, Firefox 85+, Safari 15.4+ (focus styling only) |
 

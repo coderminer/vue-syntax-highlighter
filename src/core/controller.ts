@@ -269,7 +269,13 @@ export function createHighlightController(options: ControllerOptions): Highlight
   function schedule(): void {
     if (scheduled || disposed || !hasStarted) return
     scheduled = true
-    queueMicrotask(() => {
+    const defer =
+      typeof queueMicrotask === 'function'
+        ? queueMicrotask
+        : (callback: () => void) => {
+            void Promise.resolve().then(callback)
+          }
+    defer(() => {
       scheduled = false
       if (!disposed && hasStarted) void runAsync(false)
     })

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { expect, test } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
@@ -77,6 +78,37 @@ test.describe('deferral', () => {
 })
 
 test.describe('nested scheme scopes', () => {
+  test('the explicit fallback aliases also resolve nested scopes', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'dark' })
+    await page.goto('/e2e-fixtures')
+    const fallback = readFileSync(
+      new URL('../../src/styles/fallback.css', import.meta.url),
+      'utf8',
+    ).replace(
+      '@supports not (color: light-dark(#000000, #ffffff))',
+      '@supports (color: light-dark(#000000, #ffffff))',
+    )
+    await page.addStyleTag({ content: fallback })
+    const automatic = page.getByTestId('auto-scheme-block')
+    const forcedLight = page.getByTestId('light-scheme-block')
+    await expect(automatic.locator('.vsh-token-keyword').first()).toBeVisible({
+      timeout: 30_000,
+    })
+    await expect(forcedLight.locator('.vsh-token-keyword').first()).toBeVisible({
+      timeout: 30_000,
+    })
+    const colors = await page.evaluate(() => {
+      const auto = document.querySelector('[data-testid="auto-scheme-block"]')
+      const light = document.querySelector('[data-testid="light-scheme-block"]')
+      return {
+        autoBackground: auto ? getComputedStyle(auto).backgroundColor : null,
+        lightBackground: light ? getComputedStyle(light).backgroundColor : null,
+      }
+    })
+    expect(colors.autoBackground).toBe('rgb(13, 17, 23)')
+    expect(colors.lightBackground).toBe('rgb(255, 255, 255)')
+  })
+
   test('a nested light scope overrides an automatic ancestor under dark preference', async ({
     page,
   }) => {
