@@ -1,0 +1,62 @@
+[
+  {
+    "name": "core (excluding Vue)",
+    "path": "dist/index.js",
+    "limit": "12 kB"
+  },
+  {
+    "name": "adapter: Shiki (excluding Shiki)",
+    "path": "dist/engines/shiki.js",
+    "limit": "5 kB"
+  },
+  {
+    "name": "adapter: highlight.js (excluding peers)",
+    "path": "dist/engines/highlightjs.js",
+    "limit": "5 kB"
+  },
+  {
+    "name": "adapter: lowlight (excluding peers)",
+    "path": "dist/engines/lowlight.js",
+    "limit": "5 kB"
+  },
+  {
+    "name": "adapter: Prism (excluding refractor)",
+    "path": "dist/engines/prism.js",
+    "limit": "5 kB"
+  },
+  {
+    "name": "adapter: highlight.js/lowlight shared implementation",
+    "path": "dist/chunks/index-*.js",
+    "limit": "5 kB"
+  },
+  {
+    "name": "base styles",
+    "path": "dist/styles.css",
+    "limit": "2 kB"
+  },
+  {
+    "name": "theme: vsh-light",
+    "path": "dist/themes/vsh-light.js",
+    "limit": "2 kB"
+  },
+  {
+    "name": "theme: vsh-dark",
+    "path": "dist/themes/vsh-dark.js",
+    "limit": "2 kB"
+  },
+  {
+    "name": "theme: vsh-paper",
+    "path": "dist/themes/vsh-paper.js",
+    "limit": "2 kB"
+  },
+  {
+    "name": "theme: vsh-midnight",
+    "path": "dist/themes/vsh-midnight.js",
+    "limit": "2 kB"
+  },
+  {
+    "name": "themes aggregate",
+    "path": "dist/themes.js",
+    "limit": "2 kB"
+  }
+]

@@ -1,0 +1,160 @@
+{
+  "name": "vue-syntax-highlighter",
+  "version": "0.1.0",
+  "description": "A Vue 3 syntax highlighter with pluggable engines, semantic themes, and SSR-first performance.",
+  "type": "module",
+  "license": "MIT",
+  "packageManager": "pnpm@10.14.0",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./engines/shiki": {
+      "types": "./dist/engines/shiki.d.ts",
+      "import": "./dist/engines/shiki.js",
+      "default": "./dist/engines/shiki.js"
+    },
+    "./engines/highlightjs": {
+      "types": "./dist/engines/highlightjs.d.ts",
+      "import": "./dist/engines/highlightjs.js",
+      "default": "./dist/engines/highlightjs.js"
+    },
+    "./engines/prism": {
+      "types": "./dist/engines/prism.d.ts",
+      "import": "./dist/engines/prism.js",
+      "default": "./dist/engines/prism.js"
+    },
+    "./engines/lowlight": {
+      "types": "./dist/engines/lowlight.d.ts",
+      "import": "./dist/engines/lowlight.js",
+      "default": "./dist/engines/lowlight.js"
+    },
+    "./themes": {
+      "types": "./dist/themes.d.ts",
+      "import": "./dist/themes.js",
+      "default": "./dist/themes.js"
+    },
+    "./themes/default": {
+      "types": "./dist/themes/default.d.ts",
+      "import": "./dist/themes/default.js",
+      "default": "./dist/themes/default.js"
+    },
+    "./themes/vsh-light": {
+      "types": "./dist/themes/vsh-light.d.ts",
+      "import": "./dist/themes/vsh-light.js",
+      "default": "./dist/themes/vsh-light.js"
+    },
+    "./themes/vsh-dark": {
+      "types": "./dist/themes/vsh-dark.d.ts",
+      "import": "./dist/themes/vsh-dark.js",
+      "default": "./dist/themes/vsh-dark.js"
+    },
+    "./themes/vsh-paper": {
+      "types": "./dist/themes/vsh-paper.d.ts",
+      "import": "./dist/themes/vsh-paper.js",
+      "default": "./dist/themes/vsh-paper.js"
+    },
+    "./themes/vsh-midnight": {
+      "types": "./dist/themes/vsh-midnight.d.ts",
+      "import": "./dist/themes/vsh-midnight.js",
+      "default": "./dist/themes/vsh-midnight.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "vite build && node scripts/copy-assets.mjs",
+    "dev": "vite build --watch",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "typecheck": "vue-tsc -p tsconfig.json --noEmit && tsc -p tsconfig.fixtures.json --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "size": "size-limit",
+    "check:package": "node scripts/check-package.mjs",
+    "docs:dev": "vitepress dev docs --port 4173",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs --port 4173",
+    "bench": "node scripts/bench.mjs",
+    "generate:languages": "node scripts/generate-languages.mjs",
+    "verify": "pnpm lint && pnpm build && pnpm typecheck && pnpm test:run && pnpm size && pnpm check:graph && pnpm check:docs && pnpm check:package && pnpm check:consumer && pnpm check:workflow && pnpm docs:build && pnpm test:e2e",
+    "check:graph": "node scripts/check-graph.mjs",
+    "check:docs": "node scripts/check-docs.mjs",
+    "check:consumer": "node scripts/check-consumer.mjs",
+    "check:workflow": "node scripts/check-workflow.mjs"
+  },
+  "peerDependencies": {
+    "highlight.js": "^11.0.0",
+    "lowlight": "^3.0.0",
+    "refractor": "^5.0.0",
+    "shiki": "^4.0.0",
+    "vue": "^3.4.0"
+  },
+  "peerDependenciesMeta": {
+    "highlight.js": {
+      "optional": true
+    },
+    "lowlight": {
+      "optional": true
+    },
+    "refractor": {
+      "optional": true
+    },
+    "shiki": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@axe-core/playwright": "^4.14.0",
+    "@eslint/js": "^9.39.2",
+    "@playwright/test": "^1.64.1",
+    "@size-limit/file": "^12.1.0",
+    "@types/node": "^24.10.0",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vitest/coverage-v8": "^5.0.5",
+    "@vue/server-renderer": "^3.5.44",
+    "@vue/test-utils": "^2.4.6",
+    "axe-core": "^4.14.0",
+    "eslint": "^9.39.2",
+    "eslint-plugin-vue": "^10.11.1",
+    "happy-dom": "^20.0.0",
+    "highlight.js": "^11.11.1",
+    "jsdom": "^26.1.0",
+    "lowlight": "^3.3.0",
+    "prettier": "^3.7.4",
+    "publint": "^0.3.25",
+    "refractor": "^5.0.0",
+    "shiki": "^4.5.0",
+    "size-limit": "^12.1.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.0",
+    "vite": "^7.3.7",
+    "vite-plugin-dts": "^5.1.2",
+    "vitepress": "^1.6.4",
+    "vitest": "^5.0.5",
+    "vue": "^3.5.44",
+    "vue-tsc": "^3.3.13",
+    "yaml": "^2.9.1"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

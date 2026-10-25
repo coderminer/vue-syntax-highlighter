@@ -1,0 +1,190 @@
+/* vue-syntax-highlighter base stylesheet. Theme values are supplied as custom properties. */
+.vsh,
+.vsh-scope {
+  --vsh-bg: var(--vsh-light-bg, #ffffff);
+  --vsh-fg: var(--vsh-light-fg, #24292f);
+  --vsh-gutter: var(--vsh-light-gutter, #6e7781);
+  --vsh-line-highlight: var(--vsh-light-line-highlight, transparent);
+  --vsh-selection: var(--vsh-light-selection, #b6d7ff);
+  --vsh-font-family: var(--vsh-light-font-family, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+  --vsh-gutter-width: 3.25ch;
+}
+
+[data-vsh-scheme='dark'] .vsh,
+[data-vsh-scheme='dark'].vsh {
+  --vsh-bg: var(--vsh-dark-bg, #0d1117);
+  --vsh-fg: var(--vsh-dark-fg, #e6edf3);
+  --vsh-gutter: var(--vsh-dark-gutter, #7d8590);
+  --vsh-line-highlight: var(--vsh-dark-line-highlight, transparent);
+  --vsh-selection: var(--vsh-dark-selection, #264f78);
+  --vsh-font-family: var(--vsh-dark-font-family, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-vsh-scheme='auto'] .vsh,
+  [data-vsh-scheme='auto'].vsh {
+    --vsh-bg: var(--vsh-dark-bg, #0d1117);
+    --vsh-fg: var(--vsh-dark-fg, #e6edf3);
+    --vsh-gutter: var(--vsh-dark-gutter, #7d8590);
+    --vsh-line-highlight: var(--vsh-dark-line-highlight, transparent);
+    --vsh-selection: var(--vsh-dark-selection, #264f78);
+    --vsh-font-family: var(--vsh-dark-font-family, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+  }
+}
+
+.vsh-scope {
+  display: contents;
+}
+
+.vsh {
+  position: relative;
+  box-sizing: border-box;
+  background: var(--vsh-bg);
+  color: var(--vsh-fg);
+  font-family: var(--vsh-font-family);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 6px;
+  overflow: hidden;
+  tab-size: 4;
+}
+
+.vsh-pre {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.875rem 1rem;
+  overflow: auto;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  tab-size: inherit;
+}
+
+.vsh-pre:focus-visible {
+  outline: 2px solid var(--vsh-selection);
+  outline-offset: -2px;
+}
+
+.vsh-code {
+  display: block;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  tab-size: inherit;
+}
+
+.vsh-line {
+  display: flex;
+  align-items: flex-start;
+  min-height: 1.5em;
+}
+
+.vsh-line-highlighted {
+  background: var(--vsh-line-highlight);
+}
+
+.vsh-line-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: pre;
+}
+
+.vsh-wrap .vsh-pre {
+  overflow-x: hidden;
+}
+
+.vsh-wrap .vsh-line-content {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.vsh-gutter {
+  flex: 0 0 auto;
+  width: var(--vsh-gutter-width);
+  margin-right: 1ch;
+  text-align: right;
+  color: var(--vsh-gutter);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.vsh ::selection {
+  background: var(--vsh-selection);
+}
+
+.vsh-spacer {
+  width: 100%;
+}
+
+.vsh-loading,
+.vsh-error {
+  padding: 0.25rem 1rem;
+  font-size: 0.8125rem;
+}
+
+.vsh-error {
+  color: #cf222e;
+}
+
+.vsh-token {
+  white-space: inherit;
+}
+
+.vsh-token-plain { color: var(--vsh-light-token-plain-color, inherit); font-style: var(--vsh-light-token-plain-font-style, inherit); font-weight: var(--vsh-light-token-plain-font-weight, inherit); text-decoration: var(--vsh-light-token-plain-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-plain, .vsh[data-vsh-scheme="dark"] .vsh-token-plain { color: var(--vsh-dark-token-plain-color, inherit); font-style: var(--vsh-dark-token-plain-font-style, inherit); font-weight: var(--vsh-dark-token-plain-font-weight, inherit); text-decoration: var(--vsh-dark-token-plain-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-plain, .vsh[data-vsh-scheme="auto"] .vsh-token-plain { color: var(--vsh-dark-token-plain-color, inherit); font-style: var(--vsh-dark-token-plain-font-style, inherit); font-weight: var(--vsh-dark-token-plain-font-weight, inherit); text-decoration: var(--vsh-dark-token-plain-text-decoration, inherit); } }
+.vsh-token-keyword { color: var(--vsh-light-token-keyword-color, inherit); font-style: var(--vsh-light-token-keyword-font-style, inherit); font-weight: var(--vsh-light-token-keyword-font-weight, inherit); text-decoration: var(--vsh-light-token-keyword-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-keyword, .vsh[data-vsh-scheme="dark"] .vsh-token-keyword { color: var(--vsh-dark-token-keyword-color, inherit); font-style: var(--vsh-dark-token-keyword-font-style, inherit); font-weight: var(--vsh-dark-token-keyword-font-weight, inherit); text-decoration: var(--vsh-dark-token-keyword-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-keyword, .vsh[data-vsh-scheme="auto"] .vsh-token-keyword { color: var(--vsh-dark-token-keyword-color, inherit); font-style: var(--vsh-dark-token-keyword-font-style, inherit); font-weight: var(--vsh-dark-token-keyword-font-weight, inherit); text-decoration: var(--vsh-dark-token-keyword-text-decoration, inherit); } }
+.vsh-token-string { color: var(--vsh-light-token-string-color, inherit); font-style: var(--vsh-light-token-string-font-style, inherit); font-weight: var(--vsh-light-token-string-font-weight, inherit); text-decoration: var(--vsh-light-token-string-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-string, .vsh[data-vsh-scheme="dark"] .vsh-token-string { color: var(--vsh-dark-token-string-color, inherit); font-style: var(--vsh-dark-token-string-font-style, inherit); font-weight: var(--vsh-dark-token-string-font-weight, inherit); text-decoration: var(--vsh-dark-token-string-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-string, .vsh[data-vsh-scheme="auto"] .vsh-token-string { color: var(--vsh-dark-token-string-color, inherit); font-style: var(--vsh-dark-token-string-font-style, inherit); font-weight: var(--vsh-dark-token-string-font-weight, inherit); text-decoration: var(--vsh-dark-token-string-text-decoration, inherit); } }
+.vsh-token-regexp { color: var(--vsh-light-token-regexp-color, inherit); font-style: var(--vsh-light-token-regexp-font-style, inherit); font-weight: var(--vsh-light-token-regexp-font-weight, inherit); text-decoration: var(--vsh-light-token-regexp-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-regexp, .vsh[data-vsh-scheme="dark"] .vsh-token-regexp { color: var(--vsh-dark-token-regexp-color, inherit); font-style: var(--vsh-dark-token-regexp-font-style, inherit); font-weight: var(--vsh-dark-token-regexp-font-weight, inherit); text-decoration: var(--vsh-dark-token-regexp-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-regexp, .vsh[data-vsh-scheme="auto"] .vsh-token-regexp { color: var(--vsh-dark-token-regexp-color, inherit); font-style: var(--vsh-dark-token-regexp-font-style, inherit); font-weight: var(--vsh-dark-token-regexp-font-weight, inherit); text-decoration: var(--vsh-dark-token-regexp-text-decoration, inherit); } }
+.vsh-token-comment { color: var(--vsh-light-token-comment-color, inherit); font-style: var(--vsh-light-token-comment-font-style, inherit); font-weight: var(--vsh-light-token-comment-font-weight, inherit); text-decoration: var(--vsh-light-token-comment-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-comment, .vsh[data-vsh-scheme="dark"] .vsh-token-comment { color: var(--vsh-dark-token-comment-color, inherit); font-style: var(--vsh-dark-token-comment-font-style, inherit); font-weight: var(--vsh-dark-token-comment-font-weight, inherit); text-decoration: var(--vsh-dark-token-comment-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-comment, .vsh[data-vsh-scheme="auto"] .vsh-token-comment { color: var(--vsh-dark-token-comment-color, inherit); font-style: var(--vsh-dark-token-comment-font-style, inherit); font-weight: var(--vsh-dark-token-comment-font-weight, inherit); text-decoration: var(--vsh-dark-token-comment-text-decoration, inherit); } }
+.vsh-token-number { color: var(--vsh-light-token-number-color, inherit); font-style: var(--vsh-light-token-number-font-style, inherit); font-weight: var(--vsh-light-token-number-font-weight, inherit); text-decoration: var(--vsh-light-token-number-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-number, .vsh[data-vsh-scheme="dark"] .vsh-token-number { color: var(--vsh-dark-token-number-color, inherit); font-style: var(--vsh-dark-token-number-font-style, inherit); font-weight: var(--vsh-dark-token-number-font-weight, inherit); text-decoration: var(--vsh-dark-token-number-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-number, .vsh[data-vsh-scheme="auto"] .vsh-token-number { color: var(--vsh-dark-token-number-color, inherit); font-style: var(--vsh-dark-token-number-font-style, inherit); font-weight: var(--vsh-dark-token-number-font-weight, inherit); text-decoration: var(--vsh-dark-token-number-text-decoration, inherit); } }
+.vsh-token-constant { color: var(--vsh-light-token-constant-color, inherit); font-style: var(--vsh-light-token-constant-font-style, inherit); font-weight: var(--vsh-light-token-constant-font-weight, inherit); text-decoration: var(--vsh-light-token-constant-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-constant, .vsh[data-vsh-scheme="dark"] .vsh-token-constant { color: var(--vsh-dark-token-constant-color, inherit); font-style: var(--vsh-dark-token-constant-font-style, inherit); font-weight: var(--vsh-dark-token-constant-font-weight, inherit); text-decoration: var(--vsh-dark-token-constant-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-constant, .vsh[data-vsh-scheme="auto"] .vsh-token-constant { color: var(--vsh-dark-token-constant-color, inherit); font-style: var(--vsh-dark-token-constant-font-style, inherit); font-weight: var(--vsh-dark-token-constant-font-weight, inherit); text-decoration: var(--vsh-dark-token-constant-text-decoration, inherit); } }
+.vsh-token-function { color: var(--vsh-light-token-function-color, inherit); font-style: var(--vsh-light-token-function-font-style, inherit); font-weight: var(--vsh-light-token-function-font-weight, inherit); text-decoration: var(--vsh-light-token-function-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-function, .vsh[data-vsh-scheme="dark"] .vsh-token-function { color: var(--vsh-dark-token-function-color, inherit); font-style: var(--vsh-dark-token-function-font-style, inherit); font-weight: var(--vsh-dark-token-function-font-weight, inherit); text-decoration: var(--vsh-dark-token-function-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-function, .vsh[data-vsh-scheme="auto"] .vsh-token-function { color: var(--vsh-dark-token-function-color, inherit); font-style: var(--vsh-dark-token-function-font-style, inherit); font-weight: var(--vsh-dark-token-function-font-weight, inherit); text-decoration: var(--vsh-dark-token-function-text-decoration, inherit); } }
+.vsh-token-class { color: var(--vsh-light-token-class-color, inherit); font-style: var(--vsh-light-token-class-font-style, inherit); font-weight: var(--vsh-light-token-class-font-weight, inherit); text-decoration: var(--vsh-light-token-class-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-class, .vsh[data-vsh-scheme="dark"] .vsh-token-class { color: var(--vsh-dark-token-class-color, inherit); font-style: var(--vsh-dark-token-class-font-style, inherit); font-weight: var(--vsh-dark-token-class-font-weight, inherit); text-decoration: var(--vsh-dark-token-class-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-class, .vsh[data-vsh-scheme="auto"] .vsh-token-class { color: var(--vsh-dark-token-class-color, inherit); font-style: var(--vsh-dark-token-class-font-style, inherit); font-weight: var(--vsh-dark-token-class-font-weight, inherit); text-decoration: var(--vsh-dark-token-class-text-decoration, inherit); } }
+.vsh-token-type { color: var(--vsh-light-token-type-color, inherit); font-style: var(--vsh-light-token-type-font-style, inherit); font-weight: var(--vsh-light-token-type-font-weight, inherit); text-decoration: var(--vsh-light-token-type-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-type, .vsh[data-vsh-scheme="dark"] .vsh-token-type { color: var(--vsh-dark-token-type-color, inherit); font-style: var(--vsh-dark-token-type-font-style, inherit); font-weight: var(--vsh-dark-token-type-font-weight, inherit); text-decoration: var(--vsh-dark-token-type-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-type, .vsh[data-vsh-scheme="auto"] .vsh-token-type { color: var(--vsh-dark-token-type-color, inherit); font-style: var(--vsh-dark-token-type-font-style, inherit); font-weight: var(--vsh-dark-token-type-font-weight, inherit); text-decoration: var(--vsh-dark-token-type-text-decoration, inherit); } }
+.vsh-token-variable { color: var(--vsh-light-token-variable-color, inherit); font-style: var(--vsh-light-token-variable-font-style, inherit); font-weight: var(--vsh-light-token-variable-font-weight, inherit); text-decoration: var(--vsh-light-token-variable-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-variable, .vsh[data-vsh-scheme="dark"] .vsh-token-variable { color: var(--vsh-dark-token-variable-color, inherit); font-style: var(--vsh-dark-token-variable-font-style, inherit); font-weight: var(--vsh-dark-token-variable-font-weight, inherit); text-decoration: var(--vsh-dark-token-variable-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-variable, .vsh[data-vsh-scheme="auto"] .vsh-token-variable { color: var(--vsh-dark-token-variable-color, inherit); font-style: var(--vsh-dark-token-variable-font-style, inherit); font-weight: var(--vsh-dark-token-variable-font-weight, inherit); text-decoration: var(--vsh-dark-token-variable-text-decoration, inherit); } }
+.vsh-token-property { color: var(--vsh-light-token-property-color, inherit); font-style: var(--vsh-light-token-property-font-style, inherit); font-weight: var(--vsh-light-token-property-font-weight, inherit); text-decoration: var(--vsh-light-token-property-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-property, .vsh[data-vsh-scheme="dark"] .vsh-token-property { color: var(--vsh-dark-token-property-color, inherit); font-style: var(--vsh-dark-token-property-font-style, inherit); font-weight: var(--vsh-dark-token-property-font-weight, inherit); text-decoration: var(--vsh-dark-token-property-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-property, .vsh[data-vsh-scheme="auto"] .vsh-token-property { color: var(--vsh-dark-token-property-color, inherit); font-style: var(--vsh-dark-token-property-font-style, inherit); font-weight: var(--vsh-dark-token-property-font-weight, inherit); text-decoration: var(--vsh-dark-token-property-text-decoration, inherit); } }
+.vsh-token-operator { color: var(--vsh-light-token-operator-color, inherit); font-style: var(--vsh-light-token-operator-font-style, inherit); font-weight: var(--vsh-light-token-operator-font-weight, inherit); text-decoration: var(--vsh-light-token-operator-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-operator, .vsh[data-vsh-scheme="dark"] .vsh-token-operator { color: var(--vsh-dark-token-operator-color, inherit); font-style: var(--vsh-dark-token-operator-font-style, inherit); font-weight: var(--vsh-dark-token-operator-font-weight, inherit); text-decoration: var(--vsh-dark-token-operator-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-operator, .vsh[data-vsh-scheme="auto"] .vsh-token-operator { color: var(--vsh-dark-token-operator-color, inherit); font-style: var(--vsh-dark-token-operator-font-style, inherit); font-weight: var(--vsh-dark-token-operator-font-weight, inherit); text-decoration: var(--vsh-dark-token-operator-text-decoration, inherit); } }
+.vsh-token-punctuation { color: var(--vsh-light-token-punctuation-color, inherit); font-style: var(--vsh-light-token-punctuation-font-style, inherit); font-weight: var(--vsh-light-token-punctuation-font-weight, inherit); text-decoration: var(--vsh-light-token-punctuation-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-punctuation, .vsh[data-vsh-scheme="dark"] .vsh-token-punctuation { color: var(--vsh-dark-token-punctuation-color, inherit); font-style: var(--vsh-dark-token-punctuation-font-style, inherit); font-weight: var(--vsh-dark-token-punctuation-font-weight, inherit); text-decoration: var(--vsh-dark-token-punctuation-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-punctuation, .vsh[data-vsh-scheme="auto"] .vsh-token-punctuation { color: var(--vsh-dark-token-punctuation-color, inherit); font-style: var(--vsh-dark-token-punctuation-font-style, inherit); font-weight: var(--vsh-dark-token-punctuation-font-weight, inherit); text-decoration: var(--vsh-dark-token-punctuation-text-decoration, inherit); } }
+.vsh-token-tag { color: var(--vsh-light-token-tag-color, inherit); font-style: var(--vsh-light-token-tag-font-style, inherit); font-weight: var(--vsh-light-token-tag-font-weight, inherit); text-decoration: var(--vsh-light-token-tag-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-tag, .vsh[data-vsh-scheme="dark"] .vsh-token-tag { color: var(--vsh-dark-token-tag-color, inherit); font-style: var(--vsh-dark-token-tag-font-style, inherit); font-weight: var(--vsh-dark-token-tag-font-weight, inherit); text-decoration: var(--vsh-dark-token-tag-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-tag, .vsh[data-vsh-scheme="auto"] .vsh-token-tag { color: var(--vsh-dark-token-tag-color, inherit); font-style: var(--vsh-dark-token-tag-font-style, inherit); font-weight: var(--vsh-dark-token-tag-font-weight, inherit); text-decoration: var(--vsh-dark-token-tag-text-decoration, inherit); } }
+.vsh-token-attribute { color: var(--vsh-light-token-attribute-color, inherit); font-style: var(--vsh-light-token-attribute-font-style, inherit); font-weight: var(--vsh-light-token-attribute-font-weight, inherit); text-decoration: var(--vsh-light-token-attribute-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-attribute, .vsh[data-vsh-scheme="dark"] .vsh-token-attribute { color: var(--vsh-dark-token-attribute-color, inherit); font-style: var(--vsh-dark-token-attribute-font-style, inherit); font-weight: var(--vsh-dark-token-attribute-font-weight, inherit); text-decoration: var(--vsh-dark-token-attribute-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-attribute, .vsh[data-vsh-scheme="auto"] .vsh-token-attribute { color: var(--vsh-dark-token-attribute-color, inherit); font-style: var(--vsh-dark-token-attribute-font-style, inherit); font-weight: var(--vsh-dark-token-attribute-font-weight, inherit); text-decoration: var(--vsh-dark-token-attribute-text-decoration, inherit); } }
+.vsh-token-decorator { color: var(--vsh-light-token-decorator-color, inherit); font-style: var(--vsh-light-token-decorator-font-style, inherit); font-weight: var(--vsh-light-token-decorator-font-weight, inherit); text-decoration: var(--vsh-light-token-decorator-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-decorator, .vsh[data-vsh-scheme="dark"] .vsh-token-decorator { color: var(--vsh-dark-token-decorator-color, inherit); font-style: var(--vsh-dark-token-decorator-font-style, inherit); font-weight: var(--vsh-dark-token-decorator-font-weight, inherit); text-decoration: var(--vsh-dark-token-decorator-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-decorator, .vsh[data-vsh-scheme="auto"] .vsh-token-decorator { color: var(--vsh-dark-token-decorator-color, inherit); font-style: var(--vsh-dark-token-decorator-font-style, inherit); font-weight: var(--vsh-dark-token-decorator-font-weight, inherit); text-decoration: var(--vsh-dark-token-decorator-text-decoration, inherit); } }
+.vsh-token-meta { color: var(--vsh-light-token-meta-color, inherit); font-style: var(--vsh-light-token-meta-font-style, inherit); font-weight: var(--vsh-light-token-meta-font-weight, inherit); text-decoration: var(--vsh-light-token-meta-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-meta, .vsh[data-vsh-scheme="dark"] .vsh-token-meta { color: var(--vsh-dark-token-meta-color, inherit); font-style: var(--vsh-dark-token-meta-font-style, inherit); font-weight: var(--vsh-dark-token-meta-font-weight, inherit); text-decoration: var(--vsh-dark-token-meta-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-meta, .vsh[data-vsh-scheme="auto"] .vsh-token-meta { color: var(--vsh-dark-token-meta-color, inherit); font-style: var(--vsh-dark-token-meta-font-style, inherit); font-weight: var(--vsh-dark-token-meta-font-weight, inherit); text-decoration: var(--vsh-dark-token-meta-text-decoration, inherit); } }
+.vsh-token-invalid { color: var(--vsh-light-token-invalid-color, inherit); font-style: var(--vsh-light-token-invalid-font-style, inherit); font-weight: var(--vsh-light-token-invalid-font-weight, inherit); text-decoration: var(--vsh-light-token-invalid-text-decoration, inherit); }
+[data-vsh-scheme="dark"] .vsh-token-invalid, .vsh[data-vsh-scheme="dark"] .vsh-token-invalid { color: var(--vsh-dark-token-invalid-color, inherit); font-style: var(--vsh-dark-token-invalid-font-style, inherit); font-weight: var(--vsh-dark-token-invalid-font-weight, inherit); text-decoration: var(--vsh-dark-token-invalid-text-decoration, inherit); }
+@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-invalid, .vsh[data-vsh-scheme="auto"] .vsh-token-invalid { color: var(--vsh-dark-token-invalid-color, inherit); font-style: var(--vsh-dark-token-invalid-font-style, inherit); font-weight: var(--vsh-dark-token-invalid-font-weight, inherit); text-decoration: var(--vsh-dark-token-invalid-text-decoration, inherit); } }
