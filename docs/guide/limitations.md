@@ -30,6 +30,10 @@ Wrapped, variable-height lines are not virtualized. Unsupported combinations dis
 
 Deferral uses `IntersectionObserver`. When it is unavailable, the component starts immediately after mount. Deferral is inert during SSR. It renders plain text until the block approaches the viewport.
 
+## Prism language registry
+
+`refractor` uses a process-global grammar registry. Prism engine instances share custom language registrations, including across SSR requests in the same process. The grammar data is stateless, so output is not corrupted, but registrations are not isolated per app/request and are not removed on `dispose()`. Use Shiki or highlight.js/lowlight if strict isolation is required.
+
 ## Compatibility aliases
 
 `Light` and `LightAsync` (and the Prism equivalents) are compatibility shims for migration. They select the highlight.js or Prism adapter, but both names use the same lazy language-loading implementation; there is no separate synchronous grammar-registration build.

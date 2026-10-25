@@ -214,7 +214,6 @@ export function selectHighlighterBehavior(context: HighlighterContext): Highligh
 export interface EngineSelection {
   choice: EngineChoice | undefined
   manager: EngineManager
-  owner: HighlighterContext
 }
 
 export function selectEngine(
@@ -222,16 +221,16 @@ export function selectEngine(
   localChoice?: EngineChoice,
 ): EngineSelection {
   if (localChoice !== undefined) {
-    return { choice: localChoice, manager: context.engineManager, owner: context }
+    return { choice: localChoice, manager: context.engineManager }
   }
   let current: HighlighterContext | undefined = context
   while (current) {
     if (current.engine !== undefined) {
-      return { choice: current.engine, manager: current.engineManager, owner: current }
+      return { choice: current.engine, manager: current.engineManager }
     }
     current = current.parent
   }
-  return { choice: 'shiki', manager: context.engineManager, owner: context }
+  return { choice: 'shiki', manager: context.engineManager }
 }
 
 export interface ThemeSelectionFromContext {
@@ -239,8 +238,6 @@ export interface ThemeSelectionFromContext {
   themes?: ThemePair
   colorScheme?: ColorScheme
   registry: Record<string, ThemeDefinition>
-  inherited: boolean
-  scoped: boolean
 }
 
 export function selectTheme(
@@ -276,22 +273,7 @@ export function selectTheme(
   }
 
   const registry = context.themeRegistry
-  const scoped =
-    inherited &&
-    local.colorScheme === undefined &&
-    hasScopeAncestor(context) &&
-    (theme !== undefined || themes !== undefined)
-
-  return { theme, themes, colorScheme, registry, inherited, scoped }
-}
-
-function hasScopeAncestor(context: HighlighterContext): boolean {
-  let current: HighlighterContext | undefined = context
-  while (current) {
-    if (current.providesScope) return true
-    current = current.parent
-  }
-  return false
+  return { theme, themes, colorScheme, registry }
 }
 
 export async function preloadLanguages(context: HighlighterContext): Promise<void> {
@@ -299,13 +281,25 @@ export async function preloadLanguages(context: HighlighterContext): Promise<voi
   const selection = selectEngine(context)
   try {
     const engine = await selection.manager.resolve(selection.choice)
-    await Promise.allSettled(
-      context.languages.map(async (language) => {
+    const languages = [...context.languages]
+    const results = await Promise.allSettled(
+      languages.map(async (language) => {
         if (!engine.loadLanguage) return
         if (engine.hasLanguage && engine.hasLanguage(language)) return
         await engine.loadLanguage(language)
       }),
     )
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') return
+      const language = languages[index] ?? 'unknown'
+      const detail =
+        result.reason instanceof Error ? result.reason.message : String(result.reason)
+      warnOnce(
+        `preload-language:${language}:${detail}`,
+        `Unable to preload language "${language}": ${detail}`,
+        context.warningSet,
+      )
+    })
   } catch (error) {
     warnOnce(
       'preload-failed',

@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
 import { EngineManager, requestCacheKey } from '@/core/engine'
-import { createHighlighterContext, selectEngine } from '@/core/context'
+import {
+  createHighlighterContext,
+  preloadLanguages,
+  selectEngine,
+} from '@/core/context'
 import { createPlainResult } from '@/core/source'
 import type { HighlightEngine } from '@/types'
 
@@ -41,11 +45,36 @@ describe('EngineManager', () => {
     expect(() => manager.resolve('missing')).toThrow(/Unknown engine "missing"/)
   })
 
-  it('wraps loader failures with install guidance', async () => {
+  it('keeps custom loader failures free of install guidance', async () => {
     const manager = new EngineManager({
       broken: () => Promise.reject(new Error('cannot load')),
     })
-    await expect(manager.resolve('broken')).rejects.toThrow(/Install it with/)
+    await expect(manager.resolve('broken')).rejects.toThrow(
+      /Custom engine "broken" failed to load: cannot load/,
+    )
+    await expect(manager.resolve('broken')).rejects.not.toThrow(/Install it with/)
+  })
+
+  it('warns once when a preload language fails', async () => {
+    const spy = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const engine: HighlightEngine = {
+      id: 'preload-engine',
+      hasLanguage: () => false,
+      loadLanguage: async (language: string) => {
+        throw new Error(`missing ${language}`)
+      },
+      highlight: () => createPlainResult('x', 'text'),
+    }
+    const context = createHighlighterContext({
+      engine,
+      languages: ['bad-language'],
+    })
+    await preloadLanguages(context)
+    expect(
+      spy.mock.calls.some((call) =>
+        String(call[0]).includes('Unable to preload language "bad-language"'),
+      ),
+    ).toBe(true)
   })
 
   it('rejects disposed scopes', () => {

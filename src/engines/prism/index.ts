@@ -1,3 +1,5 @@
+// refractor exposes a process-global grammar registry. Custom language
+// registration is therefore shared by all Prism engine instances in a process.
 import { refractor } from 'refractor'
 import type {
   EngineOptions,

@@ -81,6 +81,8 @@ const engine = await createPrismEngine({ preload: ['rust'] })
 
 Prism token classes are mapped to the same semantic model. Refractor's common grammars are available immediately; additional grammars are imported on demand.
 
+Refractor exposes a process-global grammar registry. Custom `registerLanguage` calls are shared by all Prism engine instances in the same process, and `dispose()` does not unregister grammars. Grammar definitions are stateless, so rendered output remains correct, but strict per-application/per-request language isolation requires the Shiki or highlight.js/lowlight adapter, or a separate process/worker.
+
 ## Custom engines
 
 The public contract is small:

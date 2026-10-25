@@ -158,6 +158,10 @@ export class EngineManager {
     } catch (error) {
       this.loads.delete(id)
       if (error instanceof Error && error.message.includes('vue-syntax-highlighter')) throw error
+      if (loader) {
+        const detail = error instanceof Error ? error.message : String(error)
+        throw new Error(`[vue-syntax-highlighter] Custom engine "${id}" failed to load: ${detail}`)
+      }
       throw createMissingEngineError(id, error)
     } finally {
       this.loads.delete(id)
