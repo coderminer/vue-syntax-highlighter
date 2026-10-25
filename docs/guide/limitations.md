@@ -34,9 +34,32 @@ Deferral uses `IntersectionObserver`. When it is unavailable, the component star
 
 `Light` and `LightAsync` (and the Prism equivalents) are compatibility shims for migration. They select the highlight.js or Prism adapter, but both names use the same lazy language-loading implementation; there is no separate synchronous grammar-registration build.
 
-## Modern CSS color schemes
+## Browser support
 
-The base stylesheet uses the `light-dark()` color function and the `color-scheme` property so nested light/dark/auto scopes override their ancestors correctly. This requires a 2024+ evergreen browser (Chrome 123+, Safari 17.5+, Firefox 120+).
+IE11 is not supported. The package ships ES2020 JavaScript; consumers targeting older engines must transpile and polyfill it.
+
+The base stylesheet uses the `light-dark()` color function and the `color-scheme` property so nested light/dark/auto scopes override their ancestors correctly. The modern color path requires Chrome/Edge 123+, Firefox 120+, or Safari 17.5+.
+
+For browsers that support CSS custom properties and `@supports` but not `light-dark()`, import the fallback after the base stylesheet. It is a no-op in modern browsers:
+
+```ts
+import 'vue-syntax-highlighter/styles.css'
+import 'vue-syntax-highlighter/styles/fallback.css'
+```
+
+The fallback uses explicit light/dark/auto scheme aliases and targets roughly Chrome 80+, Firefox 78+, and Safari 14+; there is no formal browser matrix. The relevant runtime features are:
+
+| Feature | Requirement |
+| --- | --- |
+| ES2020 syntax | Chrome 80+, Firefox 74+, Safari 13.1+ (or transpile the package) |
+| CSS custom properties + `@supports` | Chrome 49+, Firefox 31+, Safari 9.1+ |
+| `display: contents` | Chrome 65+, Firefox 37+, Safari 11.1+ |
+| `ResizeObserver` | Chrome 64+, Firefox 69+, Safari 13.1+ (optional; fallback viewport is used) |
+| `IntersectionObserver` | Chrome 51+, Firefox 55+, Safari 12.1+ (optional; deferral starts immediately) |
+| `AbortController` | Chrome 66+, Firefox 57+, Safari 12.1+ |
+| `queueMicrotask` | Chrome 71+, Firefox 69+, Safari 12.1+ |
+| Clipboard API | Chrome 66+, Firefox 63+, Safari 13.1+ (optional; `copy()` resolves `false`) |
+| `:focus-visible` | Chrome 86+, Firefox 85+, Safari 15.4+ (focus styling only) |
 
 ## Inline theme variables and CSP
 

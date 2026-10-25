@@ -42,7 +42,7 @@ function checkTargets(subpath, entry, prefix = '') {
 
 for (const [subpath, entry] of Object.entries(pkg.exports ?? {})) {
   checkTargets(subpath, entry)
-  if (subpath === './styles.css' || subpath === './package.json') continue
+  if (subpath.endsWith('.css') || subpath === './package.json') continue
   const specifier =
     subpath === '.' ? pkg.name : `${pkg.name}/${subpath.replace(/^\.\//, '')}`
   try {
@@ -54,7 +54,7 @@ for (const [subpath, entry] of Object.entries(pkg.exports ?? {})) {
 }
 
 const jsSubpaths = Object.keys(pkg.exports ?? {}).filter(
-  (subpath) => subpath !== './styles.css' && subpath !== './package.json',
+  (subpath) => !subpath.endsWith('.css') && subpath !== './package.json',
 )
 for (const subpath of jsSubpaths) {
   const specifier = subpath === '.' ? pkg.name : `${pkg.name}/${subpath.replace(/^\.\//, '')}`
@@ -95,7 +95,7 @@ const packOutput = execFileSync(
 )
 const packed = JSON.parse(packOutput)
 const files = packed[0]?.files?.map((file) => file.path) ?? []
-for (const required of ['README.md', 'LICENSE', 'package.json', 'dist/index.js', 'dist/index.d.ts', 'dist/styles.css']) {
+for (const required of ['README.md', 'LICENSE', 'package.json', 'dist/index.js', 'dist/index.d.ts', 'dist/styles.css', 'dist/styles/fallback.css']) {
   if (!files.includes(required)) fail(`packed artifact is missing ${required}`)
 }
 for (const file of files) {
@@ -113,7 +113,7 @@ try {
 try {
   execFileSync(
     process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm',
-    ['exec', 'attw', '--pack', '.', '--profile', 'esm-only', '--exclude-entrypoints', 'styles.css'],
+    ['exec', 'attw', '--pack', '.', '--profile', 'esm-only', '--exclude-entrypoints', 'styles.css', 'styles/fallback.css'],
     { cwd: root, stdio: 'pipe', encoding: 'utf8', shell: process.platform === 'win32' },
   )
 } catch (error) {

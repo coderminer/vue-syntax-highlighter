@@ -21,11 +21,8 @@
   margin: 0;
   padding: 0.875rem 1rem;
   overflow: auto;
-  background: transparent;
-  color: inherit;
   font: inherit;
   line-height: inherit;
-  tab-size: inherit;
 }
 
 .vsh-pre:focus-visible {
@@ -35,10 +32,8 @@
 
 .vsh-code {
   display: block;
-  color: inherit;
   font: inherit;
   line-height: inherit;
-  tab-size: inherit;
 }
 
 .vsh-line {
@@ -73,137 +68,122 @@
   text-align: right;
   color: var(--vsh-gutter, light-dark(var(--vsh-light-gutter, #6e7781), var(--vsh-dark-gutter, #7d8590)));
   user-select: none;
-  -webkit-user-select: none;
 }
 
 .vsh ::selection {
   background: var(--vsh-selection, light-dark(var(--vsh-light-selection, #b6d7ff), var(--vsh-dark-selection, #264f78)));
 }
 
-.vsh-loading,
-.vsh-error {
-  padding: 0.25rem 1rem;
-  font-size: 0.8125rem;
-}
-
-.vsh-error {
-  color: #cf222e;
-}
-
-.vsh-token {
-  white-space: inherit;
-}
-
 .vsh-token-plain {
-  color: light-dark(var(--vsh-light-token-plain-color, inherit), var(--vsh-dark-token-plain-color, inherit));
+  color: var(--vsh-c-p, light-dark(var(--vsh-light-token-plain-color, inherit), var(--vsh-dark-token-plain-color, inherit)));
   font-style: var(--vsh-t-p-s, inherit);
   font-weight: var(--vsh-t-p-w, inherit);
   text-decoration: var(--vsh-t-p-d, inherit);
 }
 .vsh-token-keyword {
-  color: light-dark(var(--vsh-light-token-keyword-color, inherit), var(--vsh-dark-token-keyword-color, inherit));
+  color: var(--vsh-c-k, light-dark(var(--vsh-light-token-keyword-color, inherit), var(--vsh-dark-token-keyword-color, inherit)));
   font-style: var(--vsh-t-k-s, inherit);
   font-weight: var(--vsh-t-k-w, inherit);
   text-decoration: var(--vsh-t-k-d, inherit);
 }
 .vsh-token-string {
-  color: light-dark(var(--vsh-light-token-string-color, inherit), var(--vsh-dark-token-string-color, inherit));
+  color: var(--vsh-c-s, light-dark(var(--vsh-light-token-string-color, inherit), var(--vsh-dark-token-string-color, inherit)));
   font-style: var(--vsh-t-s-s, inherit);
   font-weight: var(--vsh-t-s-w, inherit);
   text-decoration: var(--vsh-t-s-d, inherit);
 }
 .vsh-token-regexp {
-  color: light-dark(var(--vsh-light-token-regexp-color, inherit), var(--vsh-dark-token-regexp-color, inherit));
+  color: var(--vsh-c-r, light-dark(var(--vsh-light-token-regexp-color, inherit), var(--vsh-dark-token-regexp-color, inherit)));
   font-style: var(--vsh-t-r-s, inherit);
   font-weight: var(--vsh-t-r-w, inherit);
   text-decoration: var(--vsh-t-r-d, inherit);
 }
 .vsh-token-comment {
-  color: light-dark(var(--vsh-light-token-comment-color, inherit), var(--vsh-dark-token-comment-color, inherit));
+  color: var(--vsh-c-c, light-dark(var(--vsh-light-token-comment-color, inherit), var(--vsh-dark-token-comment-color, inherit)));
   font-style: var(--vsh-t-c-s, inherit);
   font-weight: var(--vsh-t-c-w, inherit);
   text-decoration: var(--vsh-t-c-d, inherit);
 }
 .vsh-token-number {
-  color: light-dark(var(--vsh-light-token-number-color, inherit), var(--vsh-dark-token-number-color, inherit));
+  color: var(--vsh-c-n, light-dark(var(--vsh-light-token-number-color, inherit), var(--vsh-dark-token-number-color, inherit)));
   font-style: var(--vsh-t-n-s, inherit);
   font-weight: var(--vsh-t-n-w, inherit);
   text-decoration: var(--vsh-t-n-d, inherit);
 }
 .vsh-token-constant {
-  color: light-dark(var(--vsh-light-token-constant-color, inherit), var(--vsh-dark-token-constant-color, inherit));
+  color: var(--vsh-c-o, light-dark(var(--vsh-light-token-constant-color, inherit), var(--vsh-dark-token-constant-color, inherit)));
   font-style: var(--vsh-t-o-s, inherit);
   font-weight: var(--vsh-t-o-w, inherit);
   text-decoration: var(--vsh-t-o-d, inherit);
 }
 .vsh-token-function {
-  color: light-dark(var(--vsh-light-token-function-color, inherit), var(--vsh-dark-token-function-color, inherit));
+  color: var(--vsh-c-f, light-dark(var(--vsh-light-token-function-color, inherit), var(--vsh-dark-token-function-color, inherit)));
   font-style: var(--vsh-t-f-s, inherit);
   font-weight: var(--vsh-t-f-w, inherit);
   text-decoration: var(--vsh-t-f-d, inherit);
 }
 .vsh-token-class {
-  color: light-dark(var(--vsh-light-token-class-color, inherit), var(--vsh-dark-token-class-color, inherit));
+  color: var(--vsh-c-l, light-dark(var(--vsh-light-token-class-color, inherit), var(--vsh-dark-token-class-color, inherit)));
   font-style: var(--vsh-t-l-s, inherit);
   font-weight: var(--vsh-t-l-w, inherit);
   text-decoration: var(--vsh-t-l-d, inherit);
 }
 .vsh-token-type {
-  color: light-dark(var(--vsh-light-token-type-color, inherit), var(--vsh-dark-token-type-color, inherit));
+  color: var(--vsh-c-t, light-dark(var(--vsh-light-token-type-color, inherit), var(--vsh-dark-token-type-color, inherit)));
   font-style: var(--vsh-t-t-s, inherit);
   font-weight: var(--vsh-t-t-w, inherit);
   text-decoration: var(--vsh-t-t-d, inherit);
 }
 .vsh-token-variable {
-  color: light-dark(var(--vsh-light-token-variable-color, inherit), var(--vsh-dark-token-variable-color, inherit));
+  color: var(--vsh-c-v, light-dark(var(--vsh-light-token-variable-color, inherit), var(--vsh-dark-token-variable-color, inherit)));
   font-style: var(--vsh-t-v-s, inherit);
   font-weight: var(--vsh-t-v-w, inherit);
   text-decoration: var(--vsh-t-v-d, inherit);
 }
 .vsh-token-property {
-  color: light-dark(var(--vsh-light-token-property-color, inherit), var(--vsh-dark-token-property-color, inherit));
+  color: var(--vsh-c-q, light-dark(var(--vsh-light-token-property-color, inherit), var(--vsh-dark-token-property-color, inherit)));
   font-style: var(--vsh-t-q-s, inherit);
   font-weight: var(--vsh-t-q-w, inherit);
   text-decoration: var(--vsh-t-q-d, inherit);
 }
 .vsh-token-operator {
-  color: light-dark(var(--vsh-light-token-operator-color, inherit), var(--vsh-dark-token-operator-color, inherit));
+  color: var(--vsh-c-a, light-dark(var(--vsh-light-token-operator-color, inherit), var(--vsh-dark-token-operator-color, inherit)));
   font-style: var(--vsh-t-a-s, inherit);
   font-weight: var(--vsh-t-a-w, inherit);
   text-decoration: var(--vsh-t-a-d, inherit);
 }
 .vsh-token-punctuation {
-  color: light-dark(var(--vsh-light-token-punctuation-color, inherit), var(--vsh-dark-token-punctuation-color, inherit));
+  color: var(--vsh-c-u, light-dark(var(--vsh-light-token-punctuation-color, inherit), var(--vsh-dark-token-punctuation-color, inherit)));
   font-style: var(--vsh-t-u-s, inherit);
   font-weight: var(--vsh-t-u-w, inherit);
   text-decoration: var(--vsh-t-u-d, inherit);
 }
 .vsh-token-tag {
-  color: light-dark(var(--vsh-light-token-tag-color, inherit), var(--vsh-dark-token-tag-color, inherit));
+  color: var(--vsh-c-g, light-dark(var(--vsh-light-token-tag-color, inherit), var(--vsh-dark-token-tag-color, inherit)));
   font-style: var(--vsh-t-g-s, inherit);
   font-weight: var(--vsh-t-g-w, inherit);
   text-decoration: var(--vsh-t-g-d, inherit);
 }
 .vsh-token-attribute {
-  color: light-dark(var(--vsh-light-token-attribute-color, inherit), var(--vsh-dark-token-attribute-color, inherit));
+  color: var(--vsh-c-b, light-dark(var(--vsh-light-token-attribute-color, inherit), var(--vsh-dark-token-attribute-color, inherit)));
   font-style: var(--vsh-t-b-s, inherit);
   font-weight: var(--vsh-t-b-w, inherit);
   text-decoration: var(--vsh-t-b-d, inherit);
 }
 .vsh-token-decorator {
-  color: light-dark(var(--vsh-light-token-decorator-color, inherit), var(--vsh-dark-token-decorator-color, inherit));
+  color: var(--vsh-c-d, light-dark(var(--vsh-light-token-decorator-color, inherit), var(--vsh-dark-token-decorator-color, inherit)));
   font-style: var(--vsh-t-d-s, inherit);
   font-weight: var(--vsh-t-d-w, inherit);
   text-decoration: var(--vsh-t-d-d, inherit);
 }
 .vsh-token-meta {
-  color: light-dark(var(--vsh-light-token-meta-color, inherit), var(--vsh-dark-token-meta-color, inherit));
+  color: var(--vsh-c-m, light-dark(var(--vsh-light-token-meta-color, inherit), var(--vsh-dark-token-meta-color, inherit)));
   font-style: var(--vsh-t-m-s, inherit);
   font-weight: var(--vsh-t-m-w, inherit);
   text-decoration: var(--vsh-t-m-d, inherit);
 }
 .vsh-token-invalid {
-  color: light-dark(var(--vsh-light-token-invalid-color, inherit), var(--vsh-dark-token-invalid-color, inherit));
+  color: var(--vsh-c-i, light-dark(var(--vsh-light-token-invalid-color, inherit), var(--vsh-dark-token-invalid-color, inherit)));
   font-style: var(--vsh-t-i-s, inherit);
   font-weight: var(--vsh-t-i-w, inherit);
   text-decoration: var(--vsh-t-i-d, inherit);

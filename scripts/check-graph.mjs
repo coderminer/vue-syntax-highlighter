@@ -123,3 +123,4 @@ console.log(`  theme: ${darkTheme.modules.join(', ')}`)
 
 const styles = resolve(dist, 'styles.css')
 if (!existsSync(styles)) fail('missing dist/styles.css')
+if (!existsSync(resolve(dist, 'styles/fallback.css'))) fail('missing dist/styles/fallback.css')

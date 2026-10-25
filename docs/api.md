@@ -16,6 +16,7 @@
 | `vue-syntax-highlighter/themes/vsh-paper` | `default`, `vshPaper` |
 | `vue-syntax-highlighter/themes/vsh-midnight` | `default`, `vshMidnight` |
 | `vue-syntax-highlighter/styles.css` | Base layout and token stylesheet |
+| `vue-syntax-highlighter/styles/fallback.css` | Optional pre-`light-dark()` scheme fallback |
 | `vue-syntax-highlighter/package.json` | Package metadata |
 
 Public types: `ColorScheme`, `EngineOptions`, `HighlightCacheLike`, `HighlightEngine`, `HighlightLine`, `HighlightRequest`, `HighlightResult`, `HighlightToken`, `HighlighterOptions`, `LineRenderInfo`, `LineSlotProps`, `SyntaxHighlighterEmits`, `SyntaxHighlighterExposed`, `SyntaxHighlighterProps`, `ThemeColorsInput`, `ThemeDefinition`, `ThemeInput`, `ThemePair`, `TokenSlotProps`, `TokenStyle`, `TokenType`, `CacheKeyInput`, `ResultCacheOptions`, `HighlightedEventContext`, `HighlighterContext`, `EngineChoice`, `EngineLoader`, `EngineRegistry`, `BuiltinEngineId`, `VueSyntaxHighlighterOptions`, `VueSyntaxHighlighterPlugin`, `UseSyntaxHighlighterOptions`, `UseSyntaxHighlighterReturn`.

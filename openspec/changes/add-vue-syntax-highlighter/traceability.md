@@ -137,5 +137,5 @@ Every scenario in `specs/` maps to an automated test or a documented manual chec
 - The compatibility aliases `LightAsync` and `PrismAsync` use the same lazy adapter as their synchronous-named counterparts; they do not provide a separate synchronous language-registration mode.
 - `AbortSignal` is context-owned and aborts on provider/plugin disposal; changing one block's input discards stale results via generations rather than cancelling a shared in-flight request.
 - Exact engine-native theme fidelity, a class-only CSP theme mode, Web Worker offload, Nuxt integration, and copy-button UI are explicit non-goals/open questions in `design.md`.
-- The base stylesheet requires `light-dark()`/`color-scheme` support (2024+ evergreen browsers), documented in `docs/guide/limitations.md`.
+- The modern base stylesheet requires `light-dark()`/`color-scheme` support (2024+ evergreen browsers); `styles/fallback.css` provides an explicit-scheme fallback for older browsers with CSS custom properties and `@supports`. Documented in `docs/guide/limitations.md`.
 - A custom `line-number` slot can still render content wider than the digit-based gutter width; applications can override `--vsh-gutter-width` inline.

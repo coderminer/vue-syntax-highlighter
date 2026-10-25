@@ -70,5 +70,11 @@
     "path": "dist/themes.js",
     "limit": "2 kB",
     "gzip": true
+  },
+  {
+    "name": "fallback styles",
+    "path": "dist/styles/fallback.css",
+    "limit": "5 kB",
+    "gzip": true
   }
 ]

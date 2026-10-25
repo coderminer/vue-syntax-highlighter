@@ -37,6 +37,14 @@ Import the base stylesheet once. It contains layout rules and token class/variab
 import 'vue-syntax-highlighter/styles.css'
 ```
 
+The base stylesheet uses `light-dark()`. For 2024-era browsers that do not support it, import the optional fallback after the base stylesheet. It is wrapped in `@supports not`, so importing it unconditionally is safe:
+
+```ts
+import 'vue-syntax-highlighter/styles/fallback.css'
+```
+
+IE11 is not supported; the fallback targets browsers with CSS custom properties and `@supports`.
+
 ## Quick start
 
 ```vue

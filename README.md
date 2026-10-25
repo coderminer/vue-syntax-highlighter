@@ -22,7 +22,7 @@ pnpm add lowlight highlight.js        # highlight.js / lowlight adapters
 pnpm add refractor                    # Prism adapter
 ```
 
-Vue `>=3.4` is the only required peer. Engine peers are optional. The package is ESM-only and targets Node `>=20.19` for SSR/build tooling.
+Vue `>=3.4` is the only required peer. Engine peers are optional. The package is ESM-only and targets Node `>=20.19` for SSR/build tooling. Browsers without `light-dark()` can import the optional fallback stylesheet after the base stylesheet.
 
 ```ts
 import 'vue-syntax-highlighter/styles.css'
@@ -115,6 +115,7 @@ vue-syntax-highlighter/themes/vsh-dark
 vue-syntax-highlighter/themes/vsh-paper
 vue-syntax-highlighter/themes/vsh-midnight
 vue-syntax-highlighter/styles.css
+vue-syntax-highlighter/styles/fallback.css
 vue-syntax-highlighter/package.json
 ```
 

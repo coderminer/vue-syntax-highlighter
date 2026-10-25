@@ -69,7 +69,7 @@ const styleAliases = (scheme) => {
 const tokenRules = TOKEN_TYPES.map((type) => {
   const short = SHORT[type]
   return `.vsh-token-${type} {
-  color: light-dark(var(--vsh-light-token-${type}-color, inherit), var(--vsh-dark-token-${type}-color, inherit));
+  color: var(--vsh-c-${short}, light-dark(var(--vsh-light-token-${type}-color, inherit), var(--vsh-dark-token-${type}-color, inherit)));
   font-style: var(--vsh-t-${short}-s, inherit);
   font-weight: var(--vsh-t-${short}-w, inherit);
   text-decoration: var(--vsh-t-${short}-d, inherit);
@@ -99,11 +99,8 @@ const css = `/* vue-syntax-highlighter base stylesheet. Theme values are supplie
   margin: 0;
   padding: 0.875rem 1rem;
   overflow: auto;
-  background: transparent;
-  color: inherit;
   font: inherit;
   line-height: inherit;
-  tab-size: inherit;
 }
 
 .vsh-pre:focus-visible {
@@ -113,10 +110,8 @@ const css = `/* vue-syntax-highlighter base stylesheet. Theme values are supplie
 
 .vsh-code {
   display: block;
-  color: inherit;
   font: inherit;
   line-height: inherit;
-  tab-size: inherit;
 }
 
 .vsh-line {
@@ -151,25 +146,10 @@ const css = `/* vue-syntax-highlighter base stylesheet. Theme values are supplie
   text-align: right;
   color: var(--vsh-gutter, light-dark(var(--vsh-light-gutter, #6e7781), var(--vsh-dark-gutter, #7d8590)));
   user-select: none;
-  -webkit-user-select: none;
 }
 
 .vsh ::selection {
   background: var(--vsh-selection, light-dark(var(--vsh-light-selection, #b6d7ff), var(--vsh-dark-selection, #264f78)));
-}
-
-.vsh-loading,
-.vsh-error {
-  padding: 0.25rem 1rem;
-  font-size: 0.8125rem;
-}
-
-.vsh-error {
-  color: #cf222e;
-}
-
-.vsh-token {
-  white-space: inherit;
 }
 
 ${tokenRules}
@@ -207,4 +187,57 @@ ${tokenRules}
 `
 
 writeFileSync('src/styles/base.css', css)
-console.log('generated src/styles/base.css')
+
+const fallbackAliases = (scheme) => {
+  const prefix = `--vsh-${scheme}`
+  const declarations = [
+    `--vsh-bg: var(${prefix}-bg, #ffffff);`,
+    `--vsh-fg: var(${prefix}-fg, #24292f);`,
+    `--vsh-gutter: var(${prefix}-gutter, #6e7781);`,
+    `--vsh-line-highlight: var(${prefix}-line-highlight, transparent);`,
+    `--vsh-selection: var(${prefix}-selection, #b6d7ff);`,
+    `--vsh-font-family: var(${prefix}-font-family, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);`,
+  ]
+  for (const type of TOKEN_TYPES) {
+    const short = SHORT[type]
+    declarations.push(
+      `--vsh-c-${short}: var(${prefix}-token-${type}-color, var(--vsh-fg));`,
+      `--vsh-t-${short}-s: var(${prefix}-token-${type}-font-style, inherit);`,
+      `--vsh-t-${short}-w: var(${prefix}-token-${type}-font-weight, inherit);`,
+      `--vsh-t-${short}-d: var(${prefix}-token-${type}-text-decoration, inherit);`,
+    )
+  }
+  return declarations.join('\n  ')
+}
+
+const fallback = `/* Optional fallback for browsers without light-dark(). Import after styles.css. */
+@supports not (color: light-dark(#000000, #ffffff)) {
+  .vsh-gutter {
+    -webkit-user-select: none;
+  }
+
+  .vsh[data-vsh-scheme='light'],
+  .vsh-scope[data-vsh-scheme='light'] {
+  ${fallbackAliases('light')}
+  }
+
+  .vsh[data-vsh-scheme='dark'],
+  .vsh-scope[data-vsh-scheme='dark'] {
+  ${fallbackAliases('dark')}
+  }
+
+  .vsh[data-vsh-scheme='auto'],
+  .vsh-scope[data-vsh-scheme='auto'] {
+  ${fallbackAliases('light')}
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .vsh[data-vsh-scheme='auto'],
+    .vsh-scope[data-vsh-scheme='auto'] {
+    ${fallbackAliases('dark')}
+    }
+  }
+}
+`
+writeFileSync('src/styles/fallback.css', fallback)
+console.log('generated src/styles/base.css and src/styles/fallback.css')
