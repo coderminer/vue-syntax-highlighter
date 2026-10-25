@@ -156,10 +156,14 @@ class ShikiEngineImpl implements ShikiEngine {
     try {
       result = this.highlighter.codeToTokens(code, options)
     } catch {
-      // Shiki 4.5 can throw on the first tokenization of a grammar that has
-      // dependencies loaded later (observed with C++). A second call uses the
-      // same grammar state without the transient failure.
-      result = this.highlighter.codeToTokens(code, options)
+      // Shiki 4.5 can throw while building explanations for a grammar that
+      // has dependencies loaded later (observed with C++). Tokenization still
+      // works without explanations; the numeric token types are a safe,
+      // coarser fallback.
+      result = this.highlighter.codeToTokens(code, {
+        ...options,
+        includeExplanation: false,
+      })
     }
 
     const lines = result.tokens.map((line) => {

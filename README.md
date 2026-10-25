@@ -11,15 +11,25 @@ A Vue 3 syntax highlighter with pluggable engines, semantic themes, and SSR-firs
 ## Install
 
 ```bash
-pnpm add vue-syntax-highlighter vue
+# npm
+npm install vue-syntax-highlighter
+
+# pnpm
+pnpm add vue-syntax-highlighter
+
+# yarn
+yarn add vue-syntax-highlighter
+
+# bun
+bun add vue-syntax-highlighter
 ```
 
 Install the engine you plan to use:
 
 ```bash
-pnpm add shiki                        # default
-pnpm add lowlight highlight.js        # highlight.js / lowlight adapters
-pnpm add refractor                    # Prism adapter
+npm install shiki                        # default
+npm install lowlight highlight.js        # highlight.js / lowlight adapters
+npm install refractor                    # Prism adapter
 ```
 
 Vue `>=3.4` is the only required peer. Engine peers are optional. The package is ESM-only and targets Node `>=20.19` for SSR/build tooling. Browsers without `light-dark()` can import the optional fallback stylesheet after the base stylesheet.
@@ -91,14 +101,10 @@ Theme switching updates CSS custom properties and the scheme attribute only. The
 - Cache keys cover engine, options, language, and code, but never the theme.
 - Concurrent identical requests share one engine call.
 - `defer` waits for `IntersectionObserver` before loading.
-- `virtualized` with `height`, fixed `lineHeight`, and `wrap=false` keeps only the visible window plus overscan in the DOM. A 50,000-line block renders at most 41 line elements in the demo.
+- `virtualized` with `height`, fixed `lineHeight`, and `wrap=false` keeps only the visible window plus overscan in the DOM for long documents.
 - `copy()` returns the complete source, not the virtualized window or gutter.
 
 Run `pnpm bench` for cold highlight and initial SSR render timings on 1k/10k-line inputs.
-
-## Compatibility aliases
-
-`Light`, `LightAsync`, `PrismLight`, and `PrismAsync` are exported for migration from `react-syntax-highlighter`. They select the corresponding adapter and warn once per alias per application. Deprecated props `showLineNumbers`, `wrapLines`, `customStyle`, and `codeTagProps` map to native behavior; native props win. See the migration guide.
 
 ## Exports
 
@@ -137,15 +143,21 @@ pnpm test:e2e
 
 See the full gate with `pnpm verify`.
 
+### Deploying the docs
+
+The VitePress site builds to `docs/.vitepress/dist`. A GitHub Actions workflow in `.github/workflows/docs.yml` publishes it to GitHub Pages on pushes to `main`. In the repository's **Settings → Pages**, choose **GitHub Actions** as the source. Project pages use `/<repository>/` automatically; user/organization pages use `/`.
+
 ## Documentation
 
 - [Getting Started](docs/guide/getting-started.md)
+- [Quick Start](docs/guide/quick-start.md)
+- [Basic Usage](docs/guide/basic-usage.md)
+- [Advanced Usage](docs/guide/advanced-usage.md)
 - [Engines](docs/guide/engines.md)
 - [Themes](docs/guide/themes.md)
 - [Performance](docs/guide/performance.md)
 - [Server Rendering](docs/guide/ssr.md)
 - [API](docs/api.md)
-- [Migration](docs/guide/migration.md)
 - [Limitations](docs/guide/limitations.md)
 
 ## Attribution

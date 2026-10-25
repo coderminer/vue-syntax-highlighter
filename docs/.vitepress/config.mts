@@ -2,11 +2,15 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vitepress'
 
 const src = fileURLToPath(new URL('../../src', import.meta.url))
+const repository = process.env.GITHUB_REPOSITORY
 
 export default defineConfig({
   title: 'Vue Syntax Highlighter',
   description:
     'A Vue 3 syntax highlighter with pluggable engines, semantic themes, and SSR-first performance.',
+  // The Pages workflow sets this to /<repository>/ for project pages. A
+  // user/org <owner>.github.io page builds with the default root path.
+  base: process.env.DOCS_BASE || '/',
   cleanUrls: true,
   themeConfig: {
     nav: [
@@ -19,11 +23,13 @@ export default defineConfig({
         text: 'Guide',
         items: [
           { text: 'Getting Started', link: '/guide/getting-started' },
+          { text: 'Quick Start', link: '/guide/quick-start' },
+          { text: 'Basic Usage', link: '/guide/basic-usage' },
+          { text: 'Advanced Usage', link: '/guide/advanced-usage' },
           { text: 'Engines', link: '/guide/engines' },
           { text: 'Themes', link: '/guide/themes' },
           { text: 'Performance', link: '/guide/performance' },
           { text: 'Server Rendering', link: '/guide/ssr' },
-          { text: 'Migration', link: '/guide/migration' },
           { text: 'Limitations', link: '/guide/limitations' },
         ],
       },
@@ -32,11 +38,12 @@ export default defineConfig({
         items: [
           { text: 'API', link: '/api' },
           { text: 'Live Demo', link: '/demo' },
-          { text: '50k-line Stress Demo', link: '/stress' },
         ],
       },
     ],
-    socialLinks: [{ icon: 'github', link: 'https://github.com/' }],
+    socialLinks: repository
+      ? [{ icon: 'github', link: `https://github.com/${repository}` }]
+      : [],
     footer: {
       message: 'Released under the MIT License.',
       copyright: 'Copyright © 2026 vue-syntax-highlighter contributors',

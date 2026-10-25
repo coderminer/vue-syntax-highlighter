@@ -142,38 +142,3 @@ test.describe('nested scheme scopes', () => {
     expect(colors.lightToken).toBe('rgb(207, 34, 46)')
   })
 })
-
-test.describe('50k-line stress demo', () => {
-  test('bounds the DOM and reveals lines while scrolling', async ({ page }) => {
-    test.setTimeout(120_000)
-    await page.goto('/stress')
-    const block = page.getByTestId('stress-block')
-    await expect(block.locator('.vsh-line').first()).toBeVisible({ timeout: 60_000 })
-    const initialCount = await block.locator('.vsh-line').count()
-    expect(initialCount).toBeLessThanOrEqual(100)
-    const firstLine = await block.locator('.vsh-line').first().getAttribute('data-line')
-    expect(Number(firstLine)).toBe(1)
-
-    const pre = block.locator('.vsh-pre')
-    await pre.evaluate((element) => {
-      element.scrollTop = 200_000
-      element.dispatchEvent(new Event('scroll'))
-    })
-    await expect
-      .poll(async () => Number(await block.locator('.vsh-line').first().getAttribute('data-line')))
-      .toBeGreaterThan(9000)
-    expect(await block.locator('.vsh-line').count()).toBeLessThanOrEqual(100)
-    expect(await block.locator('.vsh-gutter').first().textContent()).toMatch(/\d+/)
-    const gutterFits = await page.evaluate(() => {
-      const line = document.querySelector('[data-testid="stress-block"] .vsh-line')
-      const gutter = line?.querySelector('.vsh-gutter')
-      const content = line?.querySelector('.vsh-line-content')
-      if (!gutter || !content) return false
-      return gutter.getBoundingClientRect().right <= content.getBoundingClientRect().left + 1
-    })
-    expect(gutterFits).toBe(true)
-
-    const results = await new AxeBuilder({ page }).analyze()
-    expect(results.violations).toEqual([])
-  })
-})

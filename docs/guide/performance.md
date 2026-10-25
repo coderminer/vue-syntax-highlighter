@@ -62,7 +62,7 @@ If the configuration is incompatible, virtualization is disabled with one develo
 
 Scrolling updates the window using `requestAnimationFrame`; it never invokes the engine again. A `ResizeObserver` updates the measured viewport. Server rendering uses the deterministic height fallback so the same initial window is produced on both sides.
 
-For a 50,000-line block with a 400 px viewport, 20 px lines, and 10 overscan, at most 41 line elements exist at once. See the [stress demo](/stress).
+For example, a long document with a 400 px viewport, 20 px lines, and 10 overscan keeps at most 41 line elements in the DOM at once.
 
 ## Copying virtualized content
 

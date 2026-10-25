@@ -1,56 +1,98 @@
 # Getting Started
 
+`vue-syntax-highlighter` renders code as accessible text with semantic tokens. Engines tokenize; themes are CSS; themes never trigger re-highlighting.
+
+If you want the shortest path, jump to [Quick Start](/guide/quick-start). This page covers installation and the choices behind it.
+
 ## Requirements
 
 - Vue `>=3.4`
 - Node `>=20.19` for SSR and build tooling
 - An ESM bundler such as Vite, Nuxt, or a modern Node server renderer
+- A modern browser. IE11 is not supported. See [Browser support](/guide/limitations#browser-support) for the fallback stylesheet and API requirements.
 
 The package is ESM-only. CommonJS `require()` is not supported.
 
 ## Install
 
-```bash
-pnpm add vue-syntax-highlighter vue
+### Core package
+
+::: code-group
+
+```bash [npm]
+npm install vue-syntax-highlighter
 ```
 
-Install the engine you plan to use. Only the selected adapter needs its peer:
+```bash [pnpm]
+pnpm add vue-syntax-highlighter
+```
 
-```bash
-# Default engine
+```bash [yarn]
+yarn add vue-syntax-highlighter
+```
+
+```bash [bun]
+bun add vue-syntax-highlighter
+```
+
+:::
+
+Vue is provided by your existing Vue application; do not install a second copy of Vue here.
+
+### Install an engine
+
+Shiki is the default. Install it for the zero-configuration path:
+
+::: code-group
+
+```bash [npm]
+npm install shiki
+```
+
+```bash [pnpm]
 pnpm add shiki
-
-# highlight.js adapter (lowlight is required by the adapter)
-pnpm add lowlight highlight.js
-
-# Prism adapter
-pnpm add refractor
 ```
 
-The engine peers are optional. Importing the core entry never requires them.
+```bash [yarn]
+yarn add shiki
+```
 
-## Styles
+```bash [bun]
+bun add shiki
+```
 
-Import the base stylesheet once. It contains layout rules and token class/variable wiring, not theme data.
+:::
+
+Only the adapter you select needs its peers:
+
+| Engine | Install |
+| --- | --- |
+| Shiki (default) | `shiki` |
+| highlight.js / lowlight | `lowlight highlight.js` |
+| Prism / refractor | `refractor` |
+
+Engine peers are optional. Importing the core entry never requires them. Custom engine objects need no peer at all.
+
+### Add the stylesheet
+
+Import the base stylesheet once in your app entry or root component:
 
 ```ts
 import 'vue-syntax-highlighter/styles.css'
 ```
 
-The base stylesheet uses `light-dark()`. For 2024-era browsers that do not support it, import the optional fallback after the base stylesheet. It is wrapped in `@supports not`, so importing it unconditionally is safe:
+The base stylesheet contains layout and token wiring, not theme data. For browsers that support CSS custom properties and `@supports` but not `light-dark()`, also import the no-op-in-modern-browsers fallback:
 
 ```ts
+import 'vue-syntax-highlighter/styles.css'
 import 'vue-syntax-highlighter/styles/fallback.css'
 ```
 
-IE11 is not supported; the fallback targets browsers with CSS custom properties and `@supports`.
-
-## Quick start
+## Zero-configuration example
 
 ```vue
 <script setup lang="ts">
 import { SyntaxHighlighter } from 'vue-syntax-highlighter'
-import 'vue-syntax-highlighter/styles.css'
 
 const code = `const answer = 42
 console.log(answer)`
@@ -61,98 +103,25 @@ console.log(answer)`
 </template>
 ```
 
-The default engine is Shiki and the default theme is `vsh-light`. Without a provider each block renders its own `display: contents`-free theme scope with inline custom properties, so it is styled before JavaScript runs.
+The default engine is Shiki, the default theme is `vsh-light`, and each block creates its own theme scope. No plugin or provider is required.
 
-## Paired themes and scheme switching
+## Packages and imports
 
-```vue
-<script setup lang="ts">
-import { SyntaxHighlighter } from 'vue-syntax-highlighter'
-import { vshLight } from 'vue-syntax-highlighter/themes/vsh-light'
-import { vshDark } from 'vue-syntax-highlighter/themes/vsh-dark'
+| Import | Purpose |
+| --- | --- |
+| `vue-syntax-highlighter` | Component, provider, plugin, composable, aliases, helpers |
+| `vue-syntax-highlighter/engines/shiki` | Shiki adapter |
+| `vue-syntax-highlighter/engines/highlightjs` | highlight.js/lowlight adapter |
+| `vue-syntax-highlighter/engines/lowlight` | lowlight entry alias |
+| `vue-syntax-highlighter/engines/prism` | Prism/refractor adapter |
+| `vue-syntax-highlighter/themes` | All built-in themes |
+| `vue-syntax-highlighter/themes/vsh-*` | One built-in theme's data |
+| `vue-syntax-highlighter/styles.css` | Base stylesheet |
+| `vue-syntax-highlighter/styles/fallback.css` | Pre-`light-dark()` fallback |
 
-const themes = { light: vshLight, dark: vshDark }
-</script>
+## Next steps
 
-<template>
-  <SyntaxHighlighter
-    :code="code"
-    language="typescript"
-    :themes="themes"
-    color-scheme="auto"
-  />
-</template>
-```
-
-`auto` follows `prefers-color-scheme` in CSS. Toggling between `light`, `dark`, and `auto` never re-tokenizes the source.
-
-## Provider for many blocks
-
-A provider computes one theme scope for its subtree. Descendants inherit its variables and engine/cache defaults.
-
-```vue
-<script setup lang="ts">
-import { SyntaxHighlighter, SyntaxHighlighterProvider } from 'vue-syntax-highlighter'
-import { vshDark } from 'vue-syntax-highlighter/themes/vsh-dark'
-
-const component = { name: 'Thing' }
-</script>
-
-<template>
-  <SyntaxHighlighterProvider
-    engine="shiki"
-    :theme="vshDark"
-    :languages="['javascript', 'typescript']"
-  >
-    <SyntaxHighlighter :code="code" language="javascript" />
-    <SyntaxHighlighter :code="code" language="typescript" />
-  </SyntaxHighlighterProvider>
-</template>
-```
-
-Provider defaults are scoped to the subtree; nested providers inherit unspecified values.
-
-## Plugin
-
-```ts
-import { createApp } from 'vue'
-import VueSyntaxHighlighter from 'vue-syntax-highlighter'
-import { vshDark } from 'vue-syntax-highlighter/themes/vsh-dark'
-
-createApp(App)
-  .use(VueSyntaxHighlighter, {
-    engine: 'shiki',
-    theme: vshDark,
-    languages: ['javascript', 'typescript'],
-  })
-  .mount('#app')
-```
-
-The plugin registers `SyntaxHighlighter` globally and keeps defaults isolated per application.
-
-## Composable
-
-```ts
-import { ref } from 'vue'
-import { useSyntaxHighlighter } from 'vue-syntax-highlighter'
-
-const code = ref('const value = 1')
-const { lines, loading, error, refresh } = useSyntaxHighlighter({
-  code,
-  language: 'javascript',
-})
-```
-
-The composable respects the nearest provider or plugin configuration and exposes reactive lines, loading/error state, and `refresh()`.
-
-## Explicit engine imports
-
-Built-in identifiers load their adapter lazily through the core. To preload an engine for synchronous SSR, import the adapter entry directly and pass the engine object:
-
-```ts
-import { createShikiEngine } from 'vue-syntax-highlighter/engines/shiki'
-
-const engine = await createShikiEngine({ preload: ['javascript'] })
-```
-
-See [Engines](/guide/engines) and [Server Rendering](/guide/ssr) for the full behavior.
+- [Quick Start](/guide/quick-start) — install to rendered block in one page.
+- [Basic Usage](/guide/basic-usage) — line numbers, ranges, wrapping, themes, slots, copy.
+- [Advanced Usage](/guide/advanced-usage) — provider, plugin, composables, engines, SSR, deferral, virtualization.
+- [Engines](/guide/engines) and [Themes](/guide/themes) — detailed reference.

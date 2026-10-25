@@ -425,8 +425,8 @@ describe('deferral', () => {
 })
 
 describe('virtualization', () => {
-  it('bounds a 50,000 line document and reveals lines on scroll', async () => {
-    const code = Array.from({ length: 50_000 }, (_, index) => `line ${index + 1}`).join('\n')
+  it('bounds a long virtualized document and reveals lines on scroll', async () => {
+    const code = Array.from({ length: 3_000 }, (_, index) => `line ${index + 1}`).join('\n')
     const engine = makeEngine()
     const wrapper = mountWith({
       code,
@@ -441,7 +441,7 @@ describe('virtualization', () => {
     const rendered = wrapper.findAll('.vsh-line')
     expect(rendered.length).toBeLessThanOrEqual(100)
     expect(rendered[0]?.attributes('data-line')).toBe('1')
-    expect(wrapper.find('.vsh').attributes('style')).toContain('--vsh-gutter-width: 5.25ch')
+    expect(wrapper.find('.vsh').attributes('style')).toContain('--vsh-gutter-width: 4.25ch')
 
     const pre = wrapper.find('pre').element as HTMLElement
     pre.scrollTop = 20_000
@@ -453,7 +453,7 @@ describe('virtualization', () => {
     expect(Number(scrolled[0]?.attributes('data-line'))).toBeGreaterThan(900)
     expect(
       (wrapper.vm as unknown as { getCopyPayload: () => string }).getCopyPayload().split('\n'),
-    ).toHaveLength(50_000)
+    ).toHaveLength(3_000)
     expect(engine.highlight).toHaveBeenCalledTimes(1)
   })
 

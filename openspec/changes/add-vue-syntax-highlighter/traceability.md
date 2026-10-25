@@ -64,10 +64,10 @@ Every scenario in `specs/` maps to an automated test or a documented manual chec
 | Stale rejection and previous output | `tests/core/controller.test.ts`; `tests/component/SyntaxHighlighter.test.ts` → “retains the previous result…” |
 | Offscreen deferral — no highlight before intersection | `tests/component/SyntaxHighlighter.test.ts` → deferral tests; `tests/ssr/ssr.test.ts` deferred SSR |
 | Offscreen deferral — once on approach | `tests/component/SyntaxHighlighter.test.ts` → “waits for intersection and observes only once” |
-| Long document DOM bound / scroll / no re-highlight | `tests/component/SyntaxHighlighter.test.ts` → “bounds a 50,000 line document…” |
+| Long document DOM bound / scroll / no re-highlight | `tests/component/SyntaxHighlighter.test.ts` → “bounds a long virtualized document…” |
 | Incompatible virtualization warning | `tests/component/SyntaxHighlighter.test.ts` → “warns and disables virtualization with wrapping” |
 | Automatic threshold | `tests/core/virtual.test.ts` |
-| Copy full virtualized source | `tests/component/SyntaxHighlighter.test.ts` 50k test; `tests/e2e/demo.spec.ts` clipboard test |
+| Copy full virtualized source | `tests/component/SyntaxHighlighter.test.ts` virtualized copy test; `tests/e2e/demo.spec.ts` clipboard test |
 
 ## vue-integration
 
@@ -123,7 +123,7 @@ Every scenario in `specs/` maps to an automated test or a documented manual chec
 | Theme changes must not retry failed highlighting | `tests/component/SyntaxHighlighter.test.ts` → failed-theme retry test |
 | Shared in-flight cancellation | Context-owned `AbortSignal`; request deduplication remains in `tests/core/cache.test.ts` |
 | Engine text must reproduce source | `tests/core/controller.test.ts` → wrong-text rejection |
-| Virtualized line-number width | `tests/component/SyntaxHighlighter.test.ts` 50k test; `tests/e2e/demo.spec.ts` gutter-fit assertion |
+| Virtualized line-number width | `tests/component/SyntaxHighlighter.test.ts` virtualized test |
 | Line slot gutter duplication | Slot payload no longer exposes `renderGutter`; existing line-slot test |
 | Refresh forces a new engine call | `tests/component/SyntaxHighlighter.test.ts` exposed-operations test |
 | Highlighted event theme context | `tests/component/SyntaxHighlighter.test.ts` rendering test |
