@@ -12,6 +12,21 @@ Adapters must agree on line count and concatenated line text, not on token segme
 
 There is no CommonJS build. Consumers must use an ESM bundler or Node-based SSR with ESM. Vue is the only required peer; engines are optional peers and must be installed for the adapter you select.
 
+## Browser support
+
+The runtime targets modern ESM browsers with CSS custom properties. IE11 is not supported.
+
+Themes use `light-dark()` to switch schemes without re-highlighting. Browsers that support custom properties and `@supports` but not `light-dark()` — for example Safari before 17.5, Firefox before 120, or Chrome before 123 — can import the optional fallback after the base stylesheet:
+
+```ts
+import 'vue-syntax-highlighter/styles.css'
+import 'vue-syntax-highlighter/styles/fallback.css'
+```
+
+`fallback.css` is wrapped in `@supports not (color: light-dark(...))`, so it is a no-op in modern browsers and safe to import unconditionally. Explicit `color-scheme="light"` or `color-scheme="dark"` does not depend on `light-dark()`.
+
+Deferral needs `IntersectionObserver`, and virtualization measurement uses `ResizeObserver` when available. Both features degrade gracefully when the API is absent.
+
 ## Async first paint
 
 Built-in string engines are lazy. Without a preloaded engine object, the first render on the server and during hydration is plain text marked busy. If highlighted server HTML is required for SEO or a no-flash first paint, preload an engine object as documented in [Server Rendering](/guide/ssr).

@@ -4,6 +4,29 @@
   "description": "A Vue 3 syntax highlighter with pluggable engines, semantic themes, and SSR-first performance.",
   "type": "module",
   "license": "MIT",
+  "author": "CoderMiner",
+  "keywords": [
+    "vue",
+    "vue3",
+    "syntax-highlighting",
+    "code-highlighting",
+    "highlighter",
+    "shiki",
+    "prism",
+    "refractor",
+    "highlight.js",
+    "lowlight",
+    "ssr",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coderminer/vue-syntax-highlighter.git"
+  },
+  "homepage": "https://coderminer.github.io/vue-syntax-highlighter/",
+  "bugs": {
+    "url": "https://github.com/coderminer/vue-syntax-highlighter/issues"
+  },
   "packageManager": "pnpm@10.14.0",
   "engines": {
     "node": ">=20.19.0"
@@ -11,11 +34,17 @@
   "files": [
     "dist",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "sideEffects": [
     "**/*.css"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -88,6 +117,8 @@
     "format": "prettier --write .",
     "size": "size-limit",
     "check:package": "node scripts/check-package.mjs",
+    "check:release": "node scripts/check-release.mjs",
+    "prepublishOnly": "pnpm build && pnpm check:package",
     "docs:dev": "vitepress dev docs --port 4173",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs --port 4173",

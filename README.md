@@ -1,6 +1,14 @@
 # vue-syntax-highlighter
 
+[![npm version](https://img.shields.io/npm/v/vue-syntax-highlighter.svg)](https://www.npmjs.com/package/vue-syntax-highlighter)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/coderminer/vue-syntax-highlighter/blob/main/LICENSE)
+[![Vue 3](https://img.shields.io/badge/vue-3.x-42b883.svg)](https://vuejs.org)
+[![ESM only](https://img.shields.io/badge/module-ESM--only-blue.svg)](#install)
+[![Documentation](https://img.shields.io/badge/docs-vue--syntax--highlighter-brightgreen.svg)](https://coderminer.github.io/vue-syntax-highlighter/)
+
 A Vue 3 syntax highlighter with pluggable engines, semantic themes, and SSR-first performance.
+
+[Documentation](https://coderminer.github.io/vue-syntax-highlighter/) · [API](https://coderminer.github.io/vue-syntax-highlighter/api) · [API Examples](https://coderminer.github.io/vue-syntax-highlighter/guide/api-examples)
 
 - **Vue-idiomatic API** — component props, scoped slots, events, exposed methods, a plugin, a provider, and composables.
 - **Pluggable engines** — Shiki by default; highlight.js through lowlight, a lowlight entry, and Prism through refractor as optional adapters.
@@ -32,7 +40,7 @@ npm install lowlight highlight.js        # highlight.js / lowlight adapters
 npm install refractor                    # Prism adapter
 ```
 
-Vue `>=3.4` is the only required peer. Engine peers are optional. The package is ESM-only and targets Node `>=20.19` for SSR/build tooling. Browsers without `light-dark()` can import the optional fallback stylesheet after the base stylesheet.
+Vue `>=3.4` is the only required peer and is provided by your existing Vue application, so the install commands above intentionally omit it. Engine peers are optional. The package is ESM-only and targets Node `>=20.19` for SSR/build tooling. Browsers without `light-dark()` can import the optional fallback stylesheet after the base stylesheet.
 
 ```ts
 import 'vue-syntax-highlighter/styles.css'
@@ -143,23 +151,27 @@ pnpm test:e2e
 
 See the full gate with `pnpm verify`.
 
+### Publishing
+
+Releases are published to npm by [`.github/workflows/release.yml`](https://github.com/coderminer/vue-syntax-highlighter/blob/main/.github/workflows/release.yml) when a `v*` tag is pushed. See [RELEASING.md](https://github.com/coderminer/vue-syntax-highlighter/blob/main/RELEASING.md) for the one-time npm and GitHub setup, the version/changelog checklist, provenance, and rollback steps.
+
 ### Deploying the docs
 
 The VitePress site builds to `docs/.vitepress/dist`. A GitHub Actions workflow in `.github/workflows/docs.yml` publishes it to GitHub Pages on pushes to `main`. In the repository's **Settings → Pages**, choose **GitHub Actions** as the source. Project pages use `/<repository>/` automatically; user/organization pages use `/`.
 
 ## Documentation
 
-- [Getting Started](docs/guide/getting-started.md)
-- [Quick Start](docs/guide/quick-start.md)
-- [Basic Usage](docs/guide/basic-usage.md)
-- [Advanced Usage](docs/guide/advanced-usage.md)
-- [Engines](docs/guide/engines.md)
-- [Themes](docs/guide/themes.md)
-- [Performance](docs/guide/performance.md)
-- [Server Rendering](docs/guide/ssr.md)
-- [API](docs/api.md)
-- [API Examples](docs/guide/api-examples.md)
-- [Limitations](docs/guide/limitations.md)
+- [Getting Started](https://coderminer.github.io/vue-syntax-highlighter/guide/getting-started)
+- [Quick Start](https://coderminer.github.io/vue-syntax-highlighter/guide/quick-start)
+- [Basic Usage](https://coderminer.github.io/vue-syntax-highlighter/guide/basic-usage)
+- [Advanced Usage](https://coderminer.github.io/vue-syntax-highlighter/guide/advanced-usage)
+- [Engines](https://coderminer.github.io/vue-syntax-highlighter/guide/engines)
+- [Themes](https://coderminer.github.io/vue-syntax-highlighter/guide/themes)
+- [Performance](https://coderminer.github.io/vue-syntax-highlighter/guide/performance)
+- [Server Rendering](https://coderminer.github.io/vue-syntax-highlighter/guide/ssr)
+- [API](https://coderminer.github.io/vue-syntax-highlighter/api)
+- [API Examples](https://coderminer.github.io/vue-syntax-highlighter/guide/api-examples)
+- [Limitations](https://coderminer.github.io/vue-syntax-highlighter/guide/limitations)
 
 ## Attribution
 

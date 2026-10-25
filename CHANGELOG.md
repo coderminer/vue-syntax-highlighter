@@ -14,6 +14,9 @@ All notable changes to this project are documented here. The format follows Keep
 - Provider-scoped LRU cache with character budget, in-flight request deduplication, theme-independent cache keys, microtask scheduling, and stale-result rejection.
 - Offscreen deferral with `IntersectionObserver` and virtualized rendering for long documents with bounded DOM and full-source copying.
 - Deterministic SSR and hydration behavior for synchronous, preloaded, and asynchronous engines without runtime style injection.
-- Migration aliases `Light`, `LightAsync`, `PrismLight`, and `PrismAsync`, plus deprecated prop mapping with one-time warnings.
+- Compatibility aliases `Light`, `LightAsync`, `PrismLight`, and `PrismAsync`, plus deprecated prop mapping with one-time warnings.
+- Optional `styles/fallback.css` for browsers without `light-dark()`, wrapped in `@supports not` so it is a no-op in modern browsers.
 - Strict ESM package exports, TypeScript declarations, size budgets, static graph assertions, publint/attw validation, packed-consumer browser and SSR fixtures.
-- VitePress documentation, live demo, 50,000-line stress demo, migration guide, API reference, and Playwright/axe coverage.
+- npm metadata with repository/homepage/bugs links, `publishConfig.access`, a tag-checked release workflow with provenance, and a `prepublishOnly` build/package gate.
+- VitePress documentation with onboarding, basic and advanced usage guides, API reference, examples for every public export, live demo, and a GitHub Pages deployment workflow.
+- Playwright and axe coverage for the demo, deferral, nested schemes, and accessibility.

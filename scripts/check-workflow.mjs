@@ -60,11 +60,29 @@ for (const action of [
   if (!docsActions.includes(action)) failures.push(`docs workflow is missing ${action}`)
 }
 
+const release = readWorkflow('.github/workflows/release.yml')
+if (!release?.on) failures.push('release workflow has no trigger')
+const releaseTags = release?.on?.push?.tags
+if (!Array.isArray(releaseTags) || !releaseTags.includes('v*')) {
+  failures.push('release workflow must run on v* tags')
+}
+if (release?.permissions?.['id-token'] !== 'write') {
+  failures.push('release workflow must grant id-token:write for provenance')
+}
+const releaseSteps = validateCommands(release, 'release.yml')
+const releaseCommands = releaseSteps.map((step) => step.run).filter(Boolean).join('\n')
+if (!releaseCommands.includes('pnpm check:release')) {
+  failures.push('release workflow must verify the tag with pnpm check:release')
+}
+if (!releaseCommands.includes('npm publish') || !releaseCommands.includes('--provenance')) {
+  failures.push('release workflow must publish with npm publish --provenance')
+}
+
 if (failures.length > 0) {
   console.error(`workflow check failed:\n${failures.map((item) => `  ${item}`).join('\n')}`)
   process.exitCode = 1
 } else {
   console.log(
-    `workflow check passed (${ciSteps.length} CI steps, ${docsSteps.length} docs steps, Node ${matrix.join('/')})`,
+    `workflow check passed (${ciSteps.length} CI steps, ${docsSteps.length} docs steps, ${releaseSteps.length} release steps, Node ${matrix.join('/')})`,
   )
 }

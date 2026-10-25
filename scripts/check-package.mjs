@@ -88,6 +88,27 @@ for (const peer of ['shiki', 'lowlight', 'highlight.js', 'refractor']) {
   }
 }
 
+const metadata = {
+  description: (value) => typeof value === 'string' && value.length > 0,
+  author: (value) => typeof value === 'string' && value.length > 0,
+  repository: (value) =>
+    value?.type === 'git' && /^git\+https:\/\/github\.com\/[^/]+\/[^/]+\.git$/.test(value.url ?? ''),
+  homepage: (value) => typeof value === 'string' && value.startsWith('https://'),
+  bugs: (value) => typeof value?.url === 'string' && value.url.startsWith('https://'),
+  keywords: (value) => Array.isArray(value) && value.length >= 5,
+}
+for (const [field, validate] of Object.entries(metadata)) {
+  if (!validate(pkg[field])) fail(`package.json is missing valid npm metadata: ${field}`)
+}
+if (pkg.private === true) fail('package.json must not be private')
+if (pkg.publishConfig?.access !== 'public') fail('publishConfig.access must be public')
+for (const field of ['main', 'types']) {
+  const target = pkg[field]
+  if (typeof target !== 'string' || !existsSync(resolve(root, target))) {
+    fail(`package.json ${field} must point at a built file`)
+  }
+}
+
 const packOutput = execFileSync(
   process.platform === 'win32' ? 'npm.cmd' : 'npm',
   ['pack', '--dry-run', '--json'],
@@ -95,7 +116,7 @@ const packOutput = execFileSync(
 )
 const packed = JSON.parse(packOutput)
 const files = packed[0]?.files?.map((file) => file.path) ?? []
-for (const required of ['README.md', 'LICENSE', 'package.json', 'dist/index.js', 'dist/index.d.ts', 'dist/styles.css', 'dist/styles/fallback.css']) {
+for (const required of ['README.md', 'CHANGELOG.md', 'LICENSE', 'package.json', 'dist/index.js', 'dist/index.d.ts', 'dist/styles.css', 'dist/styles/fallback.css']) {
   if (!files.includes(required)) fail(`packed artifact is missing ${required}`)
 }
 for (const file of files) {
@@ -114,7 +135,15 @@ try {
   execFileSync(
     process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm',
     ['exec', 'attw', '--pack', '.', '--profile', 'esm-only', '--exclude-entrypoints', 'styles.css', 'styles/fallback.css'],
-    { cwd: root, stdio: 'pipe', encoding: 'utf8', shell: process.platform === 'win32' },
+    {
+      cwd: root,
+      stdio: 'pipe',
+      encoding: 'utf8',
+      shell: process.platform === 'win32',
+      // attw runs `npm pack` internally. During `npm publish --dry-run` the
+      // inherited flag would suppress the tarball that attw expects to read.
+      env: { ...process.env, npm_config_dry_run: 'false' },
+    },
   )
 } catch (error) {
   fail(`attw failed:\n${String(error.stdout ?? '')}\n${String(error.stderr ?? error.message)}`)
