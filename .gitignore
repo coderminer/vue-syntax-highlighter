@@ -147,3 +147,10 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Test and benchmark artifacts
+test-results/
+playwright-report/
+bench-report.md
+
+.tmp/
