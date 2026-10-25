@@ -367,7 +367,9 @@ export const SyntaxHighlighter = defineComponent({
     controller.attemptInitialSync()
 
     function getCopyPayload(): string {
-      return normalizeSource(normalized.value.code)
+      // Keep the terminal line break in clipboard output even though the
+      // rendered document omits the extra empty row it would create.
+      return normalizeSource(props.code)
     }
 
     async function copy(): Promise<boolean> {

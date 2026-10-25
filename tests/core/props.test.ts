@@ -26,6 +26,13 @@ describe('prop normalization', () => {
     expect(props.tabindex).toBe(0)
   })
 
+  it('drops one terminal newline but allows a zero start line', () => {
+    const props = normalizeProps({ code: 'a\n', startLine: 0 }, new Set())
+    expect(props.code).toBe('a')
+    expect(props.startLine).toBe(0)
+    expect(normalizeProps({ startLine: -4 }, new Set()).startLine).toBe(0)
+  })
+
   it('normalizes invalid numbers to safe defaults', () => {
     const props = normalizeProps(
       {

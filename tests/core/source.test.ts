@@ -5,6 +5,7 @@ import {
   createPlainResult,
   freezeResult,
   isHighlightResult,
+  normalizeDisplaySource,
   normalizeSource,
   resultLineText,
   resultToSource,
@@ -15,9 +16,17 @@ import type { HighlightResult } from '@/types'
 describe('source normalization', () => {
   it('normalizes CRLF and lone CR to LF', () => {
     expect(normalizeSource('a\r\nb\rc')).toBe('a\nb\nc')
+    expect(normalizeSource('a\r\n')).toBe('a\n')
   })
 
-  it('keeps a trailing empty line', () => {
+  it('drops one terminal line break for display', () => {
+    expect(normalizeDisplaySource('a\n')).toBe('a')
+    expect(normalizeDisplaySource('a\r\n')).toBe('a')
+    expect(normalizeDisplaySource('a\n\n')).toBe('a\n')
+    expect(normalizeDisplaySource('')).toBe('')
+  })
+
+  it('keeps raw split semantics for direct callers', () => {
     expect(splitSource('a\n')).toEqual(['a', ''])
     expect(splitSource('')).toEqual([''])
   })

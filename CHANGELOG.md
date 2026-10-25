@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here. The format follows Keep a Changelog and the project uses semantic versioning.
 
+## [1.0.1] - 2026-10-25
+
+### Fixed
+
+- A single terminal line break no longer renders an extra empty row or line number. Deliberate blank lines are preserved, and `copy()` / `getCopyPayload()` still return the original trailing line break.
+- `startLine` now accepts `0` instead of clamping the first displayed line number to `1`.
+- Added regression coverage for terminal newlines, intentional trailing blank lines, zero-based line numbers, and the raw copy payload.
+
 ## [1.0.0] - 2026-10-25
 
 Initial stable release.

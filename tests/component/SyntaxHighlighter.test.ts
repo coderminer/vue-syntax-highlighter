@@ -61,13 +61,27 @@ describe('SyntaxHighlighter rendering', () => {
     })
   })
 
-  it('preserves multi-line source and empty lines', () => {
+  it('preserves internal empty lines and drops one terminal newline', () => {
     const code = 'a\n\nb\n'
     const engine = makeEngine()
     const wrapper = mountWith({ code, engine })
     const lines = wrapper.findAll('.vsh-line')
-    expect(lines).toHaveLength(4)
-    expect(lines.map((line) => line.text())).toEqual(['a', '', 'b', ''])
+    expect(lines).toHaveLength(3)
+    expect(lines.map((line) => line.text())).toEqual(['a', '', 'b'])
+  })
+
+  it('does not add a rendered row for one terminal newline', async () => {
+    const wrapper = mountWith({ code: 'a\n', engine: makeEngine(), lineNumbers: true })
+    expect(wrapper.findAll('.vsh-line')).toHaveLength(1)
+    expect(wrapper.find('.vsh-gutter').text()).toBe('1')
+    expect(
+      (wrapper.vm as unknown as { getCopyPayload: () => string }).getCopyPayload(),
+    ).toBe('a\n')
+  })
+
+  it('keeps one intentional blank line before a terminal newline', () => {
+    const wrapper = mountWith({ code: 'a\n\n', engine: makeEngine() })
+    expect(wrapper.findAll('.vsh-line').map((line) => line.text())).toEqual(['a', ''])
   })
 
   it('renders empty code without errors or warnings', () => {
@@ -109,6 +123,16 @@ describe('line features', () => {
     const gutters = wrapper.findAll('.vsh-gutter')
     expect(gutters.map((gutter) => gutter.text())).toEqual(['10', '11', '12'])
     expect(gutters[0]?.attributes('aria-hidden')).toBe('true')
+  })
+
+  it('allows zero as the first line number', () => {
+    const wrapper = mountWith({
+      engine: makeEngine(),
+      code: 'a\nb',
+      lineNumbers: true,
+      startLine: 0,
+    })
+    expect(wrapper.findAll('.vsh-gutter').map((gutter) => gutter.text())).toEqual(['0', '1'])
   })
 
   it('disables line numbers by default and maps the deprecated alias', () => {

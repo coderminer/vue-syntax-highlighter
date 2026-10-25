@@ -11,6 +11,7 @@ import { selectEngine, type HighlighterContext } from './context.js'
 import {
   assertHighlightResult,
   freezeResult,
+  normalizeDisplaySource,
   normalizeSource,
   resultToSource,
 } from './source.js'
@@ -245,7 +246,7 @@ export function createHighlightController(options: ControllerOptions): Highlight
       throw new Error('[vue-syntax-highlighter] This highlighter scope has been disposed.')
     }
     const current = getInput()
-    const code = normalizeSource(input.code)
+    const code = normalizeDisplaySource(input.code)
     const language = input.language ?? current.language
     const selection = selectEngine(context, current.engine)
     const engine = await selection.manager.resolve(selection.choice)

@@ -25,7 +25,7 @@ import {
   type HighlightController,
 } from '../core/controller.js'
 import type { EngineChoice } from '../core/engine.js'
-import { createPlainResult } from '../core/source.js'
+import { createPlainResult, normalizeDisplaySource } from '../core/source.js'
 import { normalizeLanguage } from '../core/props.js'
 
 export interface UseSyntaxHighlighterOptions {
@@ -59,7 +59,7 @@ export function useSyntaxHighlighter(
   const controller = createHighlightController({
     context,
     getInput: () => ({
-      code: toValue(options.code) ?? '',
+      code: normalizeDisplaySource(toValue(options.code) ?? ''),
       language: language.value,
       engine: toValue(options.engine),
       engineOptions: toValue(options.engineOptions),
@@ -68,7 +68,7 @@ export function useSyntaxHighlighter(
 
   const lines = computed<readonly HighlightLine[]>(() => {
     if (controller.lines.value) return controller.lines.value
-    return createPlainResult(toValue(options.code) ?? '', language.value).lines
+    return createPlainResult(normalizeDisplaySource(toValue(options.code) ?? ''), language.value).lines
   })
 
   controller.attemptInitialSync()

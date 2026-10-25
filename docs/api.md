@@ -31,7 +31,7 @@ Deep imports into `dist/` are blocked by the exports map.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `code` | `string` | `''` | Source text. Never HTML. |
+| `code` | `string` | `''` | Source text. Never HTML. One terminal line break is not rendered as an extra row; `copy()` still returns it. |
 | `language` | `string` | `'text'` | Engine language; exposed as `language-<id>`. |
 | `engine` | `string \| HighlightEngine` | inherits | Engine identifier or adapter object. |
 | `engineOptions` | `EngineOptions` | `{}` | Serialized into the cache key. |
@@ -39,7 +39,7 @@ Deep imports into `dist/` are blocked by the exports map.
 | `themes` | `ThemePair` | inherits | Light/dark pair. |
 | `colorScheme` | `'auto' \| 'light' \| 'dark'` | inherits | Scheme mode. |
 | `lineNumbers` | `boolean` | `false` | Decorative gutter. |
-| `startLine` | `number` | `1` | First displayed/source line number. |
+| `startLine` | `number` | `1` | First displayed/source line number. `0` is allowed. |
 | `highlightLines` | `(number \| [number, number])[]` | `[]` | Source line numbers/ranges. |
 | `wrap` | `boolean` | `false` | Wrap long lines; disables virtualization. |
 | `virtualized` | `boolean \| 'auto'` | `false` | Windowed rendering. |

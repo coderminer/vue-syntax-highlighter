@@ -12,7 +12,7 @@
 />
 ```
 
-The default values are `code=""` and `language="text"`. Empty source is valid and renders an empty code block without warnings.
+The default values are `code=""` and `language="text"`. Empty source is valid and renders an empty code block without warnings. One trailing newline, which editors often add to files, is ignored for rendering; `copy()` and `getCopyPayload()` still preserve it.
 
 ## Line numbers
 
@@ -27,7 +27,7 @@ Line numbers are off by default. Enable them with `lineNumbers`, and optionally 
 />
 ```
 
-The gutter is decorative (`aria-hidden`) and is excluded from selection and from the copy payload. The width grows with the largest rendered line number.
+The gutter is decorative (`aria-hidden`) and is excluded from selection and from the copy payload. The width grows with the largest rendered line number. `startLine` accepts `0` when the source numbering really begins at zero.
 
 ## Highlight ranges
 

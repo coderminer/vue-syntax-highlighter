@@ -8,6 +8,7 @@ import type {
 } from '../types.js'
 import type { EngineChoice } from './engine.js'
 import type { HighlighterBehavior } from './context.js'
+import { normalizeDisplaySource } from './source.js'
 import { warnOnce, type WarningSet } from './warn.js'
 
 export interface RawHighlighterProps {
@@ -209,7 +210,7 @@ export function normalizeProps(
         : (behavior?.virtualized ?? false)
 
   return {
-    code: typeof raw.code === 'string' ? raw.code : '',
+    code: normalizeDisplaySource(typeof raw.code === 'string' ? raw.code : ''),
     language,
     languageClass: languageClassName(language),
     engine: raw.engine ?? undefined,
@@ -218,7 +219,7 @@ export function normalizeProps(
     themes: raw.themes,
     colorScheme,
     lineNumbers,
-    startLine: normalizeInteger(raw.startLine, 1),
+    startLine: normalizeInteger(raw.startLine, 1, 0),
     highlightLines: normalizeLines(raw.highlightLines),
     wrap,
     virtualized,

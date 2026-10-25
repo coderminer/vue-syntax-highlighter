@@ -10,6 +10,16 @@ export function normalizeSource(code: string): string {
   return code.replace(/\r\n?/g, '\n')
 }
 
+/**
+ * Renders source without the terminal line break that editors add to files.
+ * Keeping one blank line for `"a\n\n"` while treating `"a\n"` as one line
+ * avoids an empty numbered row without flattening intentional blank lines.
+ */
+export function normalizeDisplaySource(code: string): string {
+  const normalized = normalizeSource(code)
+  return normalized.endsWith('\n') ? normalized.slice(0, -1) : normalized
+}
+
 export function splitSource(code: string): string[] {
   return normalizeSource(code).split('\n')
 }
