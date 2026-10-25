@@ -112,3 +112,30 @@ Every scenario in `specs/` maps to an automated test or a documented manual chec
 | Docs demo, clipboard, deferral, virtualization, axe | `tests/e2e/demo.spec.ts` |
 | Publish dry run | `npm publish --dry-run` output reviewed during release readiness |
 | Docs preview | `pnpm docs:preview` inspected locally and exercised by Playwright |
+
+## Post-implementation review fixes
+
+| Issue | Coverage |
+| --- | --- |
+| Provider/plugin deferral and virtualization defaults | `tests/component/provider-behavior.test.ts` |
+| Nested light/auto scheme scopes | `tests/e2e/demo.spec.ts` → nested scheme scope |
+| Per-application default cache isolation (SSR) | `tests/ssr/ssr.test.ts` → cache isolation/sharing |
+| Theme changes must not retry failed highlighting | `tests/component/SyntaxHighlighter.test.ts` → failed-theme retry test |
+| Shared in-flight cancellation | Context-owned `AbortSignal`; request deduplication remains in `tests/core/cache.test.ts` |
+| Engine text must reproduce source | `tests/core/controller.test.ts` → wrong-text rejection |
+| Virtualized line-number width | `tests/component/SyntaxHighlighter.test.ts` 50k test; `tests/e2e/demo.spec.ts` gutter-fit assertion |
+| Line slot gutter duplication | Slot payload no longer exposes `renderGutter`; existing line-slot test |
+| Refresh forces a new engine call | `tests/component/SyntaxHighlighter.test.ts` exposed-operations test |
+| Highlighted event theme context | `tests/component/SyntaxHighlighter.test.ts` rendering test |
+| Unbounded `height:auto`/`none` rejected | `tests/core/virtual.test.ts` |
+| Gzip size budgets | `.size-limit.json` entries use `"gzip": true` |
+| Test source type checking | `tsconfig.tests.json`; wired into `pnpm typecheck` |
+
+## Known limitations / intentionally not implemented
+
+- Runtime replacement of provider `engines`, `cache`, `cacheCapacity`, or `themeRegistry` after mount is not propagated; these are treated as stable configuration.
+- The compatibility aliases `LightAsync` and `PrismAsync` use the same lazy adapter as their synchronous-named counterparts; they do not provide a separate synchronous language-registration mode.
+- `AbortSignal` is context-owned and aborts on provider/plugin disposal; changing one block's input discards stale results via generations rather than cancelling a shared in-flight request.
+- Exact engine-native theme fidelity, a class-only CSP theme mode, Web Worker offload, Nuxt integration, and copy-button UI are explicit non-goals/open questions in `design.md`.
+- The base stylesheet requires `light-dark()`/`color-scheme` support (2024+ evergreen browsers), documented in `docs/guide/limitations.md`.
+- A custom `line-number` slot can still render content wider than the digit-based gutter width; applications can override `--vsh-gutter-width` inline.

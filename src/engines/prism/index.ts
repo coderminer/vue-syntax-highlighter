@@ -31,6 +31,8 @@ export type PrismLanguageLoader = () => Promise<{ default: unknown } | unknown>
 export interface PrismEngine extends HighlightEngine {
   readonly id: 'prism'
   readonly capabilities: { sync: true }
+  hasLanguage(language: string): boolean
+  loadLanguage(language: string): Promise<void>
   registerLanguage(name: string, language: PrismLanguageRegistration | PrismLanguageLoader): void
   readonly supportedLanguages: readonly string[]
 }

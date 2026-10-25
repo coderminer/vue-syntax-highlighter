@@ -30,6 +30,14 @@ Wrapped, variable-height lines are not virtualized. Unsupported combinations dis
 
 Deferral uses `IntersectionObserver`. When it is unavailable, the component starts immediately after mount. Deferral is inert during SSR. It renders plain text until the block approaches the viewport.
 
+## Compatibility aliases
+
+`Light` and `LightAsync` (and the Prism equivalents) are compatibility shims for migration. They select the highlight.js or Prism adapter, but both names use the same lazy language-loading implementation; there is no separate synchronous grammar-registration build.
+
+## Modern CSS color schemes
+
+The base stylesheet uses the `light-dark()` color function and the `color-scheme` property so nested light/dark/auto scopes override their ancestors correctly. This requires a 2024+ evergreen browser (Chrome 123+, Safari 17.5+, Firefox 120+).
+
 ## Inline theme variables and CSP
 
 Theme scopes use inline `style` attributes. A strict Content Security Policy must permit style attributes for this region, or you must override colors from an external stylesheet. No runtime `<style>` injection is used.

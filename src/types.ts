@@ -182,7 +182,12 @@ export interface TokenRenderInfo {
 export interface LineSlotProps extends LineRenderInfo {
   tokens: readonly HighlightToken[]
   renderTokens: () => VNode[]
-  renderGutter: () => VNode | null
+}
+
+export interface HighlightedEventContext {
+  language: string
+  theme: string
+  colorScheme: ColorScheme
 }
 
 export interface TokenSlotProps extends TokenRenderInfo {
@@ -190,7 +195,7 @@ export interface TokenSlotProps extends TokenRenderInfo {
 }
 
 export interface SyntaxHighlighterEmits {
-  (event: 'highlighted', result: HighlightResult): void
+  (event: 'highlighted', result: HighlightResult, context: HighlightedEventContext): void
   (event: 'error', error: Error): void
 }
 

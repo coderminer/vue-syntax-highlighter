@@ -75,11 +75,46 @@ describe('prop normalization', () => {
     expect(spy).toHaveBeenCalled()
   })
 
+  it('inherits deferral and virtualization defaults when props are absent', () => {
+    const behavior = {
+      defer: true,
+      rootMargin: '10px',
+      virtualized: 'auto' as const,
+      virtualizeAfter: 500,
+    }
+    const inherited = normalizeProps(
+      { defer: null, rootMargin: null, virtualized: null, virtualizeAfter: null },
+      new Set(),
+      behavior,
+    )
+    expect(inherited.defer).toBe(true)
+    expect(inherited.rootMargin).toBe('10px')
+    expect(inherited.virtualized).toBe('auto')
+    expect(inherited.virtualizeAfter).toBe(500)
+
+    const overridden = normalizeProps(
+      { defer: false, rootMargin: '', virtualized: false, virtualizeAfter: 100 },
+      new Set(),
+      behavior,
+    )
+    expect(overridden.defer).toBe(false)
+    expect(overridden.virtualized).toBe(false)
+    expect(overridden.virtualizeAfter).toBe(100)
+  })
+
+  it('warns and falls back for an invalid colorScheme', () => {
+    const spy = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const props = normalizeProps({ colorScheme: 'system' as never }, new Set())
+    expect(props.colorScheme).toBeUndefined()
+    expect(spy).toHaveBeenCalledTimes(1)
+  })
+
   it('keeps tabindex=false and normalizes language classes', () => {
     expect(normalizeProps({ tabindex: false }, new Set()).tabindex).toBe(false)
     expect(normalizeLanguage('  Language-JS ')).toBe('js')
     expect(normalizeLanguage('')).toBe('text')
-    expect(languageClassName('c++')).toBe('language-c')
+    expect(languageClassName('c++')).toBe('language-c++')
+    expect(languageClassName('c#')).toBe('language-c#')
     expect(languageClassName('objective-c')).toBe('language-objective-c')
   })
 

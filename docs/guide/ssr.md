@@ -44,6 +44,10 @@ The default `engine="shiki"` string resolves through a dynamic import. On the se
 
 This is intentional: starting async work during SSR can resolve before hydration and produce a mismatch. If you need highlighted server HTML, preload the engine object as shown above.
 
+## Cache isolation
+
+Components without a provider or plugin get one default context per Vue application. In SSR, create one application per request (the standard `createSSRApp` flow) so caches and engines are not shared between requests. Plugin and provider contexts are also scoped to their application/subtree.
+
 ## Theme markup
 
 Every scope carries:

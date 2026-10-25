@@ -1,5 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest'
 import {
   createApp,
   defineComponent,
@@ -30,15 +30,15 @@ function result(code: string, language = 'js'): HighlightResult {
 
 let engineCounter = 0
 function engine(
-  highlight = vi.fn((request: { code: string; language: string }) =>
+  highlight: HighlightEngine['highlight'] = vi.fn((request) =>
     result(request.code, request.language),
   ),
   capabilities: { sync?: boolean } = { sync: true },
-): HighlightEngine & { highlight: ReturnType<typeof vi.fn> } {
+): HighlightEngine & { highlight: Mock<HighlightEngine['highlight']> } {
   return {
     id: `integration-engine-${++engineCounter}`,
     capabilities,
-    highlight: highlight as ReturnType<typeof vi.fn>,
+    highlight: highlight as Mock<HighlightEngine['highlight']>,
     dispose: vi.fn(),
   }
 }
@@ -240,7 +240,7 @@ describe('composable', () => {
     const fake = engine(
       vi.fn(() => {
         if (fail) throw new Error('nope')
-        return result('ok')
+        return result('x')
       }),
     )
     let api!: ReturnType<typeof useSyntaxHighlighter>
@@ -256,7 +256,7 @@ describe('composable', () => {
     fail = false
     await api.refresh()
     expect(api.error.value).toBeUndefined()
-    expect(api.result.value?.lines[0]?.tokens[0]?.text).toBe('ok')
+    expect(api.result.value?.lines[0]?.tokens[0]?.text).toBe('x')
   })
 
   it('supports async engines and reports loading', async () => {

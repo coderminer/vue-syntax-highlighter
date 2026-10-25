@@ -1,6 +1,6 @@
 import { flushPromises } from '@vue/test-utils'
 import { renderToString } from '@vue/server-renderer'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi, type Mock } from 'vitest'
 import { createSSRApp, h } from 'vue'
 import { SyntaxHighlighter } from '@/component/SyntaxHighlighter'
 import { SyntaxHighlighterProvider } from '@/component/SyntaxHighlighterProvider'
@@ -23,11 +23,11 @@ function makeEngine(
     makeResult(request.code, request.language),
   ),
   capabilities: { sync?: boolean } = { sync: true },
-): HighlightEngine & { highlight: ReturnType<typeof vi.fn> } {
+): HighlightEngine & { highlight: Mock<HighlightEngine['highlight']> } {
   return {
     id: `ssr-engine-${++counter}`,
     capabilities,
-    highlight: highlight as ReturnType<typeof vi.fn>,
+    highlight: highlight as Mock<HighlightEngine['highlight']>,
   }
 }
 
@@ -100,6 +100,28 @@ describe('server rendering', () => {
     expect(html).toContain('deferred')
     expect(html).toContain('aria-busy="true"')
     expect(engine.highlight).not.toHaveBeenCalled()
+  })
+
+  it('isolates the default cache between application instances', async () => {
+    const engine = makeEngine()
+    const render = () => h(SyntaxHighlighter, { code: 'same source', language: 'js', engine })
+    await renderToString(createSSRApp({ render }))
+    await renderToString(createSSRApp({ render }))
+    expect(engine.highlight).toHaveBeenCalledTimes(2)
+  })
+
+  it('shares the default cache within one application instance', async () => {
+    const engine = makeEngine()
+    const html = await renderToString(
+      createSSRApp({
+        render: () => [
+          h(SyntaxHighlighter, { code: 'same source', language: 'js', engine }),
+          h(SyntaxHighlighter, { code: 'same source', language: 'js', engine }),
+        ],
+      }),
+    )
+    expect(engine.highlight).toHaveBeenCalledTimes(1)
+    expect(html).toContain('vsh-token-keyword')
   })
 
   it('emits one provider scope with theme variables for a subtree', async () => {

@@ -8,7 +8,12 @@ import type {
 } from '../types.js'
 import { type EngineChoice, requestCacheKey } from './engine.js'
 import { selectEngine, type HighlighterContext } from './context.js'
-import { assertHighlightResult, freezeResult, normalizeSource } from './source.js'
+import {
+  assertHighlightResult,
+  freezeResult,
+  normalizeSource,
+  resultToSource,
+} from './source.js'
 import { warnOnce } from './warn.js'
 
 export interface ControllerInput {
@@ -55,7 +60,6 @@ export function createHighlightController(options: ControllerOptions): Highlight
   let hasStarted = false
   let lastAppliedKey: string | undefined
   let scheduled = false
-  let abortController: AbortController | undefined
 
   const { context } = options
 
@@ -87,9 +91,15 @@ export function createHighlightController(options: ControllerOptions): Highlight
     options.onError?.(normalized)
   }
 
-  function validate(value: HighlightResult): HighlightResult {
+  function validate(value: HighlightResult, expectedCode: string): HighlightResult {
     assertHighlightResult(value)
-    return freezeResult(value)
+    const frozen = freezeResult(value)
+    if (resultToSource(frozen) !== expectedCode) {
+      throw new TypeError(
+        '[vue-syntax-highlighter] Highlight engine returned tokens that do not reproduce the source text.',
+      )
+    }
+    return frozen
   }
 
   async function execute(
@@ -113,13 +123,16 @@ export function createHighlightController(options: ControllerOptions): Highlight
     const request: HighlightRequest = {
       code: input.code,
       language: input.language,
-      ...(abortController ? { signal: abortController.signal } : {}),
+      signal: context.abortSignal,
     }
 
     try {
+      if (force) context.cache.delete(key)
       const produced = context.cache.request(key, () => {
         const value = engine.highlight(request, input.engineOptions)
-        return isPromiseLike(value) ? value.then(validate) : validate(value)
+        return isPromiseLike(value)
+          ? value.then((result) => validate(result, input.code))
+          : validate(value, input.code)
       })
 
       if (isPromiseLike(produced)) {
@@ -159,8 +172,6 @@ export function createHighlightController(options: ControllerOptions): Highlight
 
     hasStarted = true
     generation += 1
-    abortController?.abort()
-    abortController = new AbortController()
     const expectedGeneration = generation
     busy.value = false
     error.value = undefined
@@ -168,7 +179,7 @@ export function createHighlightController(options: ControllerOptions): Highlight
     const request: HighlightRequest = {
       code: input.code,
       language: input.language,
-      signal: abortController.signal,
+      signal: context.abortSignal,
     }
     const key = requestCacheKey(engine, request, input.engineOptions)
     if (key === lastAppliedKey && result.value) return true
@@ -176,7 +187,9 @@ export function createHighlightController(options: ControllerOptions): Highlight
     try {
       const produced = context.cache.request(key, () => {
         const value = engine.highlight(request, input.engineOptions)
-        return isPromiseLike(value) ? value.then(validate) : validate(value)
+        return isPromiseLike(value)
+          ? value.then((result) => validate(result, input.code))
+          : validate(value, input.code)
       })
       if (isPromiseLike(produced)) {
         busy.value = true
@@ -199,8 +212,6 @@ export function createHighlightController(options: ControllerOptions): Highlight
   async function runAsync(force: boolean): Promise<HighlightResult | undefined> {
     if (disposed) return undefined
     const expectedGeneration = ++generation
-    abortController?.abort()
-    abortController = new AbortController()
     busy.value = true
     error.value = undefined
 
@@ -245,10 +256,12 @@ export function createHighlightController(options: ControllerOptions): Highlight
     )
     const produced = context.cache.request(key, () => {
       const value = engine.highlight(
-        { code, language },
+        { code, language, signal: context.abortSignal },
         current.engineOptions,
       )
-      return isPromiseLike(value) ? value.then(validate) : validate(value)
+      return isPromiseLike(value)
+        ? value.then((result) => validate(result, code))
+        : validate(value, code)
     })
     return produced
   }
@@ -266,8 +279,6 @@ export function createHighlightController(options: ControllerOptions): Highlight
     disposed = true
     scheduled = false
     generation += 1
-    abortController?.abort()
-    abortController = undefined
     busy.value = false
   }
 

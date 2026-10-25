@@ -101,7 +101,7 @@ Every scope exposes both light and dark variables for base colors and every toke
 --vsh-dark-...
 ```
 
-The stylesheet maps them to `--vsh-bg`, `--vsh-fg`, `--vsh-gutter`, `--vsh-line-highlight`, `--vsh-selection`, and `--vsh-font-family`, then to token classes. You can override any variable from application CSS without changing the theme or re-highlighting:
+The stylesheet resolves the light/dark sets through `light-dark()` using the nearest scope's `color-scheme`. Application CSS can override the documented `--vsh-bg`, `--vsh-fg`, `--vsh-gutter`, `--vsh-line-highlight`, `--vsh-selection`, and `--vsh-font-family` aliases, or the per-token `--vsh-light-*`/`--vsh-dark-*` variables, without changing the theme or re-highlighting:
 
 ```css
 .my-code-block {

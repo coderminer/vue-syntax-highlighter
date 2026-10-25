@@ -1,4 +1,4 @@
-import { shallowReactive, type InjectionKey } from 'vue'
+import { getCurrentInstance, shallowReactive, type InjectionKey } from 'vue'
 import type {
   ColorScheme,
   HighlighterOptions,
@@ -29,6 +29,8 @@ export interface HighlighterContext {
   cache: HighlightCacheLike
   cacheOwned: boolean
   engineManager: EngineManager
+  abortController: AbortController
+  abortSignal: AbortSignal
   warningSet: WarningSet
   defer?: boolean
   rootMargin?: string
@@ -74,12 +76,17 @@ export function createHighlighterContext(
   assertEngines(options.engines)
 
   const warningSet = parent?.warningSet ?? createWarningSet()
-  if (options.colorScheme && !['auto', 'light', 'dark'].includes(options.colorScheme)) {
+  let contextColorScheme = options.colorScheme
+  if (
+    contextColorScheme !== undefined &&
+    !['auto', 'light', 'dark'].includes(contextColorScheme)
+  ) {
     warnOnce(
       'context-color-scheme',
-      `Unknown colorScheme "${String(options.colorScheme)}"; expected auto, light, or dark.`,
+      `Unknown colorScheme "${String(contextColorScheme)}"; expected auto, light, or dark.`,
       warningSet,
     )
+    contextColorScheme = undefined
   }
 
   let cache: HighlightCacheLike
@@ -107,6 +114,7 @@ export function createHighlighterContext(
     ...(options.themeRegistry ?? {}),
   }
 
+  const abortController = new AbortController()
   const context: HighlighterContext = shallowReactive({
     id: nextContextId++,
     parent,
@@ -116,13 +124,15 @@ export function createHighlighterContext(
     cache,
     cacheOwned,
     engineManager: new EngineManager(engines, warningSet),
+    abortController,
+    abortSignal: abortController.signal,
     warningSet,
     providesScope,
     disposed: false,
     ...(options.engine !== undefined ? { engine: options.engine } : {}),
     ...(options.theme !== undefined ? { theme: options.theme } : {}),
     ...(options.themes !== undefined ? { themes: options.themes } : {}),
-    ...(options.colorScheme !== undefined ? { colorScheme: options.colorScheme } : {}),
+    ...(contextColorScheme !== undefined ? { colorScheme: contextColorScheme } : {}),
     ...(options.defer !== undefined ? { defer: options.defer } : {}),
     ...(options.rootMargin !== undefined ? { rootMargin: options.rootMargin } : {}),
     ...(options.virtualized !== undefined ? { virtualized: options.virtualized } : {}),
@@ -138,6 +148,67 @@ let globalContext: HighlighterContext | undefined
 export function getGlobalContext(): HighlighterContext {
   globalContext ??= createHighlighterContext({}, undefined, false)
   return globalContext
+}
+
+const appContexts = new WeakMap<object, HighlighterContext>()
+
+/**
+ * Components without a provider/plugin get one context per Vue application.
+ * This keeps browser state shared within an app while isolating SSR requests
+ * (each request creates its own app context) from one another.
+ */
+export function getDefaultContext(): HighlighterContext {
+  const appContext = getCurrentInstance()?.appContext
+  if (!appContext) return getGlobalContext()
+  let context = appContexts.get(appContext)
+  if (!context) {
+    context = createHighlighterContext({}, undefined, false)
+    appContexts.set(appContext, context)
+  }
+  return context
+}
+
+export interface HighlighterBehavior {
+  defer: boolean
+  rootMargin: string
+  virtualized: boolean | 'auto'
+  virtualizeAfter: number
+}
+
+export const DEFAULT_HIGHLIGHTER_BEHAVIOR: HighlighterBehavior = Object.freeze({
+  defer: false,
+  rootMargin: '200px 0px',
+  virtualized: false,
+  virtualizeAfter: 2000,
+})
+
+export function selectHighlighterBehavior(context: HighlighterContext): HighlighterBehavior {
+  let defer: boolean | undefined
+  let rootMargin: string | undefined
+  let virtualized: boolean | 'auto' | undefined
+  let virtualizeAfter: number | undefined
+
+  let current: HighlighterContext | undefined = context
+  while (current) {
+    if (defer === undefined && current.defer !== undefined) defer = current.defer
+    if (rootMargin === undefined && current.rootMargin !== undefined) {
+      rootMargin = current.rootMargin
+    }
+    if (virtualized === undefined && current.virtualized !== undefined) {
+      virtualized = current.virtualized
+    }
+    if (virtualizeAfter === undefined && current.virtualizeAfter !== undefined) {
+      virtualizeAfter = current.virtualizeAfter
+    }
+    current = current.parent
+  }
+
+  return {
+    defer: defer ?? DEFAULT_HIGHLIGHTER_BEHAVIOR.defer,
+    rootMargin: rootMargin ?? DEFAULT_HIGHLIGHTER_BEHAVIOR.rootMargin,
+    virtualized: virtualized ?? DEFAULT_HIGHLIGHTER_BEHAVIOR.virtualized,
+    virtualizeAfter: virtualizeAfter ?? DEFAULT_HIGHLIGHTER_BEHAVIOR.virtualizeAfter,
+  }
 }
 
 export interface EngineSelection {
@@ -247,6 +318,7 @@ export async function preloadLanguages(context: HighlighterContext): Promise<voi
 export function disposeContext(context: HighlighterContext): void {
   if (context.disposed) return
   context.disposed = true
+  context.abortController.abort()
   context.engineManager.dispose()
   if (context.cacheOwned) context.cache.clear()
 }

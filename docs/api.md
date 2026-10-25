@@ -18,7 +18,7 @@
 | `vue-syntax-highlighter/styles.css` | Base layout and token stylesheet |
 | `vue-syntax-highlighter/package.json` | Package metadata |
 
-Public types: `ColorScheme`, `EngineOptions`, `HighlightCacheLike`, `HighlightEngine`, `HighlightLine`, `HighlightRequest`, `HighlightResult`, `HighlightToken`, `HighlighterOptions`, `LineRenderInfo`, `LineSlotProps`, `SyntaxHighlighterEmits`, `SyntaxHighlighterExposed`, `SyntaxHighlighterProps`, `ThemeColorsInput`, `ThemeDefinition`, `ThemeInput`, `ThemePair`, `TokenSlotProps`, `TokenStyle`, `TokenType`, `CacheKeyInput`, `ResultCacheOptions`, `HighlighterContext`, `EngineChoice`, `EngineLoader`, `EngineRegistry`, `BuiltinEngineId`, `VueSyntaxHighlighterOptions`, `VueSyntaxHighlighterPlugin`, `UseSyntaxHighlighterOptions`, `UseSyntaxHighlighterReturn`.
+Public types: `ColorScheme`, `EngineOptions`, `HighlightCacheLike`, `HighlightEngine`, `HighlightLine`, `HighlightRequest`, `HighlightResult`, `HighlightToken`, `HighlighterOptions`, `LineRenderInfo`, `LineSlotProps`, `SyntaxHighlighterEmits`, `SyntaxHighlighterExposed`, `SyntaxHighlighterProps`, `ThemeColorsInput`, `ThemeDefinition`, `ThemeInput`, `ThemePair`, `TokenSlotProps`, `TokenStyle`, `TokenType`, `CacheKeyInput`, `ResultCacheOptions`, `HighlightedEventContext`, `HighlighterContext`, `EngineChoice`, `EngineLoader`, `EngineRegistry`, `BuiltinEngineId`, `VueSyntaxHighlighterOptions`, `VueSyntaxHighlighterPlugin`, `UseSyntaxHighlighterOptions`, `UseSyntaxHighlighterReturn`.
 
 Deep imports into `dist/` are blocked by the exports map.
 
@@ -69,7 +69,7 @@ All content slots are optional and scoped.
 | `footer` | `{ language, theme }` |
 | `loading` | `{ busy, language, error }` |
 | `error` | `{ error, language }` |
-| `line` | `{ line, lineNumber, index, highlighted, tokens, renderTokens, renderGutter }` |
+| `line` | `{ line, lineNumber, index, highlighted, tokens, renderTokens }` |
 | `line-number` | same line payload; gutter content |
 | `token` | `{ token, index, line, lineNumber, tokenIndex, renderToken }` |
 
@@ -79,7 +79,7 @@ Line slots replace line content; the gutter, line wrapper, and highlighted-line 
 
 | Event | Payload |
 | --- | --- |
-| `highlighted` | `HighlightResult` |
+| `highlighted` | `result: HighlightResult`, `context: { language, theme, colorScheme }` |
 | `error` | `Error` |
 
 Errors never throw out of render. The component keeps the last valid result or plain text and emits one development warning per distinct failure signature.

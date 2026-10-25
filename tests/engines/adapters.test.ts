@@ -21,7 +21,7 @@ afterEach(() => {
 describe('Shiki adapter', () => {
   it('returns synchronous results after preload', async () => {
     const engine = await createShikiEngine({ preload: ['javascript'] })
-    dispose.push(() => engine.dispose())
+    dispose.push(() => engine.dispose?.())
     const result = engine.highlight({ code: 'const x = 1', language: 'javascript' })
     expect(result).not.toBeInstanceOf(Promise)
     expect(resultToSource(await result)).toBe('const x = 1')
@@ -29,7 +29,7 @@ describe('Shiki adapter', () => {
 
   it('loads a language lazily and then returns synchronously', async () => {
     const engine = await createShikiEngine()
-    dispose.push(() => engine.dispose())
+    dispose.push(() => engine.dispose?.())
     expect(engine.hasLanguage('javascript')).toBe(false)
     const pending = engine.highlight({ code: CODE, language: 'javascript' })
     expect(pending).toBeInstanceOf(Promise)
@@ -44,7 +44,7 @@ describe('Shiki adapter', () => {
 
   it('reports unavailable languages actionably', async () => {
     const engine = await createShikiEngine()
-    dispose.push(() => engine.dispose())
+    dispose.push(() => engine.dispose?.())
     await expect(
       engine.highlight({ code: 'x', language: 'not-a-real-language' }),
     ).rejects.toThrow(/not available in the Shiki adapter/)
@@ -52,10 +52,10 @@ describe('Shiki adapter', () => {
 
   it('accepts manually registered languages', async () => {
     const engine = await createShikiEngine()
-    dispose.push(() => engine.dispose())
+    dispose.push(() => engine.dispose?.())
     const module = await import('shiki/langs/javascript.mjs')
     const registration = {
-      ...((module.default as Record<string, unknown>[])[0] ?? {}),
+      ...((module.default as unknown as Record<string, unknown>[])[0] ?? {}),
       name: 'my-shiki-js',
     }
     engine.registerLanguage('my-shiki-js', registration)
@@ -67,7 +67,7 @@ describe('Shiki adapter', () => {
   it('ignores work and rejects after disposal', async () => {
     const engine = await createShikiEngine()
     await engine.loadLanguage('javascript')
-    engine.dispose()
+    engine.dispose?.()
     await expect(engine.highlight({ code: 'x', language: 'javascript' })).rejects.toThrow(
       /disposed/,
     )
@@ -77,7 +77,7 @@ describe('Shiki adapter', () => {
 describe('highlight.js adapter', () => {
   it('returns synchronous results after preload', async () => {
     const engine = await createHighlightjsEngine({ preload: ['javascript'] })
-    dispose.push(() => engine.dispose())
+    dispose.push(() => engine.dispose?.())
     const result = engine.highlight({ code: 'const x = 1', language: 'javascript' })
     expect(result).not.toBeInstanceOf(Promise)
     expect(resultToSource(await result)).toBe('const x = 1')
@@ -85,7 +85,7 @@ describe('highlight.js adapter', () => {
 
   it('loads a language lazily and then returns synchronously', async () => {
     const engine = await createHighlightjsEngine()
-    dispose.push(() => engine.dispose())
+    dispose.push(() => engine.dispose?.())
     expect(engine.hasLanguage('javascript')).toBe(false)
     const pending = engine.highlight({ code: CODE, language: 'javascript' })
     expect(pending).toBeInstanceOf(Promise)
@@ -102,7 +102,7 @@ describe('highlight.js adapter', () => {
     await expect(engine.highlight({ code: 'x', language: 'nope' })).rejects.toThrow(
       /not available in the highlight.js adapter/,
     )
-    engine.dispose()
+    engine.dispose?.()
     await expect(engine.highlight({ code: 'x', language: 'javascript' })).rejects.toThrow(
       /disposed/,
     )
@@ -110,7 +110,7 @@ describe('highlight.js adapter', () => {
 
   it('accepts manually registered grammars', async () => {
     const engine = await createHighlightjsEngine()
-    dispose.push(() => engine.dispose())
+    dispose.push(() => engine.dispose?.())
     const module = await import('highlight.js/lib/languages/javascript')
     engine.registerLanguage('my-hljs', module.default)
     const result = engine.highlight({ code: 'const a = 1', language: 'my-hljs' })
@@ -121,7 +121,7 @@ describe('highlight.js adapter', () => {
 describe('lowlight entry', () => {
   it('exposes the lowlight-backed implementation under its own name', async () => {
     const engine = await createLowlightEngine()
-    dispose.push(() => engine.dispose())
+    dispose.push(() => engine.dispose?.())
     const result = await engine.highlight({ code: 'const x = 1', language: 'javascript' })
     expect(resultToSource(result)).toBe('const x = 1')
     expect(engine.id).toBe('highlightjs')
@@ -131,7 +131,7 @@ describe('lowlight entry', () => {
 describe('Prism adapter', () => {
   it('returns synchronous results after preload', async () => {
     const engine = await createPrismEngine({ preload: ['ocaml'] })
-    dispose.push(() => engine.dispose())
+    dispose.push(() => engine.dispose?.())
     const result = engine.highlight({ code: 'const x = 1', language: 'ocaml' })
     expect(result).not.toBeInstanceOf(Promise)
     expect(resultToSource(await result)).toBe('const x = 1')
@@ -139,7 +139,7 @@ describe('Prism adapter', () => {
 
   it('loads a language lazily and then returns synchronously', async () => {
     const engine = await createPrismEngine()
-    dispose.push(() => engine.dispose())
+    dispose.push(() => engine.dispose?.())
     expect(engine.hasLanguage('julia')).toBe(false)
     const pending = engine.highlight({ code: CODE, language: 'julia' })
     expect(pending).toBeInstanceOf(Promise)
@@ -156,13 +156,13 @@ describe('Prism adapter', () => {
     await expect(engine.highlight({ code: 'x', language: 'nope' })).rejects.toThrow(
       /not available in the Prism adapter/,
     )
-    engine.dispose()
+    engine.dispose?.()
     expect(() => engine.highlight({ code: 'x', language: 'rust' })).toThrow(/disposed/)
   })
 
   it('accepts manually registered grammars', async () => {
     const engine = await createPrismEngine()
-    dispose.push(() => engine.dispose())
+    dispose.push(() => engine.dispose?.())
     const module = await import('refractor/ruby')
     engine.registerLanguage('my-prism', module.default)
     const result = engine.highlight({ code: 'puts "hi"', language: 'my-prism' })
@@ -190,7 +190,7 @@ describe('cross-adapter contract', () => {
     const shiki: ShikiEngine = await createShikiEngine()
     const highlightjs: HighlightjsEngine = await createHighlightjsEngine()
     const prism: PrismEngine = await createPrismEngine()
-    dispose.push(() => shiki.dispose(), () => highlightjs.dispose(), () => prism.dispose())
+    dispose.push(() => shiki.dispose?.(), () => highlightjs.dispose?.(), () => prism.dispose?.())
 
     for (const language of sharedLanguages) {
       try {

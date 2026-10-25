@@ -76,6 +76,41 @@ test.describe('deferral', () => {
   })
 })
 
+test.describe('nested scheme scopes', () => {
+  test('a nested light scope overrides an automatic ancestor under dark preference', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: 'dark' })
+    await page.goto('/e2e-fixtures')
+    const automatic = page.getByTestId('auto-scheme-block')
+    const forcedLight = page.getByTestId('light-scheme-block')
+    await expect(automatic).toBeVisible()
+    await expect(forcedLight).toBeVisible()
+    await expect(automatic.locator('.vsh-token-keyword').first()).toBeVisible({
+      timeout: 30_000,
+    })
+    await expect(forcedLight.locator('.vsh-token-keyword').first()).toBeVisible({
+      timeout: 30_000,
+    })
+    const colors = await page.evaluate(() => {
+      const auto = document.querySelector('[data-testid="auto-scheme-block"]')
+      const light = document.querySelector('[data-testid="light-scheme-block"]')
+      const autoToken = auto?.querySelector('.vsh-token-keyword')
+      const lightToken = light?.querySelector('.vsh-token-keyword')
+      return {
+        autoBackground: auto ? getComputedStyle(auto).backgroundColor : null,
+        lightBackground: light ? getComputedStyle(light).backgroundColor : null,
+        autoToken: autoToken ? getComputedStyle(autoToken).color : null,
+        lightToken: lightToken ? getComputedStyle(lightToken).color : null,
+      }
+    })
+    expect(colors.autoBackground).toBe('rgb(13, 17, 23)')
+    expect(colors.lightBackground).toBe('rgb(255, 255, 255)')
+    expect(colors.autoToken).toBe('rgb(255, 123, 114)')
+    expect(colors.lightToken).toBe('rgb(207, 34, 46)')
+  })
+})
+
 test.describe('50k-line stress demo', () => {
   test('bounds the DOM and reveals lines while scrolling', async ({ page }) => {
     test.setTimeout(120_000)
@@ -97,6 +132,14 @@ test.describe('50k-line stress demo', () => {
       .toBeGreaterThan(9000)
     expect(await block.locator('.vsh-line').count()).toBeLessThanOrEqual(100)
     expect(await block.locator('.vsh-gutter').first().textContent()).toMatch(/\d+/)
+    const gutterFits = await page.evaluate(() => {
+      const line = document.querySelector('[data-testid="stress-block"] .vsh-line')
+      const gutter = line?.querySelector('.vsh-gutter')
+      const content = line?.querySelector('.vsh-line-content')
+      if (!gutter || !content) return false
+      return gutter.getBoundingClientRect().right <= content.getBoundingClientRect().left + 1
+    })
+    expect(gutterFits).toBe(true)
 
     const results = await new AxeBuilder({ page }).analyze()
     expect(results.violations).toEqual([])

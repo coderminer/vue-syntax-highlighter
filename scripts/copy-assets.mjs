@@ -11,7 +11,8 @@ const readable = readFileSync(source, 'utf8')
 const minified = readable
   .replace(/\/\*[\s\S]*?\*\//g, '')
   .replace(/\s+/g, ' ')
-  .replace(/\s*([{}:;,>])\s*/g, '$1')
+  .replace(/\s*([{};,>])\s*/g, '$1')
+  .replace(/:\s+/g, ':')
   .trim()
 writeFileSync(target, `${minified}\n`, 'utf8')
 

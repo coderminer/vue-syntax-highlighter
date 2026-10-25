@@ -11,6 +11,8 @@ import { createPlainResult, normalizeSource, resultToSource, splitSource } from 
 import { mapShikiScopes } from '../../core/token-types.js'
 import { languageAliases, languageLoaders, supportedLanguages } from './languages.js'
 
+export { languageAliases, languageLoaders, supportedLanguages }
+
 const NEUTRAL_THEME = {
   name: 'vsh-neutral',
   type: 'dark' as const,
@@ -29,6 +31,8 @@ export type ShikiLanguageLoader = () => Promise<unknown>
 export interface ShikiEngine extends HighlightEngine {
   readonly id: 'shiki'
   readonly capabilities: { sync: true }
+  hasLanguage(language: string): boolean
+  loadLanguage(language: string): Promise<void>
   registerLanguage(name: string, language: ShikiLanguageRegistration | ShikiLanguageLoader): void
   readonly supportedLanguages: readonly string[]
 }

@@ -48,6 +48,15 @@ export const VueSyntaxHighlighter: VueSyntaxHighlighterPlugin = {
         disposeContext(context)
         installedContexts.delete(app)
       })
+    } else {
+      // Vue 3.4 does not expose app.onUnmount. Preserve app-owned resource
+      // disposal without requiring a newer Vue release.
+      const originalUnmount = app.unmount
+      app.unmount = () => {
+        disposeContext(context)
+        installedContexts.delete(app)
+        originalUnmount.call(app)
+      }
     }
 
     void preloadLanguages(context)

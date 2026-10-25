@@ -18,12 +18,14 @@ import type {
 import {
   createHighlighterContext,
   disposeContext,
-  getGlobalContext,
+  getDefaultContext,
   HIGHLIGHTER_CONTEXT,
   preloadLanguages,
   type HighlighterContext,
 } from '../core/context.js'
 import type { EngineChoice, EngineRegistry } from '../core/engine.js'
+import { isColorScheme } from '../core/theme.js'
+import { warnOnce } from '../core/warn.js'
 import { useResolvedTheme } from './use-theme.js'
 
 export const SyntaxHighlighterProvider = defineComponent({
@@ -51,7 +53,7 @@ export const SyntaxHighlighterProvider = defineComponent({
     virtualizeAfter: { type: Number, default: undefined },
   },
   setup(props, { slots }) {
-    const parent = inject(HIGHLIGHTER_CONTEXT, getGlobalContext())
+    const parent = inject(HIGHLIGHTER_CONTEXT, null) ?? getDefaultContext()
     const context = createHighlighterContext(
       {
         ...(props.engine !== undefined ? { engine: props.engine } : {}),
@@ -80,7 +82,7 @@ export const SyntaxHighlighterProvider = defineComponent({
     const resolvedTheme = useResolvedTheme(context, () => ({
       theme: props.theme,
       themes: props.themes,
-      colorScheme: props.colorScheme,
+      colorScheme: isColorScheme(props.colorScheme) ? props.colorScheme : undefined,
     }))
 
     watch(
@@ -107,14 +109,56 @@ export const SyntaxHighlighterProvider = defineComponent({
     watch(
       () => props.colorScheme,
       (value) => {
-        if (value === undefined) delete context.colorScheme
-        else context.colorScheme = value
+        if (value === undefined) {
+          delete context.colorScheme
+        } else if (isColorScheme(value)) {
+          context.colorScheme = value
+        } else {
+          delete context.colorScheme
+          warnOnce(
+            'context-color-scheme',
+            `Unknown colorScheme "${String(value)}"; expected auto, light, or dark.`,
+            context.warningSet,
+          )
+        }
+      },
+    )
+    const mergeLanguages = (value: readonly string[] | undefined): string[] => [
+      ...new Set([...(parent.languages ?? []), ...(value ?? [])]),
+    ]
+    watch(
+      [() => props.languages, () => parent.languages],
+      () => {
+        context.languages = mergeLanguages(props.languages)
+        void preloadLanguages(context)
       },
     )
     watch(
-      () => props.languages,
+      () => props.defer,
       (value) => {
-        if (value) context.languages = [...new Set(value)]
+        if (value === undefined) delete context.defer
+        else context.defer = value
+      },
+    )
+    watch(
+      () => props.rootMargin,
+      (value) => {
+        if (value === undefined) delete context.rootMargin
+        else context.rootMargin = value
+      },
+    )
+    watch(
+      () => props.virtualized,
+      (value) => {
+        if (value === undefined) delete context.virtualized
+        else context.virtualized = value
+      },
+    )
+    watch(
+      () => props.virtualizeAfter,
+      (value) => {
+        if (value === undefined) delete context.virtualizeAfter
+        else context.virtualizeAfter = value
       },
     )
 

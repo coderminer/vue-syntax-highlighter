@@ -16,10 +16,15 @@ import type {
   HighlightLine,
   HighlightResult,
   HighlightToken,
+  HighlightedEventContext,
   LineRenderInfo,
   TokenRenderInfo,
 } from '../types.js'
-import { getGlobalContext, HIGHLIGHTER_CONTEXT } from '../core/context.js'
+import {
+  getDefaultContext,
+  HIGHLIGHTER_CONTEXT,
+  selectHighlighterBehavior,
+} from '../core/context.js'
 import { createHighlightController } from '../core/controller.js'
 import { normalizeProps, highlighterProps, type RawHighlighterProps } from '../core/props.js'
 import { createPlainResult, normalizeSource } from '../core/source.js'
@@ -47,19 +52,23 @@ export const SyntaxHighlighter = defineComponent({
   inheritAttrs: false,
   props: highlighterProps,
   emits: {
-    highlighted: (_result: HighlightResult) => true,
+    highlighted: (_result: HighlightResult, _context: HighlightedEventContext) => true,
     error: (_error: Error) => true,
   },
   setup(props, { attrs, slots, emit, expose }) {
-    const context = inject(HIGHLIGHTER_CONTEXT, getGlobalContext())
+    const context = inject(HIGHLIGHTER_CONTEXT, null) ?? getDefaultContext()
     const normalized = computed(() =>
-      normalizeProps(props as unknown as RawHighlighterProps, context.warningSet),
+      normalizeProps(
+        props as unknown as RawHighlighterProps,
+        context.warningSet,
+        selectHighlighterBehavior(context),
+      ),
     )
 
     const resolvedTheme = useResolvedTheme(context, () => ({
-      theme: props.theme,
-      themes: props.themes,
-      colorScheme: props.colorScheme,
+      theme: normalized.value.theme,
+      themes: normalized.value.themes,
+      colorScheme: normalized.value.colorScheme,
     }))
 
     const hasProviderScope = computed(() => {
@@ -94,7 +103,14 @@ export const SyntaxHighlighter = defineComponent({
         }
       },
       isDeferred: () => normalized.value.defer,
-      onResult: (result) => emit('highlighted', result),
+      onResult: (result) => {
+        const theme = resolvedTheme.theme.value
+        emit('highlighted', result, {
+          language: result.language,
+          theme: theme.scopeName,
+          colorScheme: theme.mode,
+        })
+      },
       onError: (error) => emit('error', error),
     })
 
@@ -221,7 +237,6 @@ export const SyntaxHighlighter = defineComponent({
           ...info,
           tokens: line.tokens,
           renderTokens,
-          renderGutter: () => null,
         }
         const content = slots['line-number']?.(payload) ?? String(lineNumber)
         return h('span', { class: 'vsh-gutter', 'aria-hidden': 'true' }, content)
@@ -231,7 +246,6 @@ export const SyntaxHighlighter = defineComponent({
         ...info,
         tokens: line.tokens,
         renderTokens,
-        renderGutter,
       }
       const slotContent = slots.line?.(linePayload)
       const content = slotContent ?? renderTokens()
@@ -306,17 +320,29 @@ export const SyntaxHighlighter = defineComponent({
         void controller.start()
         return
       }
-      observer = new IntersectionObserver(
-        (entries) => {
-          if (entries.some((entry) => entry.isIntersecting)) {
-            observer?.disconnect()
-            observer = undefined
-            void controller.start()
-          }
-        },
-        { rootMargin: normalized.value.rootMargin },
-      )
-      observer.observe(observed)
+      try {
+        observer = new IntersectionObserver(
+          (entries) => {
+            if (entries.some((entry) => entry.isIntersecting)) {
+              observer?.disconnect()
+              observer = undefined
+              void controller.start()
+            }
+          },
+          { rootMargin: normalized.value.rootMargin },
+        )
+        observer.observe(observed)
+      } catch (error) {
+        observer = undefined
+        warnOnce(
+          'intersection-observer',
+          `Unable to observe the deferred block: ${
+            error instanceof Error ? error.message : String(error)
+          }. Highlighting immediately instead.`,
+          context.warningSet,
+        )
+        void controller.start()
+      }
     })
 
     onBeforeUnmount(() => {
@@ -331,12 +357,7 @@ export const SyntaxHighlighter = defineComponent({
     })
 
     watch(
-      () => [
-        normalized.value.code,
-        normalized.value.language,
-        normalized.value.engine,
-        normalized.value.engineOptions,
-      ],
+      () => [props.code, props.language, props.engine, props.engineOptions, context.engine],
       () => controller.schedule(),
     )
 
@@ -375,9 +396,21 @@ export const SyntaxHighlighter = defineComponent({
       const window = virtualWindow.value
       const { class: attrClass, style: attrStyle, ...restAttrs } = attrs
 
+      const gutterDigits = Math.max(
+        3,
+        String(current.startLine + Math.max(0, renderedLines.value.length - 1)).length,
+      )
+      const gutterStyle = current.lineNumbers
+        ? { '--vsh-gutter-width': `${gutterDigits + 0.25}ch` }
+        : undefined
       const rootStyle = ownsScope.value
-        ? [resolvedTheme.variables.value, current.customStyle, attrStyle]
-        : [current.customStyle, attrStyle]
+        ? [
+            resolvedTheme.variables.value,
+            gutterStyle,
+            current.customStyle,
+            attrStyle,
+          ]
+        : [gutterStyle, current.customStyle, attrStyle]
 
       const rootAttributes: Record<string, unknown> = {
         ...restAttrs,

@@ -7,6 +7,7 @@ import type {
   ThemePair,
 } from '../types.js'
 import type { EngineChoice } from './engine.js'
+import type { HighlighterBehavior } from './context.js'
 import { warnOnce, type WarningSet } from './warn.js'
 
 export interface RawHighlighterProps {
@@ -24,13 +25,13 @@ export interface RawHighlighterProps {
   wrap?: boolean | null
   wrapLines?: boolean | null
   virtualized?: boolean | 'auto' | null
-  virtualizeAfter?: number
+  virtualizeAfter?: number | null
   height?: string | number
   maxHeight?: string | number
   lineHeight?: number
   overscan?: number
-  defer?: boolean
-  rootMargin?: string
+  defer?: boolean | null
+  rootMargin?: string | null
   preTag?: string | Component
   codeTag?: string | Component
   lineProps?: (info: unknown) => Record<string, unknown> | undefined
@@ -88,13 +89,13 @@ export const highlighterProps = {
   wrap: { type: Boolean, default: null },
   wrapLines: { type: Boolean, default: null },
   virtualized: { type: [Boolean, String] as PropType<boolean | 'auto'>, default: null },
-  virtualizeAfter: { type: Number, default: 2000 },
+  virtualizeAfter: { type: Number, default: null },
   height: { type: [String, Number] as PropType<string | number>, default: undefined },
   maxHeight: { type: [String, Number] as PropType<string | number>, default: undefined },
   lineHeight: { type: Number, default: 20 },
   overscan: { type: Number, default: 10 },
-  defer: { type: Boolean, default: false },
-  rootMargin: { type: String, default: '200px 0px' },
+  defer: { type: Boolean, default: null },
+  rootMargin: { type: String, default: null },
   preTag: { type: [String, Object, Function] as PropType<string | Component>, default: 'pre' },
   codeTag: { type: [String, Object, Function] as PropType<string | Component>, default: 'code' },
   lineProps: {
@@ -160,13 +161,14 @@ export function normalizeLanguage(value: string | undefined): string {
 }
 
 export function languageClassName(language: string): string {
-  const safe = language.replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '')
+  const safe = language.replace(/[^a-z0-9_+#-]+/g, '-').replace(/^-+|-+$/g, '')
   return `language-${safe || 'text'}`
 }
 
 export function normalizeProps(
   raw: RawHighlighterProps,
   warningSet: WarningSet,
+  behavior?: HighlighterBehavior,
 ): NormalizedProps {
   if (raw.showLineNumbers !== null && raw.showLineNumbers !== undefined) {
     warnOnce('prop-showLineNumbers', DEPRECATED_PROP_WARNINGS.showLineNumbers, warningSet)
@@ -181,6 +183,16 @@ export function normalizeProps(
     warnOnce('prop-codeTagProps', DEPRECATED_PROP_WARNINGS.codeTagProps, warningSet)
   }
 
+  let colorScheme = raw.colorScheme
+  if (colorScheme !== undefined && !['auto', 'light', 'dark'].includes(colorScheme)) {
+    warnOnce(
+      'prop-colorScheme',
+      `Unknown colorScheme "${String(colorScheme)}". Expected "auto", "light", or "dark".`,
+      warningSet,
+    )
+    colorScheme = undefined
+  }
+
   const lineNumbers =
     raw.lineNumbers !== null && raw.lineNumbers !== undefined
       ? Boolean(raw.lineNumbers)
@@ -192,7 +204,9 @@ export function normalizeProps(
   const virtualized =
     raw.virtualized === 'auto' || raw.virtualized === true
       ? raw.virtualized
-      : false
+      : raw.virtualized === false
+        ? false
+        : (behavior?.virtualized ?? false)
 
   return {
     code: typeof raw.code === 'string' ? raw.code : '',
@@ -202,19 +216,23 @@ export function normalizeProps(
     engineOptions: raw.engineOptions ?? {},
     theme: raw.theme,
     themes: raw.themes,
-    colorScheme: raw.colorScheme,
+    colorScheme,
     lineNumbers,
     startLine: normalizeInteger(raw.startLine, 1),
     highlightLines: normalizeLines(raw.highlightLines),
     wrap,
     virtualized,
-    virtualizeAfter: normalizeInteger(raw.virtualizeAfter, 2000, 1),
+    virtualizeAfter: normalizeInteger(
+      raw.virtualizeAfter ?? undefined,
+      behavior?.virtualizeAfter ?? 2000,
+      1,
+    ),
     height: raw.height,
     maxHeight: raw.maxHeight,
     lineHeight: normalizeInteger(raw.lineHeight, 20, 1),
     overscan: normalizeInteger(raw.overscan, 10, 0),
-    defer: Boolean(raw.defer),
-    rootMargin: raw.rootMargin?.trim() || '200px 0px',
+    defer: raw.defer ?? behavior?.defer ?? false,
+    rootMargin: raw.rootMargin?.trim() || behavior?.rootMargin || '200px 0px',
     preTag: raw.preTag ?? 'pre',
     codeTag: raw.codeTag ?? 'code',
     lineProps: raw.lineProps,

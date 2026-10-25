@@ -16,7 +16,7 @@ import type {
   HighlightLine,
 } from '../types.js'
 import {
-  getGlobalContext,
+  getDefaultContext,
   HIGHLIGHTER_CONTEXT,
   type HighlighterContext,
 } from '../core/context.js'
@@ -51,7 +51,8 @@ export interface UseSyntaxHighlighterReturn {
 export function useSyntaxHighlighter(
   options: UseSyntaxHighlighterOptions,
 ): UseSyntaxHighlighterReturn {
-  const context = options.context ?? inject(HIGHLIGHTER_CONTEXT, getGlobalContext())
+  const context =
+    options.context ?? inject(HIGHLIGHTER_CONTEXT, null) ?? getDefaultContext()
   const instance = getCurrentInstance()
 
   const language = computed(() => normalizeLanguage(toValue(options.language)))

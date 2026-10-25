@@ -87,8 +87,26 @@ export function hasBoundedHeight(
 function isPositiveSize(value: string | number | undefined): boolean {
   if (typeof value === 'number') return Number.isFinite(value) && value > 0
   if (typeof value !== 'string') return false
-  const trimmed = value.trim()
-  if (!trimmed || trimmed === '0') return false
+  const trimmed = value.trim().toLowerCase()
+  if (!trimmed) return false
+  if (
+    [
+      '0',
+      'auto',
+      'none',
+      'initial',
+      'inherit',
+      'unset',
+      'revert',
+      'revert-layer',
+      'fit-content',
+      'min-content',
+      'max-content',
+    ].includes(trimmed)
+  ) {
+    return false
+  }
+  if (/^0(?:\.[0-9]+)?(?:[a-z%]+)?$/.test(trimmed)) return false
   return true
 }
 

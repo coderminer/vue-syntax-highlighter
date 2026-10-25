@@ -1,5 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi, type Mock } from 'vitest'
 import { h, nextTick } from 'vue'
 import { SyntaxHighlighter } from '@/component/SyntaxHighlighter'
 import { SyntaxHighlighterProvider } from '@/component/SyntaxHighlighterProvider'
@@ -25,11 +25,11 @@ function makeEngine(
     makeResult(request.code, request.language),
   ),
   capabilities: { sync?: boolean } = { sync: true },
-): HighlightEngine & { highlight: ReturnType<typeof vi.fn> } {
+): HighlightEngine & { highlight: Mock<HighlightEngine['highlight']> } {
   return {
     id: `test-engine-${++engineCounter}`,
     capabilities,
-    highlight: highlight as ReturnType<typeof vi.fn>,
+    highlight: highlight as Mock<HighlightEngine['highlight']>,
   }
 }
 
@@ -54,6 +54,11 @@ describe('SyntaxHighlighter rendering', () => {
     expect(wrapper.findAll('.vsh-token-keyword')).toHaveLength(1)
     expect(wrapper.find('.vsh-line').text()).toBe('const x = 1')
     expect(engine.highlight).toHaveBeenCalledTimes(1)
+    expect(wrapper.emitted('highlighted')?.[0]?.[1]).toMatchObject({
+      language: 'js',
+      theme: 'vsh-light',
+      colorScheme: 'light',
+    })
   })
 
   it('preserves multi-line source and empty lines', () => {
@@ -302,10 +307,24 @@ describe('theme and reactivity', () => {
     expect(spy.mock.calls.some((call) => String(call[0]).includes('Unknown theme'))).toBe(true)
   })
 
+  it('does not retry a failed highlight when only the theme changes', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const engine = makeEngine(
+      vi.fn(() => {
+        throw new Error('unsupported')
+      }),
+    )
+    const wrapper = mountWith({ engine })
+    expect(engine.highlight).toHaveBeenCalledTimes(1)
+    await wrapper.setProps({ theme: vshDark })
+    await nextTick()
+    expect(engine.highlight).toHaveBeenCalledTimes(1)
+  })
+
   it('does not re-highlight on unrelated prop changes', async () => {
     const engine = makeEngine()
     const wrapper = mountWith({ engine })
-    await wrapper.setProps({ 'aria-label': 'Updated label' })
+    await wrapper.setProps({ 'aria-label': 'Updated label' } as never)
     expect(engine.highlight).toHaveBeenCalledTimes(1)
     expect(wrapper.find('.vsh-token').text()).toBe('const x = 1')
   })
@@ -364,7 +383,7 @@ describe('exposed operations', () => {
     await (wrapper.vm as unknown as { highlight: (input: { code: string }) => Promise<HighlightResult> }).highlight({
       code: 'other',
     })
-    expect(engine.highlight).toHaveBeenCalledTimes(2)
+    expect(engine.highlight).toHaveBeenCalledTimes(3)
   })
 })
 
@@ -416,11 +435,13 @@ describe('virtualization', () => {
       height: 400,
       lineHeight: 20,
       overscan: 10,
+      lineNumbers: true,
     })
     await nextTick()
     const rendered = wrapper.findAll('.vsh-line')
     expect(rendered.length).toBeLessThanOrEqual(100)
     expect(rendered[0]?.attributes('data-line')).toBe('1')
+    expect(wrapper.find('.vsh').attributes('style')).toContain('--vsh-gutter-width: 5.25ch')
 
     const pre = wrapper.find('pre').element as HTMLElement
     pre.scrollTop = 20_000

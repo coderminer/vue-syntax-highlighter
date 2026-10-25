@@ -1,37 +1,4 @@
-/* vue-syntax-highlighter base stylesheet. Theme values are supplied as custom properties. */
-.vsh,
-.vsh-scope {
-  --vsh-bg: var(--vsh-light-bg, #ffffff);
-  --vsh-fg: var(--vsh-light-fg, #24292f);
-  --vsh-gutter: var(--vsh-light-gutter, #6e7781);
-  --vsh-line-highlight: var(--vsh-light-line-highlight, transparent);
-  --vsh-selection: var(--vsh-light-selection, #b6d7ff);
-  --vsh-font-family: var(--vsh-light-font-family, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
-  --vsh-gutter-width: 3.25ch;
-}
-
-[data-vsh-scheme='dark'] .vsh,
-[data-vsh-scheme='dark'].vsh {
-  --vsh-bg: var(--vsh-dark-bg, #0d1117);
-  --vsh-fg: var(--vsh-dark-fg, #e6edf3);
-  --vsh-gutter: var(--vsh-dark-gutter, #7d8590);
-  --vsh-line-highlight: var(--vsh-dark-line-highlight, transparent);
-  --vsh-selection: var(--vsh-dark-selection, #264f78);
-  --vsh-font-family: var(--vsh-dark-font-family, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
-}
-
-@media (prefers-color-scheme: dark) {
-  [data-vsh-scheme='auto'] .vsh,
-  [data-vsh-scheme='auto'].vsh {
-    --vsh-bg: var(--vsh-dark-bg, #0d1117);
-    --vsh-fg: var(--vsh-dark-fg, #e6edf3);
-    --vsh-gutter: var(--vsh-dark-gutter, #7d8590);
-    --vsh-line-highlight: var(--vsh-dark-line-highlight, transparent);
-    --vsh-selection: var(--vsh-dark-selection, #264f78);
-    --vsh-font-family: var(--vsh-dark-font-family, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
-  }
-}
-
+/* vue-syntax-highlighter base stylesheet. Theme values are supplied as CSS custom properties. */
 .vsh-scope {
   display: contents;
 }
@@ -39,9 +6,9 @@
 .vsh {
   position: relative;
   box-sizing: border-box;
-  background: var(--vsh-bg);
-  color: var(--vsh-fg);
-  font-family: var(--vsh-font-family);
+  background: var(--vsh-bg, light-dark(var(--vsh-light-bg, #ffffff), var(--vsh-dark-bg, #0d1117)));
+  color: var(--vsh-fg, light-dark(var(--vsh-light-fg, #24292f), var(--vsh-dark-fg, #e6edf3)));
+  font-family: var(--vsh-font-family, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
   font-size: 0.875rem;
   line-height: 1.5;
   border-radius: 6px;
@@ -62,7 +29,7 @@
 }
 
 .vsh-pre:focus-visible {
-  outline: 2px solid var(--vsh-selection);
+  outline: 2px solid var(--vsh-selection, light-dark(var(--vsh-light-selection, #b6d7ff), var(--vsh-dark-selection, #264f78)));
   outline-offset: -2px;
 }
 
@@ -81,7 +48,7 @@
 }
 
 .vsh-line-highlighted {
-  background: var(--vsh-line-highlight);
+  background: var(--vsh-line-highlight, light-dark(var(--vsh-light-line-highlight, transparent), var(--vsh-dark-line-highlight, transparent)));
 }
 
 .vsh-line-content {
@@ -104,17 +71,13 @@
   width: var(--vsh-gutter-width);
   margin-right: 1ch;
   text-align: right;
-  color: var(--vsh-gutter);
+  color: var(--vsh-gutter, light-dark(var(--vsh-light-gutter, #6e7781), var(--vsh-dark-gutter, #7d8590)));
   user-select: none;
   -webkit-user-select: none;
 }
 
 .vsh ::selection {
-  background: var(--vsh-selection);
-}
-
-.vsh-spacer {
-  width: 100%;
+  background: var(--vsh-selection, light-dark(var(--vsh-light-selection, #b6d7ff), var(--vsh-dark-selection, #264f78)));
 }
 
 .vsh-loading,
@@ -131,60 +94,372 @@
   white-space: inherit;
 }
 
-.vsh-token-plain { color: var(--vsh-light-token-plain-color, inherit); font-style: var(--vsh-light-token-plain-font-style, inherit); font-weight: var(--vsh-light-token-plain-font-weight, inherit); text-decoration: var(--vsh-light-token-plain-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-plain, .vsh[data-vsh-scheme="dark"] .vsh-token-plain { color: var(--vsh-dark-token-plain-color, inherit); font-style: var(--vsh-dark-token-plain-font-style, inherit); font-weight: var(--vsh-dark-token-plain-font-weight, inherit); text-decoration: var(--vsh-dark-token-plain-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-plain, .vsh[data-vsh-scheme="auto"] .vsh-token-plain { color: var(--vsh-dark-token-plain-color, inherit); font-style: var(--vsh-dark-token-plain-font-style, inherit); font-weight: var(--vsh-dark-token-plain-font-weight, inherit); text-decoration: var(--vsh-dark-token-plain-text-decoration, inherit); } }
-.vsh-token-keyword { color: var(--vsh-light-token-keyword-color, inherit); font-style: var(--vsh-light-token-keyword-font-style, inherit); font-weight: var(--vsh-light-token-keyword-font-weight, inherit); text-decoration: var(--vsh-light-token-keyword-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-keyword, .vsh[data-vsh-scheme="dark"] .vsh-token-keyword { color: var(--vsh-dark-token-keyword-color, inherit); font-style: var(--vsh-dark-token-keyword-font-style, inherit); font-weight: var(--vsh-dark-token-keyword-font-weight, inherit); text-decoration: var(--vsh-dark-token-keyword-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-keyword, .vsh[data-vsh-scheme="auto"] .vsh-token-keyword { color: var(--vsh-dark-token-keyword-color, inherit); font-style: var(--vsh-dark-token-keyword-font-style, inherit); font-weight: var(--vsh-dark-token-keyword-font-weight, inherit); text-decoration: var(--vsh-dark-token-keyword-text-decoration, inherit); } }
-.vsh-token-string { color: var(--vsh-light-token-string-color, inherit); font-style: var(--vsh-light-token-string-font-style, inherit); font-weight: var(--vsh-light-token-string-font-weight, inherit); text-decoration: var(--vsh-light-token-string-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-string, .vsh[data-vsh-scheme="dark"] .vsh-token-string { color: var(--vsh-dark-token-string-color, inherit); font-style: var(--vsh-dark-token-string-font-style, inherit); font-weight: var(--vsh-dark-token-string-font-weight, inherit); text-decoration: var(--vsh-dark-token-string-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-string, .vsh[data-vsh-scheme="auto"] .vsh-token-string { color: var(--vsh-dark-token-string-color, inherit); font-style: var(--vsh-dark-token-string-font-style, inherit); font-weight: var(--vsh-dark-token-string-font-weight, inherit); text-decoration: var(--vsh-dark-token-string-text-decoration, inherit); } }
-.vsh-token-regexp { color: var(--vsh-light-token-regexp-color, inherit); font-style: var(--vsh-light-token-regexp-font-style, inherit); font-weight: var(--vsh-light-token-regexp-font-weight, inherit); text-decoration: var(--vsh-light-token-regexp-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-regexp, .vsh[data-vsh-scheme="dark"] .vsh-token-regexp { color: var(--vsh-dark-token-regexp-color, inherit); font-style: var(--vsh-dark-token-regexp-font-style, inherit); font-weight: var(--vsh-dark-token-regexp-font-weight, inherit); text-decoration: var(--vsh-dark-token-regexp-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-regexp, .vsh[data-vsh-scheme="auto"] .vsh-token-regexp { color: var(--vsh-dark-token-regexp-color, inherit); font-style: var(--vsh-dark-token-regexp-font-style, inherit); font-weight: var(--vsh-dark-token-regexp-font-weight, inherit); text-decoration: var(--vsh-dark-token-regexp-text-decoration, inherit); } }
-.vsh-token-comment { color: var(--vsh-light-token-comment-color, inherit); font-style: var(--vsh-light-token-comment-font-style, inherit); font-weight: var(--vsh-light-token-comment-font-weight, inherit); text-decoration: var(--vsh-light-token-comment-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-comment, .vsh[data-vsh-scheme="dark"] .vsh-token-comment { color: var(--vsh-dark-token-comment-color, inherit); font-style: var(--vsh-dark-token-comment-font-style, inherit); font-weight: var(--vsh-dark-token-comment-font-weight, inherit); text-decoration: var(--vsh-dark-token-comment-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-comment, .vsh[data-vsh-scheme="auto"] .vsh-token-comment { color: var(--vsh-dark-token-comment-color, inherit); font-style: var(--vsh-dark-token-comment-font-style, inherit); font-weight: var(--vsh-dark-token-comment-font-weight, inherit); text-decoration: var(--vsh-dark-token-comment-text-decoration, inherit); } }
-.vsh-token-number { color: var(--vsh-light-token-number-color, inherit); font-style: var(--vsh-light-token-number-font-style, inherit); font-weight: var(--vsh-light-token-number-font-weight, inherit); text-decoration: var(--vsh-light-token-number-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-number, .vsh[data-vsh-scheme="dark"] .vsh-token-number { color: var(--vsh-dark-token-number-color, inherit); font-style: var(--vsh-dark-token-number-font-style, inherit); font-weight: var(--vsh-dark-token-number-font-weight, inherit); text-decoration: var(--vsh-dark-token-number-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-number, .vsh[data-vsh-scheme="auto"] .vsh-token-number { color: var(--vsh-dark-token-number-color, inherit); font-style: var(--vsh-dark-token-number-font-style, inherit); font-weight: var(--vsh-dark-token-number-font-weight, inherit); text-decoration: var(--vsh-dark-token-number-text-decoration, inherit); } }
-.vsh-token-constant { color: var(--vsh-light-token-constant-color, inherit); font-style: var(--vsh-light-token-constant-font-style, inherit); font-weight: var(--vsh-light-token-constant-font-weight, inherit); text-decoration: var(--vsh-light-token-constant-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-constant, .vsh[data-vsh-scheme="dark"] .vsh-token-constant { color: var(--vsh-dark-token-constant-color, inherit); font-style: var(--vsh-dark-token-constant-font-style, inherit); font-weight: var(--vsh-dark-token-constant-font-weight, inherit); text-decoration: var(--vsh-dark-token-constant-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-constant, .vsh[data-vsh-scheme="auto"] .vsh-token-constant { color: var(--vsh-dark-token-constant-color, inherit); font-style: var(--vsh-dark-token-constant-font-style, inherit); font-weight: var(--vsh-dark-token-constant-font-weight, inherit); text-decoration: var(--vsh-dark-token-constant-text-decoration, inherit); } }
-.vsh-token-function { color: var(--vsh-light-token-function-color, inherit); font-style: var(--vsh-light-token-function-font-style, inherit); font-weight: var(--vsh-light-token-function-font-weight, inherit); text-decoration: var(--vsh-light-token-function-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-function, .vsh[data-vsh-scheme="dark"] .vsh-token-function { color: var(--vsh-dark-token-function-color, inherit); font-style: var(--vsh-dark-token-function-font-style, inherit); font-weight: var(--vsh-dark-token-function-font-weight, inherit); text-decoration: var(--vsh-dark-token-function-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-function, .vsh[data-vsh-scheme="auto"] .vsh-token-function { color: var(--vsh-dark-token-function-color, inherit); font-style: var(--vsh-dark-token-function-font-style, inherit); font-weight: var(--vsh-dark-token-function-font-weight, inherit); text-decoration: var(--vsh-dark-token-function-text-decoration, inherit); } }
-.vsh-token-class { color: var(--vsh-light-token-class-color, inherit); font-style: var(--vsh-light-token-class-font-style, inherit); font-weight: var(--vsh-light-token-class-font-weight, inherit); text-decoration: var(--vsh-light-token-class-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-class, .vsh[data-vsh-scheme="dark"] .vsh-token-class { color: var(--vsh-dark-token-class-color, inherit); font-style: var(--vsh-dark-token-class-font-style, inherit); font-weight: var(--vsh-dark-token-class-font-weight, inherit); text-decoration: var(--vsh-dark-token-class-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-class, .vsh[data-vsh-scheme="auto"] .vsh-token-class { color: var(--vsh-dark-token-class-color, inherit); font-style: var(--vsh-dark-token-class-font-style, inherit); font-weight: var(--vsh-dark-token-class-font-weight, inherit); text-decoration: var(--vsh-dark-token-class-text-decoration, inherit); } }
-.vsh-token-type { color: var(--vsh-light-token-type-color, inherit); font-style: var(--vsh-light-token-type-font-style, inherit); font-weight: var(--vsh-light-token-type-font-weight, inherit); text-decoration: var(--vsh-light-token-type-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-type, .vsh[data-vsh-scheme="dark"] .vsh-token-type { color: var(--vsh-dark-token-type-color, inherit); font-style: var(--vsh-dark-token-type-font-style, inherit); font-weight: var(--vsh-dark-token-type-font-weight, inherit); text-decoration: var(--vsh-dark-token-type-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-type, .vsh[data-vsh-scheme="auto"] .vsh-token-type { color: var(--vsh-dark-token-type-color, inherit); font-style: var(--vsh-dark-token-type-font-style, inherit); font-weight: var(--vsh-dark-token-type-font-weight, inherit); text-decoration: var(--vsh-dark-token-type-text-decoration, inherit); } }
-.vsh-token-variable { color: var(--vsh-light-token-variable-color, inherit); font-style: var(--vsh-light-token-variable-font-style, inherit); font-weight: var(--vsh-light-token-variable-font-weight, inherit); text-decoration: var(--vsh-light-token-variable-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-variable, .vsh[data-vsh-scheme="dark"] .vsh-token-variable { color: var(--vsh-dark-token-variable-color, inherit); font-style: var(--vsh-dark-token-variable-font-style, inherit); font-weight: var(--vsh-dark-token-variable-font-weight, inherit); text-decoration: var(--vsh-dark-token-variable-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-variable, .vsh[data-vsh-scheme="auto"] .vsh-token-variable { color: var(--vsh-dark-token-variable-color, inherit); font-style: var(--vsh-dark-token-variable-font-style, inherit); font-weight: var(--vsh-dark-token-variable-font-weight, inherit); text-decoration: var(--vsh-dark-token-variable-text-decoration, inherit); } }
-.vsh-token-property { color: var(--vsh-light-token-property-color, inherit); font-style: var(--vsh-light-token-property-font-style, inherit); font-weight: var(--vsh-light-token-property-font-weight, inherit); text-decoration: var(--vsh-light-token-property-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-property, .vsh[data-vsh-scheme="dark"] .vsh-token-property { color: var(--vsh-dark-token-property-color, inherit); font-style: var(--vsh-dark-token-property-font-style, inherit); font-weight: var(--vsh-dark-token-property-font-weight, inherit); text-decoration: var(--vsh-dark-token-property-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-property, .vsh[data-vsh-scheme="auto"] .vsh-token-property { color: var(--vsh-dark-token-property-color, inherit); font-style: var(--vsh-dark-token-property-font-style, inherit); font-weight: var(--vsh-dark-token-property-font-weight, inherit); text-decoration: var(--vsh-dark-token-property-text-decoration, inherit); } }
-.vsh-token-operator { color: var(--vsh-light-token-operator-color, inherit); font-style: var(--vsh-light-token-operator-font-style, inherit); font-weight: var(--vsh-light-token-operator-font-weight, inherit); text-decoration: var(--vsh-light-token-operator-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-operator, .vsh[data-vsh-scheme="dark"] .vsh-token-operator { color: var(--vsh-dark-token-operator-color, inherit); font-style: var(--vsh-dark-token-operator-font-style, inherit); font-weight: var(--vsh-dark-token-operator-font-weight, inherit); text-decoration: var(--vsh-dark-token-operator-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-operator, .vsh[data-vsh-scheme="auto"] .vsh-token-operator { color: var(--vsh-dark-token-operator-color, inherit); font-style: var(--vsh-dark-token-operator-font-style, inherit); font-weight: var(--vsh-dark-token-operator-font-weight, inherit); text-decoration: var(--vsh-dark-token-operator-text-decoration, inherit); } }
-.vsh-token-punctuation { color: var(--vsh-light-token-punctuation-color, inherit); font-style: var(--vsh-light-token-punctuation-font-style, inherit); font-weight: var(--vsh-light-token-punctuation-font-weight, inherit); text-decoration: var(--vsh-light-token-punctuation-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-punctuation, .vsh[data-vsh-scheme="dark"] .vsh-token-punctuation { color: var(--vsh-dark-token-punctuation-color, inherit); font-style: var(--vsh-dark-token-punctuation-font-style, inherit); font-weight: var(--vsh-dark-token-punctuation-font-weight, inherit); text-decoration: var(--vsh-dark-token-punctuation-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-punctuation, .vsh[data-vsh-scheme="auto"] .vsh-token-punctuation { color: var(--vsh-dark-token-punctuation-color, inherit); font-style: var(--vsh-dark-token-punctuation-font-style, inherit); font-weight: var(--vsh-dark-token-punctuation-font-weight, inherit); text-decoration: var(--vsh-dark-token-punctuation-text-decoration, inherit); } }
-.vsh-token-tag { color: var(--vsh-light-token-tag-color, inherit); font-style: var(--vsh-light-token-tag-font-style, inherit); font-weight: var(--vsh-light-token-tag-font-weight, inherit); text-decoration: var(--vsh-light-token-tag-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-tag, .vsh[data-vsh-scheme="dark"] .vsh-token-tag { color: var(--vsh-dark-token-tag-color, inherit); font-style: var(--vsh-dark-token-tag-font-style, inherit); font-weight: var(--vsh-dark-token-tag-font-weight, inherit); text-decoration: var(--vsh-dark-token-tag-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-tag, .vsh[data-vsh-scheme="auto"] .vsh-token-tag { color: var(--vsh-dark-token-tag-color, inherit); font-style: var(--vsh-dark-token-tag-font-style, inherit); font-weight: var(--vsh-dark-token-tag-font-weight, inherit); text-decoration: var(--vsh-dark-token-tag-text-decoration, inherit); } }
-.vsh-token-attribute { color: var(--vsh-light-token-attribute-color, inherit); font-style: var(--vsh-light-token-attribute-font-style, inherit); font-weight: var(--vsh-light-token-attribute-font-weight, inherit); text-decoration: var(--vsh-light-token-attribute-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-attribute, .vsh[data-vsh-scheme="dark"] .vsh-token-attribute { color: var(--vsh-dark-token-attribute-color, inherit); font-style: var(--vsh-dark-token-attribute-font-style, inherit); font-weight: var(--vsh-dark-token-attribute-font-weight, inherit); text-decoration: var(--vsh-dark-token-attribute-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-attribute, .vsh[data-vsh-scheme="auto"] .vsh-token-attribute { color: var(--vsh-dark-token-attribute-color, inherit); font-style: var(--vsh-dark-token-attribute-font-style, inherit); font-weight: var(--vsh-dark-token-attribute-font-weight, inherit); text-decoration: var(--vsh-dark-token-attribute-text-decoration, inherit); } }
-.vsh-token-decorator { color: var(--vsh-light-token-decorator-color, inherit); font-style: var(--vsh-light-token-decorator-font-style, inherit); font-weight: var(--vsh-light-token-decorator-font-weight, inherit); text-decoration: var(--vsh-light-token-decorator-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-decorator, .vsh[data-vsh-scheme="dark"] .vsh-token-decorator { color: var(--vsh-dark-token-decorator-color, inherit); font-style: var(--vsh-dark-token-decorator-font-style, inherit); font-weight: var(--vsh-dark-token-decorator-font-weight, inherit); text-decoration: var(--vsh-dark-token-decorator-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-decorator, .vsh[data-vsh-scheme="auto"] .vsh-token-decorator { color: var(--vsh-dark-token-decorator-color, inherit); font-style: var(--vsh-dark-token-decorator-font-style, inherit); font-weight: var(--vsh-dark-token-decorator-font-weight, inherit); text-decoration: var(--vsh-dark-token-decorator-text-decoration, inherit); } }
-.vsh-token-meta { color: var(--vsh-light-token-meta-color, inherit); font-style: var(--vsh-light-token-meta-font-style, inherit); font-weight: var(--vsh-light-token-meta-font-weight, inherit); text-decoration: var(--vsh-light-token-meta-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-meta, .vsh[data-vsh-scheme="dark"] .vsh-token-meta { color: var(--vsh-dark-token-meta-color, inherit); font-style: var(--vsh-dark-token-meta-font-style, inherit); font-weight: var(--vsh-dark-token-meta-font-weight, inherit); text-decoration: var(--vsh-dark-token-meta-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-meta, .vsh[data-vsh-scheme="auto"] .vsh-token-meta { color: var(--vsh-dark-token-meta-color, inherit); font-style: var(--vsh-dark-token-meta-font-style, inherit); font-weight: var(--vsh-dark-token-meta-font-weight, inherit); text-decoration: var(--vsh-dark-token-meta-text-decoration, inherit); } }
-.vsh-token-invalid { color: var(--vsh-light-token-invalid-color, inherit); font-style: var(--vsh-light-token-invalid-font-style, inherit); font-weight: var(--vsh-light-token-invalid-font-weight, inherit); text-decoration: var(--vsh-light-token-invalid-text-decoration, inherit); }
-[data-vsh-scheme="dark"] .vsh-token-invalid, .vsh[data-vsh-scheme="dark"] .vsh-token-invalid { color: var(--vsh-dark-token-invalid-color, inherit); font-style: var(--vsh-dark-token-invalid-font-style, inherit); font-weight: var(--vsh-dark-token-invalid-font-weight, inherit); text-decoration: var(--vsh-dark-token-invalid-text-decoration, inherit); }
-@media (prefers-color-scheme: dark) { [data-vsh-scheme="auto"] .vsh-token-invalid, .vsh[data-vsh-scheme="auto"] .vsh-token-invalid { color: var(--vsh-dark-token-invalid-color, inherit); font-style: var(--vsh-dark-token-invalid-font-style, inherit); font-weight: var(--vsh-dark-token-invalid-font-weight, inherit); text-decoration: var(--vsh-dark-token-invalid-text-decoration, inherit); } }
+.vsh-token-plain {
+  color: light-dark(var(--vsh-light-token-plain-color, inherit), var(--vsh-dark-token-plain-color, inherit));
+  font-style: var(--vsh-t-p-s, inherit);
+  font-weight: var(--vsh-t-p-w, inherit);
+  text-decoration: var(--vsh-t-p-d, inherit);
+}
+.vsh-token-keyword {
+  color: light-dark(var(--vsh-light-token-keyword-color, inherit), var(--vsh-dark-token-keyword-color, inherit));
+  font-style: var(--vsh-t-k-s, inherit);
+  font-weight: var(--vsh-t-k-w, inherit);
+  text-decoration: var(--vsh-t-k-d, inherit);
+}
+.vsh-token-string {
+  color: light-dark(var(--vsh-light-token-string-color, inherit), var(--vsh-dark-token-string-color, inherit));
+  font-style: var(--vsh-t-s-s, inherit);
+  font-weight: var(--vsh-t-s-w, inherit);
+  text-decoration: var(--vsh-t-s-d, inherit);
+}
+.vsh-token-regexp {
+  color: light-dark(var(--vsh-light-token-regexp-color, inherit), var(--vsh-dark-token-regexp-color, inherit));
+  font-style: var(--vsh-t-r-s, inherit);
+  font-weight: var(--vsh-t-r-w, inherit);
+  text-decoration: var(--vsh-t-r-d, inherit);
+}
+.vsh-token-comment {
+  color: light-dark(var(--vsh-light-token-comment-color, inherit), var(--vsh-dark-token-comment-color, inherit));
+  font-style: var(--vsh-t-c-s, inherit);
+  font-weight: var(--vsh-t-c-w, inherit);
+  text-decoration: var(--vsh-t-c-d, inherit);
+}
+.vsh-token-number {
+  color: light-dark(var(--vsh-light-token-number-color, inherit), var(--vsh-dark-token-number-color, inherit));
+  font-style: var(--vsh-t-n-s, inherit);
+  font-weight: var(--vsh-t-n-w, inherit);
+  text-decoration: var(--vsh-t-n-d, inherit);
+}
+.vsh-token-constant {
+  color: light-dark(var(--vsh-light-token-constant-color, inherit), var(--vsh-dark-token-constant-color, inherit));
+  font-style: var(--vsh-t-o-s, inherit);
+  font-weight: var(--vsh-t-o-w, inherit);
+  text-decoration: var(--vsh-t-o-d, inherit);
+}
+.vsh-token-function {
+  color: light-dark(var(--vsh-light-token-function-color, inherit), var(--vsh-dark-token-function-color, inherit));
+  font-style: var(--vsh-t-f-s, inherit);
+  font-weight: var(--vsh-t-f-w, inherit);
+  text-decoration: var(--vsh-t-f-d, inherit);
+}
+.vsh-token-class {
+  color: light-dark(var(--vsh-light-token-class-color, inherit), var(--vsh-dark-token-class-color, inherit));
+  font-style: var(--vsh-t-l-s, inherit);
+  font-weight: var(--vsh-t-l-w, inherit);
+  text-decoration: var(--vsh-t-l-d, inherit);
+}
+.vsh-token-type {
+  color: light-dark(var(--vsh-light-token-type-color, inherit), var(--vsh-dark-token-type-color, inherit));
+  font-style: var(--vsh-t-t-s, inherit);
+  font-weight: var(--vsh-t-t-w, inherit);
+  text-decoration: var(--vsh-t-t-d, inherit);
+}
+.vsh-token-variable {
+  color: light-dark(var(--vsh-light-token-variable-color, inherit), var(--vsh-dark-token-variable-color, inherit));
+  font-style: var(--vsh-t-v-s, inherit);
+  font-weight: var(--vsh-t-v-w, inherit);
+  text-decoration: var(--vsh-t-v-d, inherit);
+}
+.vsh-token-property {
+  color: light-dark(var(--vsh-light-token-property-color, inherit), var(--vsh-dark-token-property-color, inherit));
+  font-style: var(--vsh-t-q-s, inherit);
+  font-weight: var(--vsh-t-q-w, inherit);
+  text-decoration: var(--vsh-t-q-d, inherit);
+}
+.vsh-token-operator {
+  color: light-dark(var(--vsh-light-token-operator-color, inherit), var(--vsh-dark-token-operator-color, inherit));
+  font-style: var(--vsh-t-a-s, inherit);
+  font-weight: var(--vsh-t-a-w, inherit);
+  text-decoration: var(--vsh-t-a-d, inherit);
+}
+.vsh-token-punctuation {
+  color: light-dark(var(--vsh-light-token-punctuation-color, inherit), var(--vsh-dark-token-punctuation-color, inherit));
+  font-style: var(--vsh-t-u-s, inherit);
+  font-weight: var(--vsh-t-u-w, inherit);
+  text-decoration: var(--vsh-t-u-d, inherit);
+}
+.vsh-token-tag {
+  color: light-dark(var(--vsh-light-token-tag-color, inherit), var(--vsh-dark-token-tag-color, inherit));
+  font-style: var(--vsh-t-g-s, inherit);
+  font-weight: var(--vsh-t-g-w, inherit);
+  text-decoration: var(--vsh-t-g-d, inherit);
+}
+.vsh-token-attribute {
+  color: light-dark(var(--vsh-light-token-attribute-color, inherit), var(--vsh-dark-token-attribute-color, inherit));
+  font-style: var(--vsh-t-b-s, inherit);
+  font-weight: var(--vsh-t-b-w, inherit);
+  text-decoration: var(--vsh-t-b-d, inherit);
+}
+.vsh-token-decorator {
+  color: light-dark(var(--vsh-light-token-decorator-color, inherit), var(--vsh-dark-token-decorator-color, inherit));
+  font-style: var(--vsh-t-d-s, inherit);
+  font-weight: var(--vsh-t-d-w, inherit);
+  text-decoration: var(--vsh-t-d-d, inherit);
+}
+.vsh-token-meta {
+  color: light-dark(var(--vsh-light-token-meta-color, inherit), var(--vsh-dark-token-meta-color, inherit));
+  font-style: var(--vsh-t-m-s, inherit);
+  font-weight: var(--vsh-t-m-w, inherit);
+  text-decoration: var(--vsh-t-m-d, inherit);
+}
+.vsh-token-invalid {
+  color: light-dark(var(--vsh-light-token-invalid-color, inherit), var(--vsh-dark-token-invalid-color, inherit));
+  font-style: var(--vsh-t-i-s, inherit);
+  font-weight: var(--vsh-t-i-w, inherit);
+  text-decoration: var(--vsh-t-i-d, inherit);
+}
+
+/* color-scheme makes light-dark() follow the nearest scope, so nested scopes
+   override their ancestors without descendant-specific selectors. */
+.vsh[data-vsh-scheme='light'],
+.vsh-scope[data-vsh-scheme='light'] {
+  color-scheme: light;
+  --vsh-font-family: var(--vsh-light-font-family, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+  --vsh-t-p-s: var(--vsh-light-token-plain-font-style, inherit);
+  --vsh-t-p-w: var(--vsh-light-token-plain-font-weight, inherit);
+  --vsh-t-p-d: var(--vsh-light-token-plain-text-decoration, inherit);
+  --vsh-t-k-s: var(--vsh-light-token-keyword-font-style, inherit);
+  --vsh-t-k-w: var(--vsh-light-token-keyword-font-weight, inherit);
+  --vsh-t-k-d: var(--vsh-light-token-keyword-text-decoration, inherit);
+  --vsh-t-s-s: var(--vsh-light-token-string-font-style, inherit);
+  --vsh-t-s-w: var(--vsh-light-token-string-font-weight, inherit);
+  --vsh-t-s-d: var(--vsh-light-token-string-text-decoration, inherit);
+  --vsh-t-r-s: var(--vsh-light-token-regexp-font-style, inherit);
+  --vsh-t-r-w: var(--vsh-light-token-regexp-font-weight, inherit);
+  --vsh-t-r-d: var(--vsh-light-token-regexp-text-decoration, inherit);
+  --vsh-t-c-s: var(--vsh-light-token-comment-font-style, inherit);
+  --vsh-t-c-w: var(--vsh-light-token-comment-font-weight, inherit);
+  --vsh-t-c-d: var(--vsh-light-token-comment-text-decoration, inherit);
+  --vsh-t-n-s: var(--vsh-light-token-number-font-style, inherit);
+  --vsh-t-n-w: var(--vsh-light-token-number-font-weight, inherit);
+  --vsh-t-n-d: var(--vsh-light-token-number-text-decoration, inherit);
+  --vsh-t-o-s: var(--vsh-light-token-constant-font-style, inherit);
+  --vsh-t-o-w: var(--vsh-light-token-constant-font-weight, inherit);
+  --vsh-t-o-d: var(--vsh-light-token-constant-text-decoration, inherit);
+  --vsh-t-f-s: var(--vsh-light-token-function-font-style, inherit);
+  --vsh-t-f-w: var(--vsh-light-token-function-font-weight, inherit);
+  --vsh-t-f-d: var(--vsh-light-token-function-text-decoration, inherit);
+  --vsh-t-l-s: var(--vsh-light-token-class-font-style, inherit);
+  --vsh-t-l-w: var(--vsh-light-token-class-font-weight, inherit);
+  --vsh-t-l-d: var(--vsh-light-token-class-text-decoration, inherit);
+  --vsh-t-t-s: var(--vsh-light-token-type-font-style, inherit);
+  --vsh-t-t-w: var(--vsh-light-token-type-font-weight, inherit);
+  --vsh-t-t-d: var(--vsh-light-token-type-text-decoration, inherit);
+  --vsh-t-v-s: var(--vsh-light-token-variable-font-style, inherit);
+  --vsh-t-v-w: var(--vsh-light-token-variable-font-weight, inherit);
+  --vsh-t-v-d: var(--vsh-light-token-variable-text-decoration, inherit);
+  --vsh-t-q-s: var(--vsh-light-token-property-font-style, inherit);
+  --vsh-t-q-w: var(--vsh-light-token-property-font-weight, inherit);
+  --vsh-t-q-d: var(--vsh-light-token-property-text-decoration, inherit);
+  --vsh-t-a-s: var(--vsh-light-token-operator-font-style, inherit);
+  --vsh-t-a-w: var(--vsh-light-token-operator-font-weight, inherit);
+  --vsh-t-a-d: var(--vsh-light-token-operator-text-decoration, inherit);
+  --vsh-t-u-s: var(--vsh-light-token-punctuation-font-style, inherit);
+  --vsh-t-u-w: var(--vsh-light-token-punctuation-font-weight, inherit);
+  --vsh-t-u-d: var(--vsh-light-token-punctuation-text-decoration, inherit);
+  --vsh-t-g-s: var(--vsh-light-token-tag-font-style, inherit);
+  --vsh-t-g-w: var(--vsh-light-token-tag-font-weight, inherit);
+  --vsh-t-g-d: var(--vsh-light-token-tag-text-decoration, inherit);
+  --vsh-t-b-s: var(--vsh-light-token-attribute-font-style, inherit);
+  --vsh-t-b-w: var(--vsh-light-token-attribute-font-weight, inherit);
+  --vsh-t-b-d: var(--vsh-light-token-attribute-text-decoration, inherit);
+  --vsh-t-d-s: var(--vsh-light-token-decorator-font-style, inherit);
+  --vsh-t-d-w: var(--vsh-light-token-decorator-font-weight, inherit);
+  --vsh-t-d-d: var(--vsh-light-token-decorator-text-decoration, inherit);
+  --vsh-t-m-s: var(--vsh-light-token-meta-font-style, inherit);
+  --vsh-t-m-w: var(--vsh-light-token-meta-font-weight, inherit);
+  --vsh-t-m-d: var(--vsh-light-token-meta-text-decoration, inherit);
+  --vsh-t-i-s: var(--vsh-light-token-invalid-font-style, inherit);
+  --vsh-t-i-w: var(--vsh-light-token-invalid-font-weight, inherit);
+  --vsh-t-i-d: var(--vsh-light-token-invalid-text-decoration, inherit);
+}
+
+.vsh[data-vsh-scheme='dark'],
+.vsh-scope[data-vsh-scheme='dark'] {
+  color-scheme: dark;
+  --vsh-font-family: var(--vsh-dark-font-family, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+  --vsh-t-p-s: var(--vsh-dark-token-plain-font-style, inherit);
+  --vsh-t-p-w: var(--vsh-dark-token-plain-font-weight, inherit);
+  --vsh-t-p-d: var(--vsh-dark-token-plain-text-decoration, inherit);
+  --vsh-t-k-s: var(--vsh-dark-token-keyword-font-style, inherit);
+  --vsh-t-k-w: var(--vsh-dark-token-keyword-font-weight, inherit);
+  --vsh-t-k-d: var(--vsh-dark-token-keyword-text-decoration, inherit);
+  --vsh-t-s-s: var(--vsh-dark-token-string-font-style, inherit);
+  --vsh-t-s-w: var(--vsh-dark-token-string-font-weight, inherit);
+  --vsh-t-s-d: var(--vsh-dark-token-string-text-decoration, inherit);
+  --vsh-t-r-s: var(--vsh-dark-token-regexp-font-style, inherit);
+  --vsh-t-r-w: var(--vsh-dark-token-regexp-font-weight, inherit);
+  --vsh-t-r-d: var(--vsh-dark-token-regexp-text-decoration, inherit);
+  --vsh-t-c-s: var(--vsh-dark-token-comment-font-style, inherit);
+  --vsh-t-c-w: var(--vsh-dark-token-comment-font-weight, inherit);
+  --vsh-t-c-d: var(--vsh-dark-token-comment-text-decoration, inherit);
+  --vsh-t-n-s: var(--vsh-dark-token-number-font-style, inherit);
+  --vsh-t-n-w: var(--vsh-dark-token-number-font-weight, inherit);
+  --vsh-t-n-d: var(--vsh-dark-token-number-text-decoration, inherit);
+  --vsh-t-o-s: var(--vsh-dark-token-constant-font-style, inherit);
+  --vsh-t-o-w: var(--vsh-dark-token-constant-font-weight, inherit);
+  --vsh-t-o-d: var(--vsh-dark-token-constant-text-decoration, inherit);
+  --vsh-t-f-s: var(--vsh-dark-token-function-font-style, inherit);
+  --vsh-t-f-w: var(--vsh-dark-token-function-font-weight, inherit);
+  --vsh-t-f-d: var(--vsh-dark-token-function-text-decoration, inherit);
+  --vsh-t-l-s: var(--vsh-dark-token-class-font-style, inherit);
+  --vsh-t-l-w: var(--vsh-dark-token-class-font-weight, inherit);
+  --vsh-t-l-d: var(--vsh-dark-token-class-text-decoration, inherit);
+  --vsh-t-t-s: var(--vsh-dark-token-type-font-style, inherit);
+  --vsh-t-t-w: var(--vsh-dark-token-type-font-weight, inherit);
+  --vsh-t-t-d: var(--vsh-dark-token-type-text-decoration, inherit);
+  --vsh-t-v-s: var(--vsh-dark-token-variable-font-style, inherit);
+  --vsh-t-v-w: var(--vsh-dark-token-variable-font-weight, inherit);
+  --vsh-t-v-d: var(--vsh-dark-token-variable-text-decoration, inherit);
+  --vsh-t-q-s: var(--vsh-dark-token-property-font-style, inherit);
+  --vsh-t-q-w: var(--vsh-dark-token-property-font-weight, inherit);
+  --vsh-t-q-d: var(--vsh-dark-token-property-text-decoration, inherit);
+  --vsh-t-a-s: var(--vsh-dark-token-operator-font-style, inherit);
+  --vsh-t-a-w: var(--vsh-dark-token-operator-font-weight, inherit);
+  --vsh-t-a-d: var(--vsh-dark-token-operator-text-decoration, inherit);
+  --vsh-t-u-s: var(--vsh-dark-token-punctuation-font-style, inherit);
+  --vsh-t-u-w: var(--vsh-dark-token-punctuation-font-weight, inherit);
+  --vsh-t-u-d: var(--vsh-dark-token-punctuation-text-decoration, inherit);
+  --vsh-t-g-s: var(--vsh-dark-token-tag-font-style, inherit);
+  --vsh-t-g-w: var(--vsh-dark-token-tag-font-weight, inherit);
+  --vsh-t-g-d: var(--vsh-dark-token-tag-text-decoration, inherit);
+  --vsh-t-b-s: var(--vsh-dark-token-attribute-font-style, inherit);
+  --vsh-t-b-w: var(--vsh-dark-token-attribute-font-weight, inherit);
+  --vsh-t-b-d: var(--vsh-dark-token-attribute-text-decoration, inherit);
+  --vsh-t-d-s: var(--vsh-dark-token-decorator-font-style, inherit);
+  --vsh-t-d-w: var(--vsh-dark-token-decorator-font-weight, inherit);
+  --vsh-t-d-d: var(--vsh-dark-token-decorator-text-decoration, inherit);
+  --vsh-t-m-s: var(--vsh-dark-token-meta-font-style, inherit);
+  --vsh-t-m-w: var(--vsh-dark-token-meta-font-weight, inherit);
+  --vsh-t-m-d: var(--vsh-dark-token-meta-text-decoration, inherit);
+  --vsh-t-i-s: var(--vsh-dark-token-invalid-font-style, inherit);
+  --vsh-t-i-w: var(--vsh-dark-token-invalid-font-weight, inherit);
+  --vsh-t-i-d: var(--vsh-dark-token-invalid-text-decoration, inherit);
+}
+
+.vsh[data-vsh-scheme='auto'],
+.vsh-scope[data-vsh-scheme='auto'] {
+  color-scheme: light dark;
+  --vsh-font-family: var(--vsh-light-font-family, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+  --vsh-t-p-s: var(--vsh-light-token-plain-font-style, inherit);
+  --vsh-t-p-w: var(--vsh-light-token-plain-font-weight, inherit);
+  --vsh-t-p-d: var(--vsh-light-token-plain-text-decoration, inherit);
+  --vsh-t-k-s: var(--vsh-light-token-keyword-font-style, inherit);
+  --vsh-t-k-w: var(--vsh-light-token-keyword-font-weight, inherit);
+  --vsh-t-k-d: var(--vsh-light-token-keyword-text-decoration, inherit);
+  --vsh-t-s-s: var(--vsh-light-token-string-font-style, inherit);
+  --vsh-t-s-w: var(--vsh-light-token-string-font-weight, inherit);
+  --vsh-t-s-d: var(--vsh-light-token-string-text-decoration, inherit);
+  --vsh-t-r-s: var(--vsh-light-token-regexp-font-style, inherit);
+  --vsh-t-r-w: var(--vsh-light-token-regexp-font-weight, inherit);
+  --vsh-t-r-d: var(--vsh-light-token-regexp-text-decoration, inherit);
+  --vsh-t-c-s: var(--vsh-light-token-comment-font-style, inherit);
+  --vsh-t-c-w: var(--vsh-light-token-comment-font-weight, inherit);
+  --vsh-t-c-d: var(--vsh-light-token-comment-text-decoration, inherit);
+  --vsh-t-n-s: var(--vsh-light-token-number-font-style, inherit);
+  --vsh-t-n-w: var(--vsh-light-token-number-font-weight, inherit);
+  --vsh-t-n-d: var(--vsh-light-token-number-text-decoration, inherit);
+  --vsh-t-o-s: var(--vsh-light-token-constant-font-style, inherit);
+  --vsh-t-o-w: var(--vsh-light-token-constant-font-weight, inherit);
+  --vsh-t-o-d: var(--vsh-light-token-constant-text-decoration, inherit);
+  --vsh-t-f-s: var(--vsh-light-token-function-font-style, inherit);
+  --vsh-t-f-w: var(--vsh-light-token-function-font-weight, inherit);
+  --vsh-t-f-d: var(--vsh-light-token-function-text-decoration, inherit);
+  --vsh-t-l-s: var(--vsh-light-token-class-font-style, inherit);
+  --vsh-t-l-w: var(--vsh-light-token-class-font-weight, inherit);
+  --vsh-t-l-d: var(--vsh-light-token-class-text-decoration, inherit);
+  --vsh-t-t-s: var(--vsh-light-token-type-font-style, inherit);
+  --vsh-t-t-w: var(--vsh-light-token-type-font-weight, inherit);
+  --vsh-t-t-d: var(--vsh-light-token-type-text-decoration, inherit);
+  --vsh-t-v-s: var(--vsh-light-token-variable-font-style, inherit);
+  --vsh-t-v-w: var(--vsh-light-token-variable-font-weight, inherit);
+  --vsh-t-v-d: var(--vsh-light-token-variable-text-decoration, inherit);
+  --vsh-t-q-s: var(--vsh-light-token-property-font-style, inherit);
+  --vsh-t-q-w: var(--vsh-light-token-property-font-weight, inherit);
+  --vsh-t-q-d: var(--vsh-light-token-property-text-decoration, inherit);
+  --vsh-t-a-s: var(--vsh-light-token-operator-font-style, inherit);
+  --vsh-t-a-w: var(--vsh-light-token-operator-font-weight, inherit);
+  --vsh-t-a-d: var(--vsh-light-token-operator-text-decoration, inherit);
+  --vsh-t-u-s: var(--vsh-light-token-punctuation-font-style, inherit);
+  --vsh-t-u-w: var(--vsh-light-token-punctuation-font-weight, inherit);
+  --vsh-t-u-d: var(--vsh-light-token-punctuation-text-decoration, inherit);
+  --vsh-t-g-s: var(--vsh-light-token-tag-font-style, inherit);
+  --vsh-t-g-w: var(--vsh-light-token-tag-font-weight, inherit);
+  --vsh-t-g-d: var(--vsh-light-token-tag-text-decoration, inherit);
+  --vsh-t-b-s: var(--vsh-light-token-attribute-font-style, inherit);
+  --vsh-t-b-w: var(--vsh-light-token-attribute-font-weight, inherit);
+  --vsh-t-b-d: var(--vsh-light-token-attribute-text-decoration, inherit);
+  --vsh-t-d-s: var(--vsh-light-token-decorator-font-style, inherit);
+  --vsh-t-d-w: var(--vsh-light-token-decorator-font-weight, inherit);
+  --vsh-t-d-d: var(--vsh-light-token-decorator-text-decoration, inherit);
+  --vsh-t-m-s: var(--vsh-light-token-meta-font-style, inherit);
+  --vsh-t-m-w: var(--vsh-light-token-meta-font-weight, inherit);
+  --vsh-t-m-d: var(--vsh-light-token-meta-text-decoration, inherit);
+  --vsh-t-i-s: var(--vsh-light-token-invalid-font-style, inherit);
+  --vsh-t-i-w: var(--vsh-light-token-invalid-font-weight, inherit);
+  --vsh-t-i-d: var(--vsh-light-token-invalid-text-decoration, inherit);
+}
+
+@media (prefers-color-scheme: dark) {
+  .vsh[data-vsh-scheme='auto'],
+  .vsh-scope[data-vsh-scheme='auto'] {
+    --vsh-font-family: var(--vsh-dark-font-family, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+    --vsh-t-p-s: var(--vsh-dark-token-plain-font-style, inherit);
+  --vsh-t-p-w: var(--vsh-dark-token-plain-font-weight, inherit);
+  --vsh-t-p-d: var(--vsh-dark-token-plain-text-decoration, inherit);
+  --vsh-t-k-s: var(--vsh-dark-token-keyword-font-style, inherit);
+  --vsh-t-k-w: var(--vsh-dark-token-keyword-font-weight, inherit);
+  --vsh-t-k-d: var(--vsh-dark-token-keyword-text-decoration, inherit);
+  --vsh-t-s-s: var(--vsh-dark-token-string-font-style, inherit);
+  --vsh-t-s-w: var(--vsh-dark-token-string-font-weight, inherit);
+  --vsh-t-s-d: var(--vsh-dark-token-string-text-decoration, inherit);
+  --vsh-t-r-s: var(--vsh-dark-token-regexp-font-style, inherit);
+  --vsh-t-r-w: var(--vsh-dark-token-regexp-font-weight, inherit);
+  --vsh-t-r-d: var(--vsh-dark-token-regexp-text-decoration, inherit);
+  --vsh-t-c-s: var(--vsh-dark-token-comment-font-style, inherit);
+  --vsh-t-c-w: var(--vsh-dark-token-comment-font-weight, inherit);
+  --vsh-t-c-d: var(--vsh-dark-token-comment-text-decoration, inherit);
+  --vsh-t-n-s: var(--vsh-dark-token-number-font-style, inherit);
+  --vsh-t-n-w: var(--vsh-dark-token-number-font-weight, inherit);
+  --vsh-t-n-d: var(--vsh-dark-token-number-text-decoration, inherit);
+  --vsh-t-o-s: var(--vsh-dark-token-constant-font-style, inherit);
+  --vsh-t-o-w: var(--vsh-dark-token-constant-font-weight, inherit);
+  --vsh-t-o-d: var(--vsh-dark-token-constant-text-decoration, inherit);
+  --vsh-t-f-s: var(--vsh-dark-token-function-font-style, inherit);
+  --vsh-t-f-w: var(--vsh-dark-token-function-font-weight, inherit);
+  --vsh-t-f-d: var(--vsh-dark-token-function-text-decoration, inherit);
+  --vsh-t-l-s: var(--vsh-dark-token-class-font-style, inherit);
+  --vsh-t-l-w: var(--vsh-dark-token-class-font-weight, inherit);
+  --vsh-t-l-d: var(--vsh-dark-token-class-text-decoration, inherit);
+  --vsh-t-t-s: var(--vsh-dark-token-type-font-style, inherit);
+  --vsh-t-t-w: var(--vsh-dark-token-type-font-weight, inherit);
+  --vsh-t-t-d: var(--vsh-dark-token-type-text-decoration, inherit);
+  --vsh-t-v-s: var(--vsh-dark-token-variable-font-style, inherit);
+  --vsh-t-v-w: var(--vsh-dark-token-variable-font-weight, inherit);
+  --vsh-t-v-d: var(--vsh-dark-token-variable-text-decoration, inherit);
+  --vsh-t-q-s: var(--vsh-dark-token-property-font-style, inherit);
+  --vsh-t-q-w: var(--vsh-dark-token-property-font-weight, inherit);
+  --vsh-t-q-d: var(--vsh-dark-token-property-text-decoration, inherit);
+  --vsh-t-a-s: var(--vsh-dark-token-operator-font-style, inherit);
+  --vsh-t-a-w: var(--vsh-dark-token-operator-font-weight, inherit);
+  --vsh-t-a-d: var(--vsh-dark-token-operator-text-decoration, inherit);
+  --vsh-t-u-s: var(--vsh-dark-token-punctuation-font-style, inherit);
+  --vsh-t-u-w: var(--vsh-dark-token-punctuation-font-weight, inherit);
+  --vsh-t-u-d: var(--vsh-dark-token-punctuation-text-decoration, inherit);
+  --vsh-t-g-s: var(--vsh-dark-token-tag-font-style, inherit);
+  --vsh-t-g-w: var(--vsh-dark-token-tag-font-weight, inherit);
+  --vsh-t-g-d: var(--vsh-dark-token-tag-text-decoration, inherit);
+  --vsh-t-b-s: var(--vsh-dark-token-attribute-font-style, inherit);
+  --vsh-t-b-w: var(--vsh-dark-token-attribute-font-weight, inherit);
+  --vsh-t-b-d: var(--vsh-dark-token-attribute-text-decoration, inherit);
+  --vsh-t-d-s: var(--vsh-dark-token-decorator-font-style, inherit);
+  --vsh-t-d-w: var(--vsh-dark-token-decorator-font-weight, inherit);
+  --vsh-t-d-d: var(--vsh-dark-token-decorator-text-decoration, inherit);
+  --vsh-t-m-s: var(--vsh-dark-token-meta-font-style, inherit);
+  --vsh-t-m-w: var(--vsh-dark-token-meta-font-weight, inherit);
+  --vsh-t-m-d: var(--vsh-dark-token-meta-text-decoration, inherit);
+  --vsh-t-i-s: var(--vsh-dark-token-invalid-font-style, inherit);
+  --vsh-t-i-w: var(--vsh-dark-token-invalid-font-weight, inherit);
+  --vsh-t-i-d: var(--vsh-dark-token-invalid-text-decoration, inherit);
+  }
+}

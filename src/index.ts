@@ -39,6 +39,7 @@ export type {
   HighlightRequest,
   HighlightResult,
   HighlightToken,
+  HighlightedEventContext,
   HighlighterOptions,
   LineRenderInfo,
   LineSlotProps,

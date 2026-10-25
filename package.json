@@ -82,7 +82,7 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "typecheck": "vue-tsc -p tsconfig.json --noEmit && tsc -p tsconfig.fixtures.json --noEmit",
+    "typecheck": "vue-tsc -p tsconfig.json --noEmit && vue-tsc -p tsconfig.tests.json --noEmit && tsc -p tsconfig.fixtures.json --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
     "size": "size-limit",
@@ -96,7 +96,8 @@
     "check:graph": "node scripts/check-graph.mjs",
     "check:docs": "node scripts/check-docs.mjs",
     "check:consumer": "node scripts/check-consumer.mjs",
-    "check:workflow": "node scripts/check-workflow.mjs"
+    "check:workflow": "node scripts/check-workflow.mjs",
+    "generate:css": "node scripts/generate-base-css.mjs"
   },
   "peerDependencies": {
     "highlight.js": "^11.0.0",

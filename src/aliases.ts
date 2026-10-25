@@ -1,5 +1,5 @@
 import { defineComponent, h, inject, type Component } from 'vue'
-import { getGlobalContext, HIGHLIGHTER_CONTEXT } from './core/context.js'
+import { getDefaultContext, HIGHLIGHTER_CONTEXT } from './core/context.js'
 import { warnOnce } from './core/warn.js'
 import { SyntaxHighlighter } from './component/SyntaxHighlighter.js'
 
@@ -8,7 +8,7 @@ function createAlias(name: string, engine: 'highlightjs' | 'prism'): Component {
     name,
     inheritAttrs: false,
     setup(_, { attrs, slots }) {
-      const context = inject(HIGHLIGHTER_CONTEXT, getGlobalContext())
+      const context = inject(HIGHLIGHTER_CONTEXT, null) ?? getDefaultContext()
       warnOnce(
         `alias:${name}`,
         `The "${name}" component alias is deprecated. Use SyntaxHighlighter with engine="${engine}" instead.`,

@@ -37,6 +37,8 @@ export type HighlightjsLanguageLoader = () => Promise<{ default: LanguageFn } | 
 export interface HighlightjsEngine extends HighlightEngine {
   readonly id: 'highlightjs'
   readonly capabilities: { sync: true }
+  hasLanguage(language: string): boolean
+  loadLanguage(language: string): Promise<void>
   registerLanguage(
     name: string,
     language: HighlightjsLanguageRegistration | HighlightjsLanguageLoader,

@@ -173,6 +173,23 @@ describe('highlight controller', () => {
     expect(spy).toHaveBeenCalledTimes(1)
   })
 
+  it('rejects results that do not reproduce the source text', () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const engine: HighlightEngine = {
+      id: 'wrong-text',
+      capabilities: { sync: true },
+      highlight: () => tokenResult('different'),
+    }
+    const context = createHighlighterContext({ engine })
+    const controller = createHighlightController({
+      context,
+      getInput: () => ({ code: 'expected', language: 'js' }),
+    })
+    expect(controller.attemptInitialSync()).toBe(true)
+    expect(controller.result.value).toBeUndefined()
+    expect(controller.error.value?.message).toContain('do not reproduce')
+  })
+
   it('ignores results after disposal', async () => {
     let resolve!: (value: HighlightResult) => void
     const engine: HighlightEngine = {

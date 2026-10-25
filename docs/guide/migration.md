@@ -64,10 +64,9 @@ Vue:
 
 ```vue
 <SyntaxHighlighter :code="code" language="ts">
-  <template #line="{ line, lineNumber, highlighted, renderTokens, renderGutter }">
+  <template #line="{ lineNumber, highlighted, renderTokens }">
     <span :data-source-line="lineNumber">
       <span v-if="highlighted" class="my-marker">*</span>
-      <component :is="renderGutter()" />
       <component :is="renderTokens()" />
     </span>
   </template>
