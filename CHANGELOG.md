@@ -2,7 +2,9 @@
 
 All notable changes to this project are documented here. The format follows Keep a Changelog and the project uses semantic versioning.
 
-## [0.1.0] - 2026-10-25
+## [1.0.0] - 2026-10-25
+
+Initial stable release.
 
 ### Added
 

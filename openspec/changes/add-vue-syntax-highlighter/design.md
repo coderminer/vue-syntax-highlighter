@@ -26,7 +26,7 @@ See `proposal.md` for motivation and `specs/` for the behavioral contract. Key c
 
 - Vue 2 support, a Nuxt module, or a Vite plugin.
 - Re-implementing TextMate/Prism grammars or shipping a full theme catalog.
-- Exact per-scope TextMate color fidelity in v0.1 (see Decisions and Open Questions).
+- Exact per-scope TextMate color fidelity in v1.0 (see Decisions and Open Questions).
 - Web Worker offload, editor/autocomplete features, or a copy-button UI component.
 - CommonJS output or legacy browser support.
 - Runtime style injection or a shadow-DOM mode.
@@ -62,7 +62,7 @@ interface HighlightResult {
 
 **Alternatives considered:**
 
-- *Engine-native inline styles* (closest to `react-syntax-highlighter`): preserves exact theme colors but requires re-highlighting on theme changes, enlarges cached data and SSR markup, and makes themes adapter-specific. Rejected for v0.1.
+- *Engine-native inline styles* (closest to `react-syntax-highlighter`): preserves exact theme colors but requires re-highlighting on theme changes, enlarges cached data and SSR markup, and makes themes adapter-specific. Rejected for v1.0.
 - *Shiki dual-theme CSS variables*: free light/dark switching for Shiki only, but requires per-token inline variables, does not generalize to lowlight/refractor or arbitrary themes, and still re-highlights when moving outside the pair. Rejected as the primary model.
 - *Hybrid semantic plus exact styles*: best fidelity but a larger contract and two rendering paths. Deferred to a possible `style` extension.
 
@@ -222,13 +222,13 @@ This is a greenfield package; there is no existing behavior or persisted data to
 3. Implement adapters and generated language registries; verify text parity and fallback behavior.
 4. Add SSR, virtualization, provider/composables, and compatibility aliases.
 5. Build the docs/demo and migration guide; run accessibility and performance checks.
-6. Validate the packed artifact in clean browser and SSR fixtures, then publish `0.1.0` (initially under a pre-release tag) and pin the verified version.
+6. Validate the packed artifact in clean browser and SSR fixtures, then publish `1.0.0` (initially under a pre-release tag) and pin the verified version.
 
 Rollback is version-based: republish/pin the last known-good version; there is no schema or data migration. The OpenSpec change can be archived once implemented and verified.
 
 ## Open Questions
 
 - Should a future mode preserve exact engine theme colors per token while keeping theme-independent caching (for example by storing a theme/style key rather than inline colors)? This is deferred and does not affect the current token contract or tasks.
-- Is a class-based/CSP-safe theme output needed in v0.1, or can inline custom properties remain the documented constraint?
+- Is a class-based/CSP-safe theme output needed in v1.0, or can inline custom properties remain the documented constraint?
 - Should a worker-backed engine be provided as the first extension of the adapter contract, and what serialization format should it use?
 - Should a Nuxt module be added after the core package proves its SSR path, or is a documented plugin enough?

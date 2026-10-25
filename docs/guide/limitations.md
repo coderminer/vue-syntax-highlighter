@@ -2,7 +2,7 @@
 
 ## Semantic colors, not exact TextMate fidelity
 
-Tokens carry one of 19 semantic types. Two different TextMate scopes that an engine theme might color differently can share a type and therefore a color. This is the deliberate cost of theme-independent caching, cross-engine themes, and CSS-only theme switching. Exact per-scope styles are a possible future extension; they are not part of v0.1.
+Tokens carry one of 19 semantic types. Two different TextMate scopes that an engine theme might color differently can share a type and therefore a color. This is the deliberate cost of theme-independent caching, cross-engine themes, and CSS-only theme switching. Exact per-scope styles are a possible future extension; they are not part of v1.0.
 
 ## Adapter token boundaries differ
 

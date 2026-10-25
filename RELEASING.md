@@ -88,19 +88,19 @@ npm publish --provenance --access public
 - Deprecate a broken version without removing it:
 
   ```bash
-  npm deprecate vue-syntax-highlighter@0.1.0 "Use 0.1.1 or newer"
+  npm deprecate vue-syntax-highlighter@1.0.0 "Use 1.0.1 or newer"
   ```
 
 - Move the `latest` dist-tag to a known-good version:
 
   ```bash
-  npm dist-tag add vue-syntax-highlighter@0.1.1 latest
+  npm dist-tag add vue-syntax-highlighter@1.0.1 latest
   ```
 
 - Unpublish only if the release is less than 72 hours old, has no dependents, and the version must not exist:
 
   ```bash
-  npm unpublish vue-syntax-highlighter@0.1.0
+  npm unpublish vue-syntax-highlighter@1.0.0
   ```
 
   Prefer a patch release and `npm deprecate`; unpublishing breaks lockfiles and caches.
@@ -112,4 +112,3 @@ The docs site deploys separately from [`.github/workflows/docs.yml`](.github/wor
 - Project page: `https://coderminer.github.io/vue-syntax-highlighter/`
 - The workflow sets `DOCS_BASE` to `/<repository>/` automatically.
 
-Add the npm version badge to the README after the first successful publish if it is not already present.

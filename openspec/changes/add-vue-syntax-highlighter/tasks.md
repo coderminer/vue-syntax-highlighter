@@ -1,6 +1,6 @@
 ## 1. Project Scaffold and Tooling
 
-- [x] 1.1 Initialize `package.json` for `vue-syntax-highlighter` 0.1.0 with `"type": "module"`, Node >= 20.19, package scripts, `vue ^3.4` as the required peer, optional peers for `shiki ^4`, `lowlight ^3`, `highlight.js ^11`, and `refractor ^5`, `peerDependenciesMeta`, and `sideEffects` limited to CSS. Verify: `pnpm install` succeeds and `npm pkg get name version type peerDependencies sideEffects` reports the intended manifest.
+- [x] 1.1 Initialize `package.json` for `vue-syntax-highlighter` 1.0.0 with `"type": "module"`, Node >= 20.19, package scripts, `vue ^3.4` as the required peer, optional peers for `shiki ^4`, `lowlight ^3`, `highlight.js ^11`, and `refractor ^5`, `peerDependenciesMeta`, and `sideEffects` limited to CSS. Verify: `pnpm install` succeeds and `npm pkg get name version type peerDependencies sideEffects` reports the intended manifest.
 - [x] 1.2 Add strict TypeScript configuration for the library, tests, docs, and type fixtures, including bundler and Node16 resolution fixtures. Verify: `pnpm typecheck` passes on an empty source tree and the fixtures are included in the project references.
 - [x] 1.3 Configure ESLint (Vue + TypeScript), Prettier, Vitest, and Playwright with coverage and DOM/SSR environments. Verify: `pnpm lint` passes, `pnpm test --run` executes a smoke test, and `pnpm exec playwright --version` works.
 - [x] 1.4 Configure Vite library mode with multiple entries, CSS handling, declaration emission, and stable output paths for core, adapters, themes, and styles. Verify: `pnpm build` produces the planned `dist` entries and declaration files for a placeholder entry.
@@ -78,4 +78,4 @@
 
 - [x] 9.1 Run the full local gate: install, lint, typecheck, unit/component/SSR tests, build, size, package checks, docs build, and Playwright. Verify: all commands pass on Node 20 and Node 22.
 - [x] 9.2 Review every scenario in `specs/` against the test suite and record any uncovered scenario as a blocking gap. Verify: a traceability list maps each requirement/scenario to a test or documented manual check, with no gaps.
-- [x] 9.3 Perform a release dry run: bump/confirm 0.1.0, generate the changelog entry, pack the tarball, install it in the consumer fixture, and verify the docs deploy preview. Verify: `npm publish --dry-run` shows only intended files and the fixture renders in browser and SSR modes.
+- [x] 9.3 Perform a release dry run: bump/confirm 1.0.0, generate the changelog entry, pack the tarball, install it in the consumer fixture, and verify the docs deploy preview. Verify: `npm publish --dry-run` shows only intended files and the fixture renders in browser and SSR modes.
