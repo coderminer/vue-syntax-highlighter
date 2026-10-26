@@ -79,6 +79,11 @@ export function createHighlightController(options: ControllerOptions): Highlight
     return next
   }
 
+  function discardResult(): void {
+    result.value = undefined
+    lines.value = undefined
+  }
+
   function fail(cause: unknown, expectedGeneration: number): void {
     if (disposed || expectedGeneration !== generation) return
     const normalized = toError(cause)
@@ -120,6 +125,7 @@ export function createHighlightController(options: ControllerOptions): Highlight
       busy.value = false
       return result.value
     }
+    if (key !== lastAppliedKey) discardResult()
 
     const request: HighlightRequest = {
       code: input.code,
@@ -217,6 +223,16 @@ export function createHighlightController(options: ControllerOptions): Highlight
     error.value = undefined
 
     const input = getInput()
+    const current = result.value
+    if (
+      current &&
+      (current.language !== input.language || resultToSource(current) !== input.code)
+    ) {
+      // Do not keep showing the previous document while a new language or
+      // source is loading. The plain fallback already reflects the new props;
+      // the pending result will replace it when it arrives.
+      discardResult()
+    }
     const selection = selectEngine(context, input.engine)
     let engine: HighlightEngine
     try {

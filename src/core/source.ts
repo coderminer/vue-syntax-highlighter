@@ -16,8 +16,7 @@ export function normalizeSource(code: string): string {
  * avoids an empty numbered row without flattening intentional blank lines.
  */
 export function normalizeDisplaySource(code: string): string {
-  const normalized = normalizeSource(code)
-  return normalized.endsWith('\n') ? normalized.slice(0, -1) : normalized
+  return normalizeSource(code).replace(/\n$/, '')
 }
 
 export function splitSource(code: string): string[] {

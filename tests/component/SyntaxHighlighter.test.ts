@@ -258,7 +258,7 @@ describe('states and events', () => {
     expect(wrapper.emitted('error')).toHaveLength(1)
   })
 
-  it('retains the previous result while refreshing', async () => {
+  it('retains the previous result while refreshing the same input', async () => {
     const pending: ((value: HighlightResult) => void)[] = []
     const engine = makeEngine(
       vi.fn(
@@ -275,12 +275,41 @@ describe('states and events', () => {
     await flushPromises()
     expect(wrapper.text()).toContain('first')
 
-    await wrapper.setProps({ code: 'second' })
+    const refreshed = (
+      wrapper.vm as unknown as { refresh: () => Promise<unknown> }
+    ).refresh()
     await flushPromises()
     expect(wrapper.text()).toContain('first')
-    pending[1]!(makeResult('second'))
+    pending[1]!(makeResult('first'))
+    await refreshed
+    expect(wrapper.text()).toContain('first')
+  })
+
+  it('shows the new source while changed input is pending', async () => {
+    const pending: ((value: HighlightResult) => void)[] = []
+    const engine = makeEngine(
+      vi.fn(
+        () =>
+          new Promise<HighlightResult>((resolve) => {
+            pending.push(resolve)
+          }),
+      ),
+      { sync: false },
+    )
+    const wrapper = mountWith({ code: 'old\nsource', engine })
     await flushPromises()
-    expect(wrapper.text()).toContain('second')
+    pending[0]!(makeResult('old\nsource'))
+    await flushPromises()
+    expect(wrapper.text()).toContain('old')
+
+    await wrapper.setProps({ code: 'new content' })
+    await flushPromises()
+    expect(wrapper.text()).toContain('new content')
+    expect(wrapper.text()).not.toContain('source')
+
+    pending[1]!(makeResult('new content'))
+    await flushPromises()
+    expect(wrapper.text()).toContain('new content')
   })
 })
 
@@ -382,6 +411,18 @@ describe('theme and reactivity', () => {
 })
 
 describe('exposed operations', () => {
+  it('handles null code without throwing from copy helpers', async () => {
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: undefined })
+    const wrapper = mountWith({ engine: makeEngine(), code: null as never })
+    const api = wrapper.vm as unknown as {
+      getCopyPayload: () => string
+      copy: () => Promise<boolean>
+    }
+    expect(() => api.getCopyPayload()).not.toThrow()
+    expect(api.getCopyPayload()).toBe('')
+    await expect(api.copy()).resolves.toBe(false)
+  })
+
   it('copies the full source and reports clipboard failures', async () => {
     const engine = makeEngine()
     const wrapper = mountWith({ engine, code: 'a\nb\nc', lineNumbers: true })

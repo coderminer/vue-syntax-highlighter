@@ -62,6 +62,8 @@ Deep imports into `dist/` are blocked by the exports map.
 
 Unknown attributes, including `class`, `style`, `data-*`, and `aria-*`, fall through to the root `.vsh` element. Caller classes merge with built-in classes.
 
+At runtime, a non-string `code` value such as `null` from an API or Markdown parser is treated as an empty string for both rendering and copy helpers.
+
 ### Slots
 
 All content slots are optional and scoped.

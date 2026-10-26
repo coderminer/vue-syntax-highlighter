@@ -120,7 +120,7 @@ describe('highlight controller', () => {
     expect(results[0]).toBe(results[1])
   })
 
-  it('keeps the previous output during refresh and rejects stale results', async () => {
+  it('clears previous output when input changes and rejects stale results', async () => {
     const pending: ((value: HighlightResult) => void)[] = []
     const engine: HighlightEngine = {
       id: 'slow',
@@ -144,8 +144,9 @@ describe('highlight controller', () => {
     input = { code: 'two', language: 'js' }
     controller.schedule()
     await flushPromises()
-    expect(controller.result.value?.lines[0]?.tokens[0]?.text).toContain('one')
-    // Resolve superseded work after the refresh started.
+    expect(controller.result.value).toBeUndefined()
+    expect(controller.busy.value).toBe(true)
+    // Resolve superseded work after the new input started.
     pending[1]!(tokenResult('two'))
     await flushPromises()
     expect(controller.result.value?.lines[0]?.tokens[0]?.text).toContain('two')

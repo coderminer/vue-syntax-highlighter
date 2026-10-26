@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here. The format follows Keep a Changelog and the project uses semantic versioning.
 
+## [1.0.2] - 2026-10-26
+
+### Fixed
+
+- `getCopyPayload()` and `copy()` no longer throw when `code` is `null` or another non-string runtime value. Non-string values are treated as empty source, and `copy()` now resolves `false` instead of rejecting when clipboard access fails.
+- When `code` or `language` changes while an asynchronous highlight is pending, the block renders the new source as plain text instead of continuing to display the previous result. Refreshing the same input still retains the old result until the new one arrives.
+- Added regression coverage for null source copy helpers, pending source changes, and same-input refreshes.
+
 ## [1.0.1] - 2026-10-25
 
 ### Fixed

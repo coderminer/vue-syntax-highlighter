@@ -368,13 +368,15 @@ export const SyntaxHighlighter = defineComponent({
 
     function getCopyPayload(): string {
       // Keep the terminal line break in clipboard output even though the
-      // rendered document omits the extra empty row it would create.
-      return normalizeSource(props.code)
+      // rendered document omits the extra empty row it would create. Runtime
+      // callers can pass null through a non-required String prop, so guard it
+      // here even though normalizeProps already does so for rendering.
+      return normalizeSource(typeof props.code === 'string' ? props.code : '')
     }
 
     async function copy(): Promise<boolean> {
-      const payload = getCopyPayload()
       try {
+        const payload = getCopyPayload()
         if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) return false
         await navigator.clipboard.writeText(payload)
         return true
