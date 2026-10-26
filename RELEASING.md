@@ -1,34 +1,23 @@
 # Releasing
 
-This project publishes `vue-syntax-highlighter` to npm from GitHub Actions when a `v*` tag is pushed. The workflow is [`.github/workflows/release.yml`](.github/workflows/release.yml).
+npm publishing is manual. GitHub Actions only builds and deploys the documentation from [`.github/workflows/docs.yml`](.github/workflows/docs.yml); no workflow publishes to npm or holds an npm token.
 
 ## One-time setup
 
-### npm package
+Confirm you can publish the unscoped package name:
 
-1. Confirm you can publish the unscoped package name:
+```bash
+npm view vue-syntax-highlighter version
+```
 
-   ```bash
-   npm view vue-syntax-highlighter version
-   ```
+A `404` means the name is available. If the query succeeds, the package already exists and its owner must add you as a maintainer before publishing.
 
-   A `404` means the name is available. If the query succeeds, the package already exists and its owner must add you as a maintainer before the first release.
+Sign in locally and enable two-factor authentication:
 
-2. Sign in locally and enable two-factor authentication:
-
-   ```bash
-   npm login
-   npm whoami
-   ```
-
-### GitHub
-
-Choose one authentication method for the publish workflow:
-
-- **Granular access token (default in this repository).** Create an npm automation token that can publish `vue-syntax-highlighter`, then add it as the `NPM_TOKEN` repository secret under **Settings → Secrets and variables → Actions**.
-- **Trusted publishing (no long-lived token).** On npmjs.com open the package settings, add a trusted publisher for GitHub Actions, and set the repository and workflow name to `release.yml`. Then delete the `NODE_AUTH_TOKEN` environment variable from the publish step so npm uses the workflow's OIDC identity. This requires npm 11.5.1 or newer.
-
-`--provenance` is enabled in the workflow, so the published tarball is linked to the commit and workflow run. The `repository` field in `package.json` must keep pointing at this GitHub repository or npm rejects the provenance attestation.
+```bash
+npm login
+npm whoami
+```
 
 ## Release checklist
 
@@ -40,7 +29,7 @@ Choose one authentication method for the publish workflow:
    git status
    ```
 
-2. Move the changelog entry out of the previous release and add the new version under `## [x.y.z] - YYYY-MM-DD` in `CHANGELOG.md`.
+2. Add or move the changelog entry under `## [x.y.z] - YYYY-MM-DD` in `CHANGELOG.md`.
 
 3. Run the full gate:
 
@@ -49,19 +38,21 @@ Choose one authentication method for the publish workflow:
    pnpm verify
    ```
 
-4. Bump the version and create the tag:
+4. Confirm the release tag matches the package version:
 
    ```bash
-   npm version patch   # or minor / major
-   git push origin main
-   git push origin --tags
+   pnpm check:release vX.Y.Z
    ```
 
-   `npm version` refuses to run outside a clean tree and creates a commit plus an annotated `vx.y.z` tag.
+5. Publish manually and enter the npm one-time password when prompted:
 
-5. Watch the **Publish to npm** workflow. It checks that the tag matches `package.json`, builds, typechecks, tests, verifies size budgets and the packed artifact, then publishes with provenance.
+   ```bash
+   npm publish --access public
+   ```
 
-6. Verify the result:
+   `prepublishOnly` rebuilds the package and runs `check:package` before upload. Use `npm publish --dry-run` to inspect the tarball without uploading. If OTP timing is tight, run `pnpm build && pnpm check:package` first, then `npm publish --access public --ignore-scripts` and enter the code.
+
+6. Verify the registry:
 
    ```bash
    npm view vue-syntax-highlighter version
@@ -69,46 +60,50 @@ Choose one authentication method for the publish workflow:
    npm view vue-syntax-highlighter repository.url
    ```
 
-   The npm package page shows a provenance badge for the release.
+7. Create and push the release tag for history:
 
-## Manual publishing
+   ```bash
+   git tag -a vX.Y.Z -m "vue-syntax-highlighter X.Y.Z"
+   git push origin main
+   git push origin vX.Y.Z
+   ```
 
-If the workflow is unavailable, publish from a machine with npm credentials:
+   The tag does not trigger an npm publish. Pushing `main` deploys the docs.
+
+## If npm uses staged publishing
+
+A staged release is not public until a maintainer approves it. Open the package's **Staged Packages** tab on npmjs.com, review the version, and choose **Approve** with 2FA. With npm CLI 11.15.0 or newer:
 
 ```bash
-pnpm install --frozen-lockfile
-pnpm verify
-npm publish --provenance --access public
+npx --yes npm@11.15.0 stage list
+npx --yes npm@11.15.0 stage approve <stage-id>
 ```
-
-`prepublishOnly` rebuilds and re-runs the package checks before upload. Use `npm publish --dry-run` to inspect the tarball without uploading. Provenance is only generated in a supported CI environment; omit `--provenance` for a local emergency release.
 
 ## After a bad release
 
 - Deprecate a broken version without removing it:
 
   ```bash
-  npm deprecate vue-syntax-highlighter@1.0.0 "Use 1.0.1 or newer"
+  npm deprecate vue-syntax-highlighter@X.Y.Z "Use X.Y.(Z+1) or newer"
   ```
 
 - Move the `latest` dist-tag to a known-good version:
 
   ```bash
-  npm dist-tag add vue-syntax-highlighter@1.0.1 latest
+  npm dist-tag add vue-syntax-highlighter@X.Y.Z latest
   ```
 
 - Unpublish only if the release is less than 72 hours old, has no dependents, and the version must not exist:
 
   ```bash
-  npm unpublish vue-syntax-highlighter@1.0.0
+  npm unpublish vue-syntax-highlighter@X.Y.Z
   ```
 
   Prefer a patch release and `npm deprecate`; unpublishing breaks lockfiles and caches.
 
 ## Documentation
 
-The docs site deploys separately from [`.github/workflows/docs.yml`](.github/workflows/docs.yml) on every push to `main`. In the repository's **Settings → Pages**, choose **GitHub Actions** as the source. The site is published at:
+The docs site deploys from [`.github/workflows/docs.yml`](.github/workflows/docs.yml) on every push to `main`. In the repository's **Settings → Pages**, choose **GitHub Actions** as the source. The site is published at:
 
 - Project page: `https://coderminer.github.io/vue-syntax-highlighter/`
 - The workflow sets `DOCS_BASE` to `/<repository>/` automatically.
-

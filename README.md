@@ -153,7 +153,7 @@ See the full gate with `pnpm verify`.
 
 ### Publishing
 
-Releases are published to npm by [`.github/workflows/release.yml`](https://github.com/coderminer/vue-syntax-highlighter/blob/main/.github/workflows/release.yml) when a `v*` tag is pushed. See [RELEASING.md](https://github.com/coderminer/vue-syntax-highlighter/blob/main/RELEASING.md) for the one-time npm and GitHub setup, the version/changelog checklist, provenance, and rollback steps.
+GitHub Actions deploys the documentation only. npm publishing is manual from an authenticated local checkout; pushing a `v*` tag records the release but does not publish to npm. See [RELEASING.md](https://github.com/coderminer/vue-syntax-highlighter/blob/main/RELEASING.md) for the version/changelog checklist, manual publish commands, and rollback steps.
 
 ### Deploying the docs
 
