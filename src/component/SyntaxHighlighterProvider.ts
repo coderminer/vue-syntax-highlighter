@@ -162,6 +162,23 @@ export const SyntaxHighlighterProvider = defineComponent({
       },
     )
 
+    watch(
+      () => [
+        props.engines,
+        props.themeRegistry,
+        props.cache,
+        props.cacheCapacity,
+        props.cacheMaxChars,
+      ],
+      () => {
+        warnOnce(
+          'provider-static-config',
+          'Changes to provider engines, themeRegistry, cache, cacheCapacity, or cacheMaxChars after creation are ignored. Recreate the provider or plugin scope to apply them.',
+          context.warningSet,
+        )
+      },
+    )
+
     onMounted(() => {
       void preloadLanguages(context)
     })

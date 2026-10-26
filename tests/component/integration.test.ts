@@ -259,6 +259,40 @@ describe('composable', () => {
     expect(api.result.value?.lines[0]?.tokens[0]?.text).toBe('x')
   })
 
+  it('copies source from the composable API', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
+    let api!: ReturnType<typeof useSyntaxHighlighter>
+    const Child = defineComponent({
+      setup() {
+        api = useSyntaxHighlighter({ code: 'a\nb', language: 'js' })
+        return () => h('div')
+      },
+    })
+    mount(Child)
+    await flushPromises()
+    expect(api.getCopyPayload()).toBe('a\nb')
+    await expect(api.copy()).resolves.toBe(true)
+    expect(writeText).toHaveBeenCalledWith('a\nb')
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: undefined })
+  })
+
+  it('treats null code as empty in the composable copy payload', () => {
+    let api!: ReturnType<typeof useSyntaxHighlighter>
+    const Child = defineComponent({
+      setup() {
+        api = useSyntaxHighlighter({ code: null as never, language: 'js' })
+        return () => h('div')
+      },
+    })
+    mount(Child)
+    expect(() => api.getCopyPayload()).not.toThrow()
+    expect(api.getCopyPayload()).toBe('')
+  })
+
   it('supports async engines and reports loading', async () => {
     let resolve!: (value: HighlightResult) => void
     const fake = engine(

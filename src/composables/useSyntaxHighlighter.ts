@@ -25,7 +25,12 @@ import {
   type HighlightController,
 } from '../core/controller.js'
 import type { EngineChoice } from '../core/engine.js'
-import { createPlainResult, normalizeDisplaySource } from '../core/source.js'
+import { copyText } from '../core/clipboard.js'
+import {
+  createPlainResult,
+  normalizeDisplaySource,
+  normalizeSource,
+} from '../core/source.js'
 import { normalizeLanguage } from '../core/props.js'
 
 export interface UseSyntaxHighlighterOptions {
@@ -45,6 +50,8 @@ export interface UseSyntaxHighlighterReturn {
   readonly error: ShallowRef<Error | undefined>
   readonly refresh: () => Promise<HighlightResult | undefined>
   readonly highlight: (input: { code: string; language?: string }) => Promise<HighlightResult>
+  readonly copy: () => Promise<boolean>
+  readonly getCopyPayload: () => string
   readonly controller: HighlightController
 }
 
@@ -97,6 +104,19 @@ export function useSyntaxHighlighter(
     void controller.start()
   }
 
+  function getCopyPayload(): string {
+    const value = toValue(options.code)
+    return normalizeSource(typeof value === 'string' ? value : '')
+  }
+
+  async function copy(): Promise<boolean> {
+    try {
+      return await copyText(getCopyPayload())
+    } catch {
+      return false
+    }
+  }
+
   return {
     result: controller.result,
     lines,
@@ -106,6 +126,8 @@ export function useSyntaxHighlighter(
     error: controller.error,
     refresh: () => controller.refresh(),
     highlight: (input) => controller.highlight(input),
+    copy,
+    getCopyPayload,
     controller,
   }
 }

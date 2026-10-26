@@ -27,6 +27,7 @@ import {
 } from '../core/context.js'
 import { createHighlightController } from '../core/controller.js'
 import { normalizeProps, highlighterProps, type RawHighlighterProps } from '../core/props.js'
+import { copyText } from '../core/clipboard.js'
 import { createPlainResult, normalizeSource } from '../core/source.js'
 import {
   computeVirtualWindow,
@@ -376,10 +377,7 @@ export const SyntaxHighlighter = defineComponent({
 
     async function copy(): Promise<boolean> {
       try {
-        const payload = getCopyPayload()
-        if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) return false
-        await navigator.clipboard.writeText(payload)
-        return true
+        return await copyText(getCopyPayload())
       } catch {
         return false
       }
@@ -433,15 +431,24 @@ export const SyntaxHighlighter = defineComponent({
       if (active) preStyle.overflow = 'auto'
 
       const ariaLabel =
-        typeof restAttrs['aria-label'] === 'string' ? restAttrs['aria-label'] : undefined
+        typeof restAttrs['aria-label'] === 'string' && restAttrs['aria-label'].length > 0
+          ? restAttrs['aria-label']
+          : undefined
+      const ariaLabelledby =
+        typeof restAttrs['aria-labelledby'] === 'string' &&
+        restAttrs['aria-labelledby'].length > 0
+          ? restAttrs['aria-labelledby']
+          : undefined
+      const hasAccessibleName = Boolean(ariaLabel || ariaLabelledby)
 
       const preNode = h(
         current.preTag,
         {
           class: 'vsh-pre',
           style: preStyle,
-          role: 'region',
+          ...(hasAccessibleName ? { role: 'region' } : {}),
           ...(ariaLabel ? { 'aria-label': ariaLabel } : {}),
+          ...(ariaLabelledby ? { 'aria-labelledby': ariaLabelledby } : {}),
           ...(busy ? { 'aria-busy': 'true' } : {}),
           ...(current.tabindex !== false && current.tabindex !== null
             ? { tabindex: current.tabindex }

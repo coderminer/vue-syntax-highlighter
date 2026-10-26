@@ -144,7 +144,7 @@ Available content slots: `header`, `footer`, `loading`, `error`, `line`, `line-n
 />
 ```
 
-Unknown attributes fall through to the root `.vsh` element. Caller classes merge with the built-in classes.
+Unknown attributes fall through to the root `.vsh` element. Caller classes merge with the built-in classes. Add `aria-label` or `aria-labelledby` when the scrollable code block should be exposed as a named landmark; without one, the component does not create an unnamed `region`.
 
 `lineProps` and `tokenProps` return attribute objects for cases where a full slot is unnecessary:
 
@@ -178,7 +178,14 @@ async function copy(): Promise<void> {
 </template>
 ```
 
-`copy()` and `getCopyPayload()` always use the complete source, never the rendered window or gutter. `copy()` resolves `false` when the Clipboard API is unavailable or denied.
+`copy()` and `getCopyPayload()` always use the complete source, never the rendered window or gutter. `copy()` prefers the Clipboard API and falls back to `document.execCommand('copy')` in insecure contexts; it resolves `false` when both are unavailable or denied.
+
+The composable exposes the same pair:
+
+```ts
+const { copy, getCopyPayload } = useSyntaxHighlighter({ code, language: 'ts' })
+await copy()
+```
 
 ## Events
 

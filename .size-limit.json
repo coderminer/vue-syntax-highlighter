@@ -2,7 +2,7 @@
   {
     "name": "core (excluding Vue)",
     "path": "dist/index.js",
-    "limit": "12.1 kB",
+    "limit": "12.5 kB",
     "gzip": true
   },
   {

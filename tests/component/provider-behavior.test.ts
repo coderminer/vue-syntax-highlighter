@@ -5,6 +5,7 @@ import { SyntaxHighlighter } from '@/component/SyntaxHighlighter'
 import { SyntaxHighlighterProvider } from '@/component/SyntaxHighlighterProvider'
 import { splitSource } from '@/core/source'
 import type { HighlightEngine, HighlightResult } from '@/types'
+import { vshLight } from '@/themes/vsh-light'
 
 let counter = 0
 function result(code: string, language = 'js'): HighlightResult {
@@ -99,6 +100,24 @@ describe('provider behavior defaults', () => {
     await nextTick()
     await flushPromises()
     expect(wrapper.findAll('.vsh-line').length).toBeLessThanOrEqual(100)
+    wrapper.unmount()
+  })
+
+  it('warns when static provider configuration changes', async () => {
+    const spy = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const registry = ref<Record<string, typeof vshLight>>({})
+    const wrapper = mount(
+      {
+        render: () =>
+          h(SyntaxHighlighterProvider, { themeRegistry: registry.value }, () => h('div')),
+      },
+      { attachTo: document.body },
+    )
+    registry.value = { custom: vshLight }
+    await nextTick()
+    expect(
+      spy.mock.calls.some((call) => String(call[0]).includes('themeRegistry')),
+    ).toBe(true)
     wrapper.unmount()
   })
 

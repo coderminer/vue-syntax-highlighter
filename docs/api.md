@@ -64,6 +64,8 @@ Unknown attributes, including `class`, `style`, `data-*`, and `aria-*`, fall thr
 
 At runtime, a non-string `code` value such as `null` from an API or Markdown parser is treated as an empty string for both rendering and copy helpers.
 
+The scrollable `pre` becomes a named `region` only when `aria-label` or `aria-labelledby` is present. Without an accessible name it is not exposed as an unnamed landmark.
+
 ### Slots
 
 All content slots are optional and scoped.
@@ -104,19 +106,32 @@ Props: `engine`, `engines`, `theme`, `themes`, `colorScheme`, `themeRegistry`, `
 
 The provider renders one `display: contents` theme scope, provides configuration to descendants, preloads languages on mount, and disposes loader-owned engines and caches on unmount. Nested providers inherit unspecified values.
 
+`engines`, `themeRegistry`, `cache`, `cacheCapacity`, and `cacheMaxChars` are read when the provider is created. Changing them after creation is ignored and emits one development warning; recreate the provider or plugin scope to apply a new value.
+
 ## `useSyntaxHighlighter`
 
 ```ts
-const { result, lines, language, loading, busy, error, refresh, highlight, controller } =
-  useSyntaxHighlighter({
-    code,
-    language,
-    engine,
-    engineOptions,
-  })
+const {
+  result,
+  lines,
+  language,
+  loading,
+  busy,
+  error,
+  refresh,
+  highlight,
+  copy,
+  getCopyPayload,
+  controller,
+} = useSyntaxHighlighter({
+  code,
+  language,
+  engine,
+  engineOptions,
+})
 ```
 
-`code` and the other inputs accept refs or getters. The composable respects the nearest provider/plugin, exposes reactive state, and disposes its controller on scope unmount.
+`code` and the other inputs accept refs or getters. The composable respects the nearest provider/plugin, exposes reactive state, and disposes its controller on scope unmount. `copy()` and `getCopyPayload()` use the same full-source clipboard behavior as the component.
 
 ## `defineTheme`
 

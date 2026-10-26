@@ -327,6 +327,20 @@ describe('accessibility and attributes', () => {
     expect(wrapper.find('pre').attributes('role')).toBe('region')
   })
 
+  it('does not expose an unnamed region', () => {
+    const wrapper = mountWith({ engine: makeEngine() })
+    expect(wrapper.find('pre').attributes('role')).toBeUndefined()
+  })
+
+  it('supports aria-labelledby for the scroll region', () => {
+    const wrapper = mountWith({
+      engine: makeEngine(),
+      'aria-labelledby': 'code-label',
+    })
+    expect(wrapper.find('pre').attributes('role')).toBe('region')
+    expect(wrapper.find('pre').attributes('aria-labelledby')).toBe('code-label')
+  })
+
   it('honors tabindex=false and forwards data attributes', () => {
     const wrapper = mountWith({
       engine: makeEngine(),

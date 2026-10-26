@@ -2,6 +2,22 @@
 
 All notable changes to this project are documented here. The format follows Keep a Changelog and the project uses semantic versioning.
 
+## [1.0.3] - 2026-10-26
+
+### Added
+
+- `useSyntaxHighlighter` now exposes `copy()` and `getCopyPayload()` with the same full-source behavior as the component.
+- Clipboard copies fall back to `document.execCommand('copy')` when the async Clipboard API is unavailable, including plain HTTP contexts.
+
+### Fixed
+
+- The scrollable `pre` is only exposed as a named `region` when `aria-label` or `aria-labelledby` is provided, avoiding an unnamed landmark.
+- Provider changes to `engines`, `themeRegistry`, `cache`, `cacheCapacity`, or `cacheMaxChars` after creation now emit one development warning instead of being silently ignored.
+
+### Changed
+
+- GitHub Actions now only builds and deploys the documentation. npm publishing is manual, and no workflow holds an npm token or runs `npm publish`.
+
 ## [1.0.2] - 2026-10-26
 
 ### Fixed
@@ -35,6 +51,6 @@ Initial stable release.
 - Compatibility aliases `Light`, `LightAsync`, `PrismLight`, and `PrismAsync`, plus deprecated prop mapping with one-time warnings.
 - Optional `styles/fallback.css` for browsers without `light-dark()`, wrapped in `@supports not` so it is a no-op in modern browsers.
 - Strict ESM package exports, TypeScript declarations, size budgets, static graph assertions, publint/attw validation, packed-consumer browser and SSR fixtures.
-- npm metadata with repository/homepage/bugs links, `publishConfig.access`, a tag-checked release workflow with provenance, and a `prepublishOnly` build/package gate.
+- npm metadata with repository/homepage/bugs links, `publishConfig.access`, manual release guidance, and a `prepublishOnly` build/package gate.
 - VitePress documentation with onboarding, basic and advanced usage guides, API reference, examples for every public export, live demo, and a GitHub Pages deployment workflow.
 - Playwright and axe coverage for the demo, deferral, nested schemes, and accessibility.

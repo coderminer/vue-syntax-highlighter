@@ -160,6 +160,8 @@ const state: UseSyntaxHighlighterReturn = useSyntaxHighlighter(options)
 state.lines.value
 state.loading.value
 state.error.value
+state.getCopyPayload()
+await state.copy()
 await state.refresh()
 ```
 
