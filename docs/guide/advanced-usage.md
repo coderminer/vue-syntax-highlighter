@@ -58,7 +58,7 @@ const engine = await createHighlightjsEngine({ preload: ['typescript'] })
 <SyntaxHighlighter :code="code" language="ts" :engine="engine" />
 ```
 
-`vue-syntax-highlighter/full` is equivalent to the default entry in `1.1.0`.
+`vue-syntax-highlighter/full` is equivalent to the default entry in `1.1.x`.
 
 ## Plugin installation
 

@@ -1,7 +1,7 @@
 import { gzipSync } from 'node:zlib'
-import { build } from 'vite'
+import { build, transformWithEsbuild } from 'vite'
 
-const LIMIT = 15_000
+const LIMIT = 13_000
 
 const result = await build({
   configFile: false,
@@ -28,7 +28,14 @@ const code = outputs
   .filter((item) => item.type === 'chunk')
   .map((item) => item.code)
   .join('\n')
-const bytes = gzipSync(Buffer.from(code)).length
+// Vite's library build keeps whitespace for ES output. Apply the same esbuild
+// minification users get from an application build before measuring.
+const minified = await transformWithEsbuild(code, 'core.js', {
+  minify: true,
+  format: 'esm',
+  target: 'es2020',
+})
+const bytes = gzipSync(Buffer.from(minified.code)).length
 
 if (bytes > LIMIT) {
   console.error(

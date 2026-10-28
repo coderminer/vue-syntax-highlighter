@@ -3,6 +3,7 @@
 export {
   createHighlightjsEngine,
   createHighlightjsEngine as createLowlightEngine,
+  supportedLanguages,
 } from './highlightjs/index.js'
 export type {
   HighlightjsEngine,

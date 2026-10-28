@@ -55,6 +55,6 @@ Deferral uses `IntersectionObserver`. When it is unavailable, the component star
 
 ## Planned fixes
 
-Known correctness issues and the planned `1.1.0` / `2.0.0` work are tracked in the [Roadmap](/guide/roadmap). The roadmap describes intended changes; it is not a statement that a fix is already available in the current release.
+Known correctness issues and the planned `1.1.x` / `2.0.0` work are tracked in the [Roadmap](/guide/roadmap). The roadmap describes intended changes; it is not a statement that a fix is already available in the current release.
 
 

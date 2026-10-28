@@ -24,10 +24,25 @@ import {
   type TokenType,
   useSyntaxHighlighter,
 } from 'vue-syntax-highlighter'
-import { createShikiEngine, type ShikiEngine } from 'vue-syntax-highlighter/engines/shiki'
-import { createHighlightjsEngine } from 'vue-syntax-highlighter/engines/highlightjs'
-import { createLowlightEngine } from 'vue-syntax-highlighter/engines/lowlight'
-import { createPrismEngine } from 'vue-syntax-highlighter/engines/prism'
+import { SyntaxHighlighter as CoreSyntaxHighlighter } from 'vue-syntax-highlighter/core'
+import { SyntaxHighlighter as FullSyntaxHighlighter } from 'vue-syntax-highlighter/full'
+import {
+  createShikiEngine,
+  supportedLanguages as shikiLanguages,
+  type ShikiEngine,
+} from 'vue-syntax-highlighter/engines/shiki'
+import {
+  createHighlightjsEngine,
+  supportedLanguages as highlightjsLanguages,
+} from 'vue-syntax-highlighter/engines/highlightjs'
+import {
+  createLowlightEngine,
+  supportedLanguages as lowlightLanguages,
+} from 'vue-syntax-highlighter/engines/lowlight'
+import {
+  createPrismEngine,
+  supportedLanguages as prismLanguages,
+} from 'vue-syntax-highlighter/engines/prism'
 import { vshDark } from 'vue-syntax-highlighter/themes/vsh-dark'
 import { vshLight } from 'vue-syntax-highlighter/themes/vsh-light'
 import { vshMidnight } from 'vue-syntax-highlighter/themes/vsh-midnight'
@@ -126,6 +141,8 @@ function useExposed(exposed: SyntaxHighlighterExposed): Promise<boolean> {
 
 const components = [
   SyntaxHighlighter,
+  CoreSyntaxHighlighter,
+  FullSyntaxHighlighter,
   SyntaxHighlighterProvider,
   Light,
   LightAsync,
@@ -151,5 +168,9 @@ void [
   createHighlightjsEngine,
   createLowlightEngine,
   createPrismEngine,
+  shikiLanguages,
+  highlightjsLanguages,
+  lowlightLanguages,
+  prismLanguages,
 ]
 void (null as unknown as ShikiEngine)

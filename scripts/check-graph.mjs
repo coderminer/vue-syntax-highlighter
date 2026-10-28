@@ -16,8 +16,15 @@ function read(file) {
 function staticImports(file) {
   const code = read(file)
   const specifiers = new Set()
-  for (const match of code.matchAll(/\b(?:import|export)\s*(?:[^"'`()]*?\bfrom\s*)?["']([^"']+)["']/g)) {
-    if (match[1]) specifiers.add(match[1])
+  const patterns = [
+    /(?:^|[;{}\n])\s*import\s*["']([^"']+)["']/g,
+    /(?:^|[;{}\n])\s*import\s*(?:[^"'`()]*?\bfrom\s*)["']([^"']+)["']/g,
+    /(?:^|[;{}\n])\s*export\s*(?:[^"'`()]*?\bfrom\s*)["']([^"']+)["']/g,
+  ]
+  for (const pattern of patterns) {
+    for (const match of code.matchAll(pattern)) {
+      if (match[1]) specifiers.add(match[1])
+    }
   }
   return [...specifiers]
 }
@@ -33,10 +40,11 @@ function graph(entry) {
   const entryFile = resolve(dist, entry)
   if (!existsSync(entryFile)) {
     fail(`missing build entry ${entry}`)
-    return { modules: [], dynamic: [] }
+    return { modules: [], dynamic: [], bare: [] }
   }
   const modules = new Set()
   const dynamic = new Set()
+  const bare = new Set()
   const queue = [entryFile]
   while (queue.length) {
     const file = queue.pop()
@@ -44,7 +52,10 @@ function graph(entry) {
     modules.add(file)
     for (const specifier of dynamicImports(file)) dynamic.add(specifier)
     for (const specifier of staticImports(file)) {
-      if (!specifier.startsWith('.')) continue
+      if (!specifier.startsWith('.')) {
+        bare.add(specifier)
+        continue
+      }
       const target = resolve(dirname(file), specifier)
       if (!existsSync(target)) {
         fail(`${relative(dist, file)} imports missing ${specifier}`)
@@ -56,6 +67,15 @@ function graph(entry) {
   return {
     modules: [...modules].map((file) => relative(dist, file).split(sep).join('/')).sort(),
     dynamic: [...dynamic].sort(),
+    bare: [...bare].sort(),
+  }
+}
+
+function assertBare(result, entry, allowed) {
+  for (const specifier of result.bare) {
+    if (!allowed.some((pattern) => pattern.test(specifier))) {
+      fail(`${entry} statically imports unexpected package ${specifier}`)
+    }
   }
 }
 
@@ -74,6 +94,7 @@ const full = assertNoGraph(
   [/^engines\//, /^chunks\/(?:shiki|highlightjs|prism)-/, /languages/],
   'static graph',
 )
+assertBare(full, 'index.js', [/^vue$/])
 if (full.dynamic.length === 0) fail('the default entry should reference adapters through dynamic imports')
 for (const specifier of full.dynamic) {
   if (!/engines\/(shiki|highlightjs|lowlight|prism)\.js$/.test(specifier)) {
@@ -86,6 +107,7 @@ const core = assertNoGraph(
   [/^engines\//, /^chunks\/builtin-engines-/, /languages/],
   'static graph',
 )
+assertBare(core, 'core-entry.js', [/^vue$/])
 if (core.dynamic.length !== 0) {
   fail(`core entry must not reference built-in adapters: ${core.dynamic.join(', ')}`)
 }
@@ -110,12 +132,17 @@ const prism = assertNoGraph(
   [/^engines\/(?:shiki|highlightjs|lowlight)\.js$/, /^themes\//, /^index\.js$/],
   'static graph',
 )
+assertBare(shiki, 'engines/shiki.js', [/^shiki(\/.*)?$/, /^@shikijs\/.*$/])
+assertBare(highlightjs, 'engines/highlightjs.js', [/^lowlight(\/.*)?$/, /^highlight\.js(\/.*)?$/])
+assertBare(lowlight, 'engines/lowlight.js', [/^lowlight(\/.*)?$/, /^highlight\.js(\/.*)?$/])
+assertBare(prism, 'engines/prism.js', [/^refractor(\/.*)?$/])
 
 const darkTheme = assertNoGraph(
   'themes/vsh-dark.js',
   [/^themes\/(?!vsh-dark\.js$)/, /^engines\//, /^index\.js$/],
   'static graph',
 )
+assertBare(darkTheme, 'themes/vsh-dark.js', [])
 
 const coreCode = core.modules.map((file) => read(resolve(dist, file))).join('\n')
 if (/\bdocument\./.test(coreCode)) fail('core static graph accesses document at import scope')

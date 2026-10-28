@@ -98,38 +98,26 @@ run(process.execPath, ['tests/fixtures/consumer/ssr.mjs'])
 for (const name of ['core-consumer', 'single-engine']) {
   const source = join(root, `tests/fixtures/${name}`)
   const isolated = mkdtempSync(join(tmpdir(), `vsh-${name}-`))
+  let success = false
   try {
     cpSync(join(source, 'index.html'), join(isolated, 'index.html'))
     cpSync(join(source, 'src'), join(isolated, 'src'), { recursive: true })
     cpSync(join(source, 'vite.config.mjs'), join(isolated, 'vite.config.mjs'))
 
-    const dependencies = {
-      'vue-syntax-highlighter': `file:${tarball.replace(/\\/g, '/')}`,
-      vue: '^3.5.0',
-      ...(name === 'single-engine'
-        ? { 'highlight.js': '^11.11.1', lowlight: '^3.3.0' }
-        : {}),
-    }
+    const fixturePackage = JSON.parse(readFileSync(join(source, 'package.json'), 'utf8'))
+    fixturePackage.name = `vsh-${name}-isolated`
+    fixturePackage.dependencies['vue-syntax-highlighter'] =
+      `file:${tarball.replace(/\\/g, '/')}`
     writeFileSync(
       join(isolated, 'package.json'),
-      `${JSON.stringify(
-        {
-          name: `vsh-${name}-isolated`,
-          private: true,
-          type: 'module',
-          dependencies,
-        },
-        null,
-        2,
-      )}\n`,
+      `${JSON.stringify(fixturePackage, null, 2)}\n`,
     )
 
-    run(process.platform === 'win32' ? 'npm.cmd' : 'npm', [
-      'install',
-      '--no-audit',
-      '--no-fund',
-      '--ignore-scripts',
-    ], { cwd: isolated })
+    run(
+      process.platform === 'win32' ? 'npm.cmd' : 'npm',
+      ['install', '--prefer-offline', '--no-audit', '--no-fund', '--ignore-scripts'],
+      { cwd: isolated },
+    )
 
     const forbidden =
       name === 'core-consumer'
@@ -140,6 +128,14 @@ for (const name of ['core-consumer', 'single-engine']) {
         throw new Error(`${name} isolated fixture unexpectedly installed ${peer}`)
       }
     }
+
+    // A static import of an optional peer in the core entry fails here because
+    // that peer is not installed in the isolated project.
+    writeFileSync(
+      join(isolated, 'check-core.mjs'),
+      "await import('vue-syntax-highlighter/core')\n",
+    )
+    run(process.execPath, [join(isolated, 'check-core.mjs')], { cwd: isolated })
 
     run(
       process.execPath,
@@ -159,8 +155,22 @@ for (const name of ['core-consumer', 'single-engine']) {
     if (!output.some((file) => file.endsWith('.js'))) {
       throw new Error(`${name} browser build did not emit JavaScript`)
     }
+    for (const file of output) {
+      if (file.includes('__vite-optional-peer-dep_')) {
+        throw new Error(`${name} build emitted an optional-peer stub: ${file}`)
+      }
+      const content = readFileSync(join(isolated, 'dist/assets', file), 'utf8')
+      if (content.includes('__vite-optional-peer-dep_')) {
+        throw new Error(`${name} build references an optional peer in ${file}`)
+      }
+    }
+    success = true
   } finally {
-    rmSync(isolated, { recursive: true, force: true })
+    if (success) {
+      rmSync(isolated, { recursive: true, force: true })
+    } else {
+      console.error(`isolated fixture kept for debugging: ${isolated}`)
+    }
   }
 }
 

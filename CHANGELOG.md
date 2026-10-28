@@ -12,14 +12,18 @@ All notable changes to this project are documented here. The format follows Keep
 
 ### Added
 
-- `supportedLanguages` is exported from the highlight.js and Prism adapter entries.
+- `supportedLanguages` is exported from the highlight.js, lowlight, and Prism adapter entries.
 - Isolated core-only and single-engine fixtures now install the packed tarball plus only their allowed peers in the OS temp directory.
-- A bundled core-entry size check measures the actual gzip cost with Vue external.
+- The isolated core fixture imports `vue-syntax-highlighter/core` in Node, so a static optional-peer import fails with `ERR_MODULE_NOT_FOUND` even when a bundler would stub it.
+- Consumer builds fail when Vite emits an `__vite-optional-peer-dep_` stub.
+- `check:graph` now rejects unexpected bare package imports, including static side-effect imports, on the default, core, adapter, and theme graphs.
+- A bundled core-entry size check measures minified gzip cost with Vue external, matching what consumers ship.
 
 ### Documentation
 
 - Documented the runtime `NODE_ENV` folding caveat for non-Vite bundlers.
 - Corrected the Prism/highlight.js language coverage imports and roadmap release tracking.
+- Added type-level imports for the `core` and `full` entries and every adapter's `supportedLanguages`.
 
 ## [1.1.0] - 2026-10-28
 
