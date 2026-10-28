@@ -1,5 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, relative, resolve, sep } from 'node:path'
+import { init, parse } from 'es-module-lexer'
+
+await init
 
 const root = process.cwd()
 const dist = resolve(root, 'dist')
@@ -13,60 +16,54 @@ function read(file) {
   return readFileSync(file, 'utf8')
 }
 
-function staticImports(file) {
-  const code = read(file)
-  const specifiers = new Set()
-  const patterns = [
-    /(?:^|[;{}\n])\s*import\s*["']([^"']+)["']/g,
-    /(?:^|[;{}\n])\s*import\s*(?:[^"'`()]*?\bfrom\s*)["']([^"']+)["']/g,
-    /(?:^|[;{}\n])\s*export\s*(?:[^"'`()]*?\bfrom\s*)["']([^"']+)["']/g,
-  ]
-  for (const pattern of patterns) {
-    for (const match of code.matchAll(pattern)) {
-      if (match[1]) specifiers.add(match[1])
-    }
-  }
-  return [...specifiers]
-}
-
-function dynamicImports(file) {
-  const code = read(file)
-  return [...code.matchAll(/\bimport\(\s*["']([^"']+)["']\s*\)/g)]
-    .map((match) => match[1])
-    .filter(Boolean)
+function importsOf(file) {
+  return parse(read(file))[0]
 }
 
 function graph(entry) {
   const entryFile = resolve(dist, entry)
   if (!existsSync(entryFile)) {
     fail(`missing build entry ${entry}`)
-    return { modules: [], dynamic: [], bare: [] }
+    return { modules: [], dynamic: [], computed: [], bare: [] }
   }
   const modules = new Set()
   const dynamic = new Set()
+  const computed = new Set()
   const bare = new Set()
   const queue = [entryFile]
   while (queue.length) {
     const file = queue.pop()
     if (!file || modules.has(file)) continue
     modules.add(file)
-    for (const specifier of dynamicImports(file)) dynamic.add(specifier)
-    for (const specifier of staticImports(file)) {
-      if (!specifier.startsWith('.')) {
-        bare.add(specifier)
-        continue
+    for (const imported of importsOf(file)) {
+      // d === -1 is a static import/export, d >= 0 is dynamic import().
+      // import.meta uses d === -2 and is ignored.
+      if (imported.d === -1) {
+        if (!imported.n) continue
+        if (!imported.n.startsWith('.')) {
+          bare.add(imported.n)
+          continue
+        }
+        const target = resolve(dirname(file), imported.n)
+        if (!existsSync(target)) {
+          fail(`${relative(dist, file)} imports missing ${imported.n}`)
+          continue
+        }
+        queue.push(target)
+      } else if (imported.d >= 0) {
+        if (imported.n) {
+          dynamic.add(imported.n)
+        } else {
+          const where = `${relative(dist, file).split(sep).join('/')}:${imported.s}`
+          computed.add(where)
+        }
       }
-      const target = resolve(dirname(file), specifier)
-      if (!existsSync(target)) {
-        fail(`${relative(dist, file)} imports missing ${specifier}`)
-        continue
-      }
-      queue.push(target)
     }
   }
   return {
     modules: [...modules].map((file) => relative(dist, file).split(sep).join('/')).sort(),
     dynamic: [...dynamic].sort(),
+    computed: [...computed].sort(),
     bare: [...bare].sort(),
   }
 }
@@ -111,6 +108,9 @@ assertBare(core, 'core-entry.js', [/^vue$/])
 if (core.dynamic.length !== 0) {
   fail(`core entry must not reference built-in adapters: ${core.dynamic.join(', ')}`)
 }
+if (core.computed.length !== 0) {
+  fail(`core entry must not contain computed dynamic imports: ${core.computed.join(', ')}`)
+}
 
 const shiki = assertNoGraph(
   'engines/shiki.js',
@@ -132,23 +132,35 @@ const prism = assertNoGraph(
   [/^engines\/(?:shiki|highlightjs|lowlight)\.js$/, /^themes\//, /^index\.js$/],
   'static graph',
 )
-assertBare(shiki, 'engines/shiki.js', [/^shiki(\/.*)?$/, /^@shikijs\/.*$/])
-assertBare(highlightjs, 'engines/highlightjs.js', [/^lowlight(\/.*)?$/, /^highlight\.js(\/.*)?$/])
-assertBare(lowlight, 'engines/lowlight.js', [/^lowlight(\/.*)?$/, /^highlight\.js(\/.*)?$/])
-assertBare(prism, 'engines/prism.js', [/^refractor(\/.*)?$/])
+assertBare(shiki, 'engines/shiki.js', [/^vue$/, /^shiki(\/.*)?$/, /^@shikijs\/.*$/])
+assertBare(highlightjs, 'engines/highlightjs.js', [
+  /^vue$/,
+  /^lowlight(\/.*)?$/,
+  /^highlight\.js(\/.*)?$/,
+])
+assertBare(lowlight, 'engines/lowlight.js', [
+  /^vue$/,
+  /^lowlight(\/.*)?$/,
+  /^highlight\.js(\/.*)?$/,
+])
+assertBare(prism, 'engines/prism.js', [/^vue$/, /^refractor(\/.*)?$/])
 
 const darkTheme = assertNoGraph(
   'themes/vsh-dark.js',
   [/^themes\/(?!vsh-dark\.js$)/, /^engines\//, /^index\.js$/],
   'static graph',
 )
-assertBare(darkTheme, 'themes/vsh-dark.js', [])
+assertBare(darkTheme, 'themes/vsh-dark.js', [/^vue$/])
 
 const coreCode = core.modules.map((file) => read(resolve(dist, file))).join('\n')
 if (/\bdocument\./.test(coreCode)) fail('core static graph accesses document at import scope')
 if (/import\s*\(\s*["'][^"']*langs?/.test(coreCode)) fail('core static graph references language data')
 
-console.log('static graph check passed')
+if (process.exitCode === 1) {
+  console.error('static graph check failed')
+} else {
+  console.log('static graph check passed')
+}
 console.log(`  default/full: ${full.modules.join(', ')}`)
 console.log(`  default/full dynamic adapters: ${full.dynamic.join(', ')}`)
 console.log(`  core entry: ${core.modules.join(', ')}`)

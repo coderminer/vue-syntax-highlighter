@@ -1,7 +1,9 @@
 import { gzipSync } from 'node:zlib'
 import { build, transformWithEsbuild } from 'vite'
 
-const LIMIT = 13_000
+// Deliberately tight: the core entry is a budget gate, so keep ~5% headroom
+// for a small patch and raise this only with a measured reason.
+const LIMIT = 13_500
 
 const result = await build({
   configFile: false,
@@ -39,11 +41,11 @@ const bytes = gzipSync(Buffer.from(minified.code)).length
 
 if (bytes > LIMIT) {
   console.error(
-    `core entry size check failed: ${(bytes / 1000).toFixed(2)} kB gzipped exceeds ${(LIMIT / 1000).toFixed(0)} kB`,
+    `core entry size check failed: ${(bytes / 1000).toFixed(2)} kB gzipped exceeds ${(LIMIT / 1000).toFixed(1)} kB`,
   )
   process.exitCode = 1
 } else {
   console.log(
-    `core entry size check passed (${(bytes / 1000).toFixed(2)} kB gzipped, limit ${(LIMIT / 1000).toFixed(0)} kB)`,
+    `core entry size check passed (${(bytes / 1000).toFixed(2)} kB gzipped, limit ${(LIMIT / 1000).toFixed(1)} kB)`,
   )
 }

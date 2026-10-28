@@ -17,12 +17,15 @@ All notable changes to this project are documented here. The format follows Keep
 - The isolated core fixture imports `vue-syntax-highlighter/core` in Node, so a static optional-peer import fails with `ERR_MODULE_NOT_FOUND` even when a bundler would stub it.
 - Consumer builds fail when Vite emits an `__vite-optional-peer-dep_` stub.
 - `check:graph` now rejects unexpected bare package imports, including static side-effect imports, on the default, core, adapter, and theme graphs.
+- `check:graph` parses ESM with `es-module-lexer` instead of text patterns, so strings and comments cannot produce false results, and computed dynamic imports are rejected in the core graph.
+- The graph summary only reports success when no assertion failed.
 - A bundled core-entry size check measures minified gzip cost with Vue external, matching what consumers ship.
 
 ### Documentation
 
 - Documented the runtime `NODE_ENV` folding caveat for non-Vite bundlers.
 - Corrected the Prism/highlight.js language coverage imports and roadmap release tracking.
+- Documented that `languages` preloading in the `core` entry requires an engine on the provider or an ancestor.
 - Added type-level imports for the `core` and `full` entries and every adapter's `supportedLanguages`.
 
 ## [1.1.0] - 2026-10-28

@@ -106,7 +106,7 @@ Errors never throw out of render. The component keeps the last valid result or p
 
 Props: `engine`, `engines`, `theme`, `themes`, `colorScheme`, `themeRegistry`, `languages`, `cache`, `cacheCapacity`, `cacheMaxChars`, `defer`, `rootMargin`, `virtualized`, `virtualizeAfter`, `scopeTag`.
 
-The provider renders one `display: contents` theme scope, provides configuration to descendants, preloads languages on mount, and disposes loader-owned engines and caches on unmount. Nested providers inherit unspecified values. `scopeTag` defaults to `div`; set it to `section`, `li`, or another tag when the provider must sit inside a specific content model.
+The provider renders one `display: contents` theme scope, provides configuration to descendants, preloads languages on mount, and disposes loader-owned engines and caches on unmount. Preloading resolves the provider or ancestor engine; in the `core` entry there is no implicit default, so a provider that preloads `languages` must configure an `engine` itself. The default entry falls back to the built-in Shiki loader. Nested providers inherit unspecified values. `scopeTag` defaults to `div`; set it to `section`, `li`, or another tag when the provider must sit inside a specific content model.
 
 `engines`, `themeRegistry`, `cache`, `cacheCapacity`, and `cacheMaxChars` are read when the provider is created. Changing them after creation is ignored and emits one development warning; recreate the provider or plugin scope to apply a new value. `defer`, `rootMargin`, themes, scheme, engine, and languages remain reactive.
 
