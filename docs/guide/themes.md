@@ -15,17 +15,26 @@ The trade-off is category-level color fidelity rather than exact TextMate theme 
 
 | Import | Scheme | Notes |
 | --- | --- | --- |
-| `vue-syntax-highlighter/themes/vsh-light` | light | Default theme, also included in core |
+| `vue-syntax-highlighter/themes/vsh-light` | light | Default theme |
 | `vue-syntax-highlighter/themes/vsh-dark` | dark | Matched counterpart to `vsh-light` |
 | `vue-syntax-highlighter/themes/vsh-paper` | light | Warm paper palette |
 | `vue-syntax-highlighter/themes/vsh-midnight` | dark | Matched counterpart to `vsh-paper` |
+
+All four built-in themes are registered by name in the default and `full` entries, so these work without a separate import or `themeRegistry`:
+
+```vue
+<SyntaxHighlighter :code="code" language="ts" theme="vsh-dark" />
+<SyntaxHighlighter :code="code" language="ts" theme="vsh-paper" />
+```
+
+The individual data entries remain available for tree-shaken imports:
 
 ```ts
 import { vshDark } from 'vue-syntax-highlighter/themes/vsh-dark'
 import { vshLight } from 'vue-syntax-highlighter/themes/vsh-light'
 ```
 
-Each theme has its own data entry. Importing one theme does not include the other three. An optional aggregate entry is available:
+An optional aggregate entry is available:
 
 ```ts
 import { vshDark, vshLight, vshMidnight, vshPaper } from 'vue-syntax-highlighter/themes'
@@ -40,6 +49,17 @@ import { vshDark, vshLight, vshMidnight, vshPaper } from 'vue-syntax-highlighter
 ```
 
 Themes resolve from the component prop, then the nearest provider, then the plugin, then `vsh-light`. A theme can be passed as data or as a name registered in the provider/plugin `themeRegistry`.
+
+A single dark theme derives its scheme automatically:
+
+```vue
+<SyntaxHighlighter :code="code" language="ts" theme="vsh-dark" />
+<!-- data-vsh-scheme="dark" -->
+```
+
+Removing a `theme` or `themes` prop falls back to the provider/default theme instead of keeping the previous one.
+
+The provider `themeRegistry`, `engines`, and cache options are read when the provider is created. Changing them later is ignored with one development warning; recreate the provider scope to apply a new value.
 
 ## Light and dark pairs
 

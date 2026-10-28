@@ -9,9 +9,6 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  define: {
-    __VSH_DEV__: 'true',
-  },
   test: {
     environment: 'jsdom',
     globals: true,

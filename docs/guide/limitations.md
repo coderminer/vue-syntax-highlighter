@@ -2,7 +2,7 @@
 
 ## Semantic colors, not exact TextMate fidelity
 
-Tokens carry one of 19 semantic types. Two different TextMate scopes that an engine theme might color differently can share a type and therefore a color. This is the deliberate cost of theme-independent caching, cross-engine themes, and CSS-only theme switching. Exact per-scope styles are a possible future extension; they are not part of v1.0.
+Tokens carry one of 19 semantic types. Two different TextMate scopes that an engine theme might color differently can share a type and therefore a color. This is the deliberate cost of theme-independent caching, cross-engine themes, and CSS-only theme switching. Exact per-scope styles are a possible future extension; they are not part of v1.1.
 
 ## Adapter token boundaries differ
 
@@ -48,5 +48,9 @@ Deferral uses `IntersectionObserver`. When it is unavailable, the component star
 ## Prism language registry
 
 `refractor` uses a process-global grammar registry. Prism engine instances share custom language registrations, including across SSR requests in the same process. The grammar data is stateless, so output is not corrupted, but registrations are not isolated per app/request and are not removed on `dispose()`. Use Shiki or highlight.js/lowlight if strict isolation is required.
+
+## Planned fixes
+
+Known correctness issues and the planned `1.1.0` / `2.0.0` work are tracked in the [Roadmap](/guide/roadmap). The roadmap describes intended changes; it is not a statement that a fix is already available in the current release.
 
 

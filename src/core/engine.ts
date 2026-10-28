@@ -43,29 +43,16 @@ export function assertHighlightEngine(value: unknown, label = 'engine'): asserts
   }
 }
 
-async function loadBuiltinEngine(id: BuiltinEngineId): Promise<HighlightEngine> {
-  try {
-    switch (id) {
-      case 'shiki': {
-        const module = await import('../engines/shiki.js')
-        return await module.createShikiEngine()
-      }
-      case 'highlightjs': {
-        const module = await import('../engines/highlightjs.js')
-        return await module.createHighlightjsEngine()
-      }
-      case 'lowlight': {
-        const module = await import('../engines/lowlight.js')
-        return await module.createLowlightEngine()
-      }
-      case 'prism': {
-        const module = await import('../engines/prism.js')
-        return await module.createPrismEngine()
-      }
-    }
-  } catch (error) {
-    throw createMissingEngineError(id, error)
-  }
+export type BuiltinEngineLoader = (id: BuiltinEngineId) => Promise<HighlightEngine>
+
+let builtinEngineLoader: BuiltinEngineLoader | undefined
+
+/**
+ * Registered by the default and full entries. The core entry deliberately
+ * leaves this unset so its bundle has no references to optional engine peers.
+ */
+export function setBuiltinEngineLoader(loader: BuiltinEngineLoader | undefined): void {
+  builtinEngineLoader = loader
 }
 
 /**
@@ -76,6 +63,7 @@ export class EngineManager {
   private readonly registry: EngineRegistry
   private readonly warningSet: WarningSet
   private readonly instances = new Map<string, HighlightEngine>()
+  private readonly owned = new Set<HighlightEngine>()
   private readonly loads = new Map<string, Promise<HighlightEngine>>()
   private disposed = false
 
@@ -113,6 +101,12 @@ export class EngineManager {
           `Use one of ${BUILTIN_ENGINE_IDS.join(', ')} or register a custom engine in the plugin/provider "engines" option.`,
       )
     }
+    if (!registered && !builtinEngineLoader) {
+      throw new Error(
+        `[vue-syntax-highlighter] The core entry has no built-in engine "${selected}". ` +
+          'Pass an engine object or import "vue-syntax-highlighter/full".',
+      )
+    }
 
     const loading = this.load(selected, registered as EngineLoader | undefined)
     this.loads.set(selected, loading)
@@ -127,6 +121,7 @@ export class EngineManager {
     if (this.disposed) return
     this.disposed = true
     for (const engine of this.instances.values()) {
+      if (!this.owned.has(engine)) continue
       try {
         engine.dispose?.()
       } catch (error) {
@@ -140,6 +135,7 @@ export class EngineManager {
       }
     }
     this.instances.clear()
+    this.owned.clear()
     this.loads.clear()
   }
 
@@ -147,12 +143,21 @@ export class EngineManager {
     try {
       const created = loader
         ? await loader()
-        : await loadBuiltinEngine(id as BuiltinEngineId)
+        : builtinEngineLoader
+          ? await builtinEngineLoader(id as BuiltinEngineId)
+          : undefined
+      if (!created) {
+        throw new Error(
+          `[vue-syntax-highlighter] The core entry has no built-in engine "${id}". ` +
+            'Pass an engine object or import "vue-syntax-highlighter/full".',
+        )
+      }
       assertHighlightEngine(created, `engine "${id}"`)
       if (this.disposed) {
         created.dispose?.()
         throw new Error('[vue-syntax-highlighter] This engine scope has been disposed.')
       }
+      this.owned.add(created)
       this.instances.set(id, created)
       return created
     } catch (error) {

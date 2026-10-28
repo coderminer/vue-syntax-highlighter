@@ -1,5 +1,26 @@
 # Engines
 
+## Entry points
+
+| Entry | Built-in engines | Use |
+| --- | --- | --- |
+| `vue-syntax-highlighter` | Available through lazy chunks | Default zero-config path |
+| `vue-syntax-highlighter/full` | Available through lazy chunks | Explicit alias for the default entry |
+| `vue-syntax-highlighter/core` | None | Pass an engine object; optional peers are never referenced by the build |
+
+`core` and `full` expose the same runtime API. The difference is that the `core` entry has no built-in engine loader, so a string engine such as `engine="shiki"` reports an actionable error. Use `core` with a preloaded engine object when a build must not resolve optional peers:
+
+```ts
+import { SyntaxHighlighter } from 'vue-syntax-highlighter/core'
+import { createShikiEngine } from 'vue-syntax-highlighter/engines/shiki'
+
+const engine = await createShikiEngine({ preload: ['typescript'] })
+```
+
+```vue
+<SyntaxHighlighter :code="code" language="ts" :engine="engine" />
+```
+
 ## Resolution order
 
 The effective engine is:
@@ -82,6 +103,28 @@ const engine = await createPrismEngine({ preload: ['rust'] })
 Prism token classes are mapped to the same semantic model. Refractor's common grammars are available immediately; additional grammars are imported on demand.
 
 Refractor exposes a process-global grammar registry. Custom `registerLanguage` calls are shared by all Prism engine instances in the same process, and `dispose()` does not unregister grammars. Grammar definitions are stateless, so rendered output remains correct, but strict per-application/per-request language isolation requires the Shiki or highlight.js/lowlight adapter, or a separate process/worker.
+
+## Language coverage
+
+Coverage differs by adapter. Use the `supportedLanguages` export from each adapter for the exact list, and `languageAliases` for short names:
+
+```ts
+import { supportedLanguages } from 'vue-syntax-highlighter/engines/shiki'
+import { supportedLanguages as lowlightLanguages } from 'vue-syntax-highlighter/engines/highlightjs'
+import { supportedLanguages as prismLanguages } from 'vue-syntax-highlighter/engines/prism'
+```
+
+| Language family | Shiki | highlight.js / lowlight | Prism / refractor |
+| --- | --- | --- | --- |
+| JavaScript, TypeScript | yes | yes | yes |
+| JSX, TSX | yes | no | yes |
+| Vue, Svelte, Astro, MDX | yes | no | no |
+| HTML, XML, CSS, SCSS, Less | yes | yes | yes |
+| Markdown, JSON, YAML, TOML | yes | partial | partial |
+| Bash, SQL, Go, Rust, Python, Java, C/C++ | yes | yes | yes |
+| Diff | yes | yes | yes |
+
+Missing grammars render plain text with an `error` event and a development warning. Register a custom grammar with `engine.registerLanguage(name, grammar)` or choose an adapter with coverage for the language.
 
 ## Custom engines
 

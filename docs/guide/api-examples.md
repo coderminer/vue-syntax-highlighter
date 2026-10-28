@@ -2,6 +2,17 @@
 
 Every public runtime export and public type has an example here. The reference tables live in [API](/api).
 
+## Entry points
+
+```ts
+import { SyntaxHighlighter as CoreHighlighter } from 'vue-syntax-highlighter/core'
+import { SyntaxHighlighter as FullHighlighter } from 'vue-syntax-highlighter/full'
+
+const entries = [CoreHighlighter, FullHighlighter]
+```
+
+`core` has no built-in engine loader; pass an explicit engine object. `full` is equivalent to the default entry in `1.1.0`.
+
 ## Component
 
 ```vue
@@ -38,12 +49,12 @@ const tokenPayload = (payload: TokenSlotProps) => payload.renderToken()
   <SyntaxHighlighter ref="block" v-bind="props" :line-props="lineProps">
     <template #line="{ lineNumber, highlighted, renderTokens }">
       <span :data-source-line="lineNumber" :class="{ highlighted }">
-        <component :is="renderTokens" />
+        <component :is="() => renderTokens()" />
       </span>
     </template>
     <template #token="{ token, renderToken }">
       <span :data-token-type="token.type">
-        <component :is="renderToken" />
+        <component :is="() => renderToken()" />
       </span>
     </template>
   </SyntaxHighlighter>
@@ -111,6 +122,7 @@ const themes = { light: vshLight, dark: vshDark }
     color-scheme="auto"
     :languages="['javascript', 'typescript']"
     :cache-capacity="100"
+    scope-tag="section"
     defer
   >
     <SyntaxHighlighter :code="one" language="ts" />

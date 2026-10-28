@@ -70,7 +70,7 @@ console.log(answer)`
 <SyntaxHighlighter :code="code" language="python" engine="prism" />
 ```
 
-Adapters are separate subpaths and lazy chunks. The core entry contains no static engine, grammar, or non-default theme data.
+Adapters are separate subpaths and lazy chunks. The default entry keeps built-in engines available through those chunks; `vue-syntax-highlighter/core` exposes the same API without any built-in engine loader, so pass an explicit engine object when a build must not resolve optional peers. `vue-syntax-highlighter/full` is equivalent to the default entry.
 
 ```ts
 import { createShikiEngine } from 'vue-syntax-highlighter/engines/shiki'
@@ -118,6 +118,8 @@ Run `pnpm bench` for cold highlight and initial SSR render timings on 1k/10k-lin
 
 ```
 vue-syntax-highlighter
+vue-syntax-highlighter/core
+vue-syntax-highlighter/full
 vue-syntax-highlighter/engines/shiki
 vue-syntax-highlighter/engines/highlightjs
 vue-syntax-highlighter/engines/lowlight
@@ -172,6 +174,7 @@ The VitePress site builds to `docs/.vitepress/dist`. A GitHub Actions workflow i
 - [API](https://coderminer.github.io/vue-syntax-highlighter/api)
 - [API Examples](https://coderminer.github.io/vue-syntax-highlighter/guide/api-examples)
 - [Limitations](https://coderminer.github.io/vue-syntax-highlighter/guide/limitations)
+- [Roadmap](https://coderminer.github.io/vue-syntax-highlighter/guide/roadmap)
 
 ## Attribution
 

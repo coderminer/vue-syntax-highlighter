@@ -40,10 +40,13 @@ export function useResolvedTheme(
     selection,
     (next) => {
       try {
+        const hasSelection =
+          next.theme !== undefined ||
+          next.themes !== undefined ||
+          next.colorScheme !== undefined
         theme.value = resolveThemes({
-          ...next,
+          ...(hasSelection ? { ...next, fallback: theme.value } : {}),
           registry: context.themeRegistry,
-          fallback: theme.value,
         })
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error)

@@ -103,6 +103,78 @@ describe('provider behavior defaults', () => {
     wrapper.unmount()
   })
 
+  it('renders div.vsh-scope by default and accepts scopeTag', () => {
+    const wrapper = mount(
+      {
+        render: () =>
+          h(SyntaxHighlighterProvider, { theme: vshLight }, () =>
+            h(SyntaxHighlighter, { code: 'x', engine: engine() }),
+          ),
+      },
+      { attachTo: document.body },
+    )
+    expect(wrapper.find('div.vsh-scope').exists()).toBe(true)
+
+    const custom = mount(
+      {
+        render: () =>
+          h(SyntaxHighlighterProvider, { theme: vshLight, scopeTag: 'section' }, () =>
+            h(SyntaxHighlighter, { code: 'x', engine: engine() }),
+          ),
+      },
+      { attachTo: document.body },
+    )
+    expect(custom.find('section.vsh-scope').exists()).toBe(true)
+    wrapper.unmount()
+    custom.unmount()
+  })
+
+  it('starts highlighting when defer turns off', async () => {
+    mockIntersectionObserver()
+    const fake = engine()
+    const defer = ref(true)
+    const wrapper = mount(
+      {
+        render: () =>
+          h(SyntaxHighlighterProvider, { defer: defer.value }, () =>
+            h(SyntaxHighlighter, { code: 'const x = 1', engine: fake }),
+          ),
+      },
+      { attachTo: document.body },
+    )
+    await flushPromises()
+    expect(fake.highlight).not.toHaveBeenCalled()
+
+    defer.value = false
+    await nextTick()
+    await flushPromises()
+    expect(fake.highlight).toHaveBeenCalledTimes(1)
+    wrapper.unmount()
+  })
+
+  it('reconnects the deferred observer when rootMargin changes', async () => {
+    const observer = mockIntersectionObserver()
+    const rootMargin = ref('50px')
+    const wrapper = mount(
+      {
+        render: () =>
+          h(SyntaxHighlighterProvider, { defer: true, rootMargin: rootMargin.value }, () =>
+            h(SyntaxHighlighter, { code: 'x', engine: engine() }),
+          ),
+      },
+      { attachTo: document.body },
+    )
+    await flushPromises()
+    expect(observer.options).toHaveLength(1)
+    expect(observer.options[0]?.rootMargin).toBe('50px')
+
+    rootMargin.value = '100px'
+    await nextTick()
+    expect(observer.options).toHaveLength(2)
+    expect(observer.options[1]?.rootMargin).toBe('100px')
+    wrapper.unmount()
+  })
+
   it('warns when static provider configuration changes', async () => {
     const spy = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
     const registry = ref<Record<string, typeof vshLight>>({})

@@ -83,8 +83,11 @@ describe('built-in themes', () => {
     expect(DEFAULT_THEME).toBe(vshLight)
   })
 
-  it('resolves themes by name and rejects unknown names', () => {
+  it('registers every built-in theme by name', () => {
     expect(resolveThemeValue('vsh-light')).toBe(vshLight)
+    expect(resolveThemeValue('vsh-dark')).toBe(vshDark)
+    expect(resolveThemeValue('vsh-paper')).toBe(vshPaper)
+    expect(resolveThemeValue('vsh-midnight')).toBe(vshMidnight)
     expect(() => resolveThemeValue('missing')).toThrow(/Unknown theme/)
     expect(
       resolveThemeValue('paper', { paper: vshPaper }),
@@ -124,7 +127,15 @@ describe('CSS custom properties', () => {
     expect(variables['--vsh-dark-bg']).toBe(vshPaper.colors.background)
   })
 
-  it('falls back to the previous theme for invalid replacement input', () => {
+  it('derives dark mode from a single dark theme', () => {
+    const resolved = resolveThemes({ theme: vshDark })
+    expect(resolved.mode).toBe('dark')
+    expect(themeScopeAttributes(resolved)['data-vsh-scheme']).toBe('dark')
+    expect(resolved.light).toBe(vshDark)
+    expect(resolved.dark).toBe(vshDark)
+  })
+
+  it('keeps the previous theme for invalid replacement input', () => {
     const previous = resolveThemes({ theme: vshLight })
     expect(() =>
       resolveThemes({ theme: 'nope', fallback: previous }),

@@ -40,6 +40,15 @@ describe('EngineManager', () => {
     expect(dispose).not.toHaveBeenCalled()
   })
 
+  it('never disposes caller-owned registered engine objects', () => {
+    const engine = fakeEngine()
+    const dispose = vi.spyOn(engine, 'dispose')
+    const manager = new EngineManager({ registered: engine })
+    expect(manager.resolve('registered')).toBe(engine)
+    manager.dispose()
+    expect(dispose).not.toHaveBeenCalled()
+  })
+
   it('reports unknown identifiers with an actionable message', () => {
     const manager = new EngineManager()
     expect(() => manager.resolve('missing')).toThrow(/Unknown engine "missing"/)

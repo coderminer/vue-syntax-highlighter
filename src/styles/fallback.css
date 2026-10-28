@@ -92,11 +92,11 @@
 
   .vsh[data-vsh-scheme='dark'],
   .vsh-scope[data-vsh-scheme='dark'] {
-  --vsh-bg: var(--vsh-dark-bg, #ffffff);
-  --vsh-fg: var(--vsh-dark-fg, #24292f);
-  --vsh-gutter: var(--vsh-dark-gutter, #6e7781);
+  --vsh-bg: var(--vsh-dark-bg, #0d1117);
+  --vsh-fg: var(--vsh-dark-fg, #e6edf3);
+  --vsh-gutter: var(--vsh-dark-gutter, #7d8590);
   --vsh-line-highlight: var(--vsh-dark-line-highlight, transparent);
-  --vsh-selection: var(--vsh-dark-selection, #b6d7ff);
+  --vsh-selection: var(--vsh-dark-selection, #264f78);
   --vsh-font-family: var(--vsh-dark-font-family, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
   --vsh-c-p: var(--vsh-dark-token-plain-color, var(--vsh-fg));
   --vsh-t-p-s: var(--vsh-dark-token-plain-font-style, inherit);
@@ -265,11 +265,11 @@
   @media (prefers-color-scheme: dark) {
     .vsh[data-vsh-scheme='auto'],
     .vsh-scope[data-vsh-scheme='auto'] {
-    --vsh-bg: var(--vsh-dark-bg, #ffffff);
-  --vsh-fg: var(--vsh-dark-fg, #24292f);
-  --vsh-gutter: var(--vsh-dark-gutter, #6e7781);
+    --vsh-bg: var(--vsh-dark-bg, #0d1117);
+  --vsh-fg: var(--vsh-dark-fg, #e6edf3);
+  --vsh-gutter: var(--vsh-dark-gutter, #7d8590);
   --vsh-line-highlight: var(--vsh-dark-line-highlight, transparent);
-  --vsh-selection: var(--vsh-dark-selection, #b6d7ff);
+  --vsh-selection: var(--vsh-dark-selection, #264f78);
   --vsh-font-family: var(--vsh-dark-font-family, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
   --vsh-c-p: var(--vsh-dark-token-plain-color, var(--vsh-fg));
   --vsh-t-p-s: var(--vsh-dark-token-plain-font-style, inherit);

@@ -7,6 +7,8 @@ Every runtime export and public type has a runnable example in [API Examples](/g
 | Entry | Public values |
 | --- | --- |
 | `vue-syntax-highlighter` | `SyntaxHighlighter`, `SyntaxHighlighterProvider`, `VueSyntaxHighlighter` (default and named), `useSyntaxHighlighter`, `Light`, `LightAsync`, `PrismLight`, `PrismAsync`, `defineTheme`, `DEFAULT_THEME`, `DEFAULT_THEME_NAME`, `BUILTIN_THEME_REGISTRY`, `isColorScheme`, `ResultCache`, `buildCacheKey`, `stableStringify`, `createHighlighterContext`, `HIGHLIGHTER_CONTEXT`, `HighlighterContext`, `EngineManager`, `isHighlightEngine`, `BUILTIN_ENGINE_IDS` |
+| `vue-syntax-highlighter/core` | The same runtime API without a built-in engine loader. Pass an explicit engine object; no optional engine peer is referenced at build time. |
+| `vue-syntax-highlighter/full` | The same API as the default entry, including all built-in engine loaders. In `1.1.0` it is equivalent to the default entry. |
 | `vue-syntax-highlighter/engines/shiki` | `createShikiEngine`, `ShikiEngine`, `ShikiEngineOptions`, `ShikiLanguageRegistration`, `ShikiLanguageLoader`, `languageLoaders`, `languageAliases`, `supportedLanguages` |
 | `vue-syntax-highlighter/engines/highlightjs` | `createHighlightjsEngine`, `HighlightjsEngine`, `HighlightjsEngineOptions`, `HighlightjsLanguageRegistration`, `HighlightjsLanguageLoader` |
 | `vue-syntax-highlighter/engines/lowlight` | `createLowlightEngine`, `LowlightEngine`, `LowlightEngineOptions`, `LowlightLanguageRegistration`, `LowlightLanguageLoader`, plus `createHighlightjsEngine` |
@@ -64,7 +66,7 @@ Unknown attributes, including `class`, `style`, `data-*`, and `aria-*`, fall thr
 
 At runtime, a non-string `code` value such as `null` from an API or Markdown parser is treated as an empty string for both rendering and copy helpers.
 
-The scrollable `pre` becomes a named `region` only when `aria-label` or `aria-labelledby` is present. Without an accessible name it is not exposed as an unnamed landmark.
+`aria-label` and `aria-labelledby` are applied to the scrollable `pre`, not duplicated on the root `.vsh` element. The `pre` becomes a named `region` only when one is present; without an accessible name it is not exposed as an unnamed landmark.
 
 ### Slots
 
@@ -102,11 +104,11 @@ Errors never throw out of render. The component keeps the last valid result or p
 
 ## `SyntaxHighlighterProvider`
 
-Props: `engine`, `engines`, `theme`, `themes`, `colorScheme`, `themeRegistry`, `languages`, `cache`, `cacheCapacity`, `cacheMaxChars`, `defer`, `rootMargin`, `virtualized`, `virtualizeAfter`.
+Props: `engine`, `engines`, `theme`, `themes`, `colorScheme`, `themeRegistry`, `languages`, `cache`, `cacheCapacity`, `cacheMaxChars`, `defer`, `rootMargin`, `virtualized`, `virtualizeAfter`, `scopeTag`.
 
-The provider renders one `display: contents` theme scope, provides configuration to descendants, preloads languages on mount, and disposes loader-owned engines and caches on unmount. Nested providers inherit unspecified values.
+The provider renders one `display: contents` theme scope, provides configuration to descendants, preloads languages on mount, and disposes loader-owned engines and caches on unmount. Nested providers inherit unspecified values. `scopeTag` defaults to `div`; set it to `section`, `li`, or another tag when the provider must sit inside a specific content model.
 
-`engines`, `themeRegistry`, `cache`, `cacheCapacity`, and `cacheMaxChars` are read when the provider is created. Changing them after creation is ignored and emits one development warning; recreate the provider or plugin scope to apply a new value.
+`engines`, `themeRegistry`, `cache`, `cacheCapacity`, and `cacheMaxChars` are read when the provider is created. Changing them after creation is ignored and emits one development warning; recreate the provider or plugin scope to apply a new value. `defer`, `rootMargin`, themes, scheme, engine, and languages remain reactive.
 
 ## `useSyntaxHighlighter`
 

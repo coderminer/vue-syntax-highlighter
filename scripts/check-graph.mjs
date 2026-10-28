@@ -69,16 +69,25 @@ function assertNoGraph(entry, patterns, label) {
   return result
 }
 
-const core = assertNoGraph(
+const full = assertNoGraph(
   'index.js',
-  [/^engines\//, /^chunks\/(?:shiki|highlightjs|prism)-/, /^themes\/(?!vsh-light\.js$)/, /languages/],
+  [/^engines\//, /^chunks\/(?:shiki|highlightjs|prism)-/, /languages/],
   'static graph',
 )
-if (core.dynamic.length === 0) fail('core should reference adapters through dynamic imports')
-for (const specifier of core.dynamic) {
+if (full.dynamic.length === 0) fail('the default entry should reference adapters through dynamic imports')
+for (const specifier of full.dynamic) {
   if (!/engines\/(shiki|highlightjs|lowlight|prism)\.js$/.test(specifier)) {
-    fail(`unexpected core dynamic import ${specifier}`)
+    fail(`unexpected default-entry dynamic import ${specifier}`)
   }
+}
+
+const core = assertNoGraph(
+  'core-entry.js',
+  [/^engines\//, /^chunks\/builtin-engines-/, /languages/],
+  'static graph',
+)
+if (core.dynamic.length !== 0) {
+  fail(`core entry must not reference built-in adapters: ${core.dynamic.join(', ')}`)
 }
 
 const shiki = assertNoGraph(
@@ -113,8 +122,10 @@ if (/\bdocument\./.test(coreCode)) fail('core static graph accesses document at 
 if (/import\s*\(\s*["'][^"']*langs?/.test(coreCode)) fail('core static graph references language data')
 
 console.log('static graph check passed')
-console.log(`  core: ${core.modules.join(', ')}`)
-console.log(`  core dynamic adapters: ${core.dynamic.join(', ')}`)
+console.log(`  default/full: ${full.modules.join(', ')}`)
+console.log(`  default/full dynamic adapters: ${full.dynamic.join(', ')}`)
+console.log(`  core entry: ${core.modules.join(', ')}`)
+console.log(`  core entry dynamic adapters: ${core.dynamic.join(', ') || 'none'}`)
 console.log(`  shiki: ${shiki.modules.join(', ')}`)
 console.log(`  highlight.js: ${highlightjs.modules.join(', ')}`)
 console.log(`  lowlight: ${lowlight.modules.join(', ')}`)

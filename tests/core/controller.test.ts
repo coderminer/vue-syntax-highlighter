@@ -239,6 +239,31 @@ describe('highlight controller', () => {
     )
   })
 
+  it('keeps the display terminal-newline behavior in highlight()', async () => {
+    const engine = syncEngine()
+    const context = createHighlighterContext({ engine })
+    const controller = createHighlightController({
+      context,
+      getInput: () => ({ code: 'default', language: 'js' }),
+    })
+    const result = await controller.highlight({ code: 'a\n', language: 'js' })
+    expect(result.lines).toHaveLength(1)
+  })
+
+  it('normalizes explicit language input in highlight()', async () => {
+    const engine = syncEngine()
+    const context = createHighlighterContext({ engine })
+    const controller = createHighlightController({
+      context,
+      getInput: () => ({ code: 'default', language: 'js' }),
+    })
+    await controller.highlight({ code: 'explicit', language: 'Language-TS' })
+    expect(engine.highlight).toHaveBeenCalledWith(
+      expect.objectContaining({ code: 'explicit', language: 'ts' }),
+      undefined,
+    )
+  })
+
   it('creates a safe plain fallback result', () => {
     expect(createPlainResult('a\n', 'text').lines).toHaveLength(2)
   })

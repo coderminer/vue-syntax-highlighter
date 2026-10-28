@@ -18,8 +18,10 @@ export function isDevelopment(): boolean {
   // rebuilding with a different flag. It is intentionally undocumented.
   const override = (globalThis as { __VSH_DEV_OVERRIDE__?: unknown }).__VSH_DEV_OVERRIDE__
   if (typeof override === 'boolean') return override
-  if (typeof __VSH_DEV__ === 'boolean') return __VSH_DEV__
-  if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'production') return false
+  // Read this through globalThis so library builds do not bake the publisher's
+  // NODE_ENV into the artifact. Consumers can still replace process.env.
+  const env = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env
+  if (env?.NODE_ENV === 'production') return false
   return true
 }
 

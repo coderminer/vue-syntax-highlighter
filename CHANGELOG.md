@@ -2,6 +2,33 @@
 
 All notable changes to this project are documented here. The format follows Keep a Changelog and the project uses semantic versioning.
 
+## [1.1.0] - 2026-10-28
+
+### Added
+
+- `vue-syntax-highlighter/core` for builds that must not resolve optional engine peers. It exposes the same API but has no built-in engine loader.
+- `vue-syntax-highlighter/full` as an explicit alias for the default entry with built-in engine loaders.
+- `scopeTag` on `SyntaxHighlighterProvider`, defaulting to the existing `div.vsh-scope` wrapper.
+- Isolated core-only and single-engine consumer fixtures.
+
+### Fixed
+
+- Development warnings now read `NODE_ENV` at runtime instead of baking `__VSH_DEV__` into the published build.
+- Removing `theme` or `themes` falls back to the provider/default theme instead of retaining the previous theme.
+- A single dark theme derives `data-vsh-scheme="dark"` from its `colorScheme`.
+- All four built-in themes are registered by name, so `vsh-dark`, `vsh-paper`, and `vsh-midnight` work without a separate registration step.
+- `styles/fallback.css` uses dark defaults for dark schemes.
+- Caller-supplied engine objects and registered engine objects are no longer disposed as if the manager owned them.
+- `defer` and `rootMargin` changes after mount are applied; turning deferral off starts highlighting immediately.
+- `aria-label` / `aria-labelledby` are applied only to the scrollable `pre`, avoiding duplicate names and unnamed landmarks.
+- Clipboard cleanup runs in `finally`, and the legacy copy path is retried when the Clipboard API rejects.
+- `highlight()` normalizes explicit language input consistently with the component prop.
+
+### Documentation
+
+- Corrected slot examples to call `renderTokens()` / `renderToken()` as functions.
+- Documented per-engine language coverage and the core/full entry split.
+
 ## [1.0.3] - 2026-10-26
 
 ### Added

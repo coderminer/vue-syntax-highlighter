@@ -48,7 +48,7 @@ for (const file of markdown) {
 
 const api = readFileSync(join(docs, 'api.md'), 'utf8')
 const examples = readFileSync(join(docs, 'guide/api-examples.md'), 'utf8')
-const index = readFileSync(join(root, 'src/index.ts'), 'utf8')
+const index = readFileSync(join(root, 'src/api.ts'), 'utf8')
 const exported = new Set()
 for (const match of index.matchAll(/export\s+(?:type\s+)?\{([\s\S]*?)\}\s+from/g)) {
   for (const part of match[1].split(',')) {

@@ -4,6 +4,8 @@ import dts from 'vite-plugin-dts'
 
 const entries = {
   index: 'src/index.ts',
+  'core-entry': 'src/core-entry.ts',
+  full: 'src/full.ts',
   'engines/shiki': 'src/engines/shiki.ts',
   'engines/highlightjs': 'src/engines/highlightjs.ts',
   'engines/prism': 'src/engines/prism.ts',
@@ -26,9 +28,6 @@ export default defineConfig({
       include: ['src'],
     }),
   ],
-  define: {
-    __VSH_DEV__: JSON.stringify(process.env.NODE_ENV !== 'production'),
-  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

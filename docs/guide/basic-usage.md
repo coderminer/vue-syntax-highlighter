@@ -105,7 +105,7 @@ Slots are scoped and replace only their part of the default output.
 
   <template #line="{ lineNumber, highlighted, renderTokens }">
     <span :data-source-line="lineNumber" :class="{ selected: highlighted }">
-      <component :is="renderTokens" />
+      <component :is="() => renderTokens()" />
     </span>
   </template>
 
@@ -115,9 +115,9 @@ Slots are scoped and replace only their part of the default output.
 
   <template #token="{ token, renderToken }">
     <span v-if="token.type === 'keyword'" class="my-keyword">
-      <component :is="renderToken" />
+      <component :is="() => renderToken()" />
     </span>
-    <component :is="renderToken()" v-else />
+    <component :is="() => renderToken()" v-else />
   </template>
 
   <template #footer>
@@ -126,7 +126,7 @@ Slots are scoped and replace only their part of the default output.
 </SyntaxHighlighter>
 ```
 
-Available content slots: `header`, `footer`, `loading`, `error`, `line`, `line-number`, `token`. The line wrapper and gutter are maintained by the component; use the `line-number` slot to customize the gutter.
+Available content slots: `header`, `footer`, `loading`, `error`, `line`, `line-number`, `token`. `renderTokens` and `renderToken` are functions that return VNodes; call them inside a render function such as `<component :is="() => renderTokens()" />`. The line wrapper and gutter are maintained by the component; use the `line-number` slot to customize the gutter.
 
 ## Custom tags and attributes
 
@@ -144,7 +144,7 @@ Available content slots: `header`, `footer`, `loading`, `error`, `line`, `line-n
 />
 ```
 
-Unknown attributes fall through to the root `.vsh` element. Caller classes merge with the built-in classes. Add `aria-label` or `aria-labelledby` when the scrollable code block should be exposed as a named landmark; without one, the component does not create an unnamed `region`.
+Unknown attributes fall through to the root `.vsh` element. Caller classes merge with the built-in classes. `aria-label` and `aria-labelledby` are applied to the scrollable `pre`, not duplicated on the root. Add one when the code block should be exposed as a named landmark; without one, the component does not create an unnamed `region`.
 
 `lineProps` and `tokenProps` return attribute objects for cases where a full slot is unnecessary:
 

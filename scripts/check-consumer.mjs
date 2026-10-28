@@ -92,4 +92,31 @@ if (!assets.some((file) => file.endsWith('.js'))) {
 
 run(process.execPath, ['tests/fixtures/consumer/ssr.mjs'])
 
-console.log('consumer fixture passed (packed tarball, Vite browser build, SSR render)')
+for (const name of ['core-consumer', 'single-engine']) {
+  const dir = join(root, `tests/fixtures/${name}`)
+  const destination = join(dir, 'node_modules/vue-syntax-highlighter')
+  rmSync(destination, { recursive: true, force: true })
+  rmSync(join(dir, 'dist'), { recursive: true, force: true })
+  mkdirSync(destination, { recursive: true })
+  extractTarGz(readFileSync(tarball), destination)
+
+  run(process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm', [
+    'exec',
+    'vite',
+    'build',
+    '--config',
+    `tests/fixtures/${name}/vite.config.mjs`,
+  ])
+  const html = readFileSync(join(dir, 'dist/index.html'), 'utf8')
+  if (!html.includes('assets/')) {
+    throw new Error(`${name} browser build did not emit assets`)
+  }
+  const output = readdirSync(join(dir, 'dist/assets'))
+  if (!output.some((file) => file.endsWith('.js'))) {
+    throw new Error(`${name} browser build did not emit JavaScript`)
+  }
+}
+
+console.log(
+  'consumer fixtures passed (packed tarball, browser build, SSR, core-only, single-engine)',
+)

@@ -301,33 +301,35 @@ export const SyntaxHighlighter = defineComponent({
     let observer: IntersectionObserver | undefined
     let resizeObserver: ResizeObserver | undefined
 
-    onMounted(() => {
-      mounted.value = true
-      measure()
-      if (typeof ResizeObserver !== 'undefined' && preEl.value) {
-        resizeObserver = new ResizeObserver(() => measure())
-        resizeObserver.observe(preEl.value)
-      }
-      if (typeof window !== 'undefined' && typeof ResizeObserver === 'undefined') {
-        window.addEventListener('resize', measure)
-      }
+    function disconnectDeferred(): void {
+      observer?.disconnect()
+      observer = undefined
+    }
 
-      if (!normalized.value.defer || controller.started()) {
-        void controller.start()
+    function startHighlighting(): void {
+      void controller.start()
+    }
+
+    function observeDeferred(): void {
+      if (controller.started()) return
+      if (!normalized.value.defer) {
+        disconnectDeferred()
+        startHighlighting()
         return
       }
       const observed = preEl.value ?? rootEl.value
       if (!observed || typeof IntersectionObserver === 'undefined') {
-        void controller.start()
+        disconnectDeferred()
+        startHighlighting()
         return
       }
+      disconnectDeferred()
       try {
         observer = new IntersectionObserver(
           (entries) => {
             if (entries.some((entry) => entry.isIntersecting)) {
-              observer?.disconnect()
-              observer = undefined
-              void controller.start()
+              disconnectDeferred()
+              startHighlighting()
             }
           },
           { rootMargin: normalized.value.rootMargin },
@@ -342,15 +344,35 @@ export const SyntaxHighlighter = defineComponent({
           }. Highlighting immediately instead.`,
           context.warningSet,
         )
-        void controller.start()
+        startHighlighting()
       }
+    }
+
+    onMounted(() => {
+      mounted.value = true
+      measure()
+      if (typeof ResizeObserver !== 'undefined' && preEl.value) {
+        resizeObserver = new ResizeObserver(() => measure())
+        resizeObserver.observe(preEl.value)
+      }
+      if (typeof window !== 'undefined' && typeof ResizeObserver === 'undefined') {
+        window.addEventListener('resize', measure)
+      }
+      observeDeferred()
     })
+
+    watch(
+      () => [normalized.value.defer, normalized.value.rootMargin] as const,
+      () => {
+        if (!mounted.value) return
+        observeDeferred()
+      },
+    )
 
     onBeforeUnmount(() => {
       if (frame && typeof cancelAnimationFrame !== 'undefined') cancelAnimationFrame(frame)
       frame = 0
-      observer?.disconnect()
-      observer = undefined
+      disconnectDeferred()
       resizeObserver?.disconnect()
       resizeObserver = undefined
       if (typeof window !== 'undefined') window.removeEventListener('resize', measure)
@@ -396,7 +418,13 @@ export const SyntaxHighlighter = defineComponent({
       const error = controller.error.value
       const active = virtualActive.value
       const window = virtualWindow.value
-      const { class: attrClass, style: attrStyle, ...restAttrs } = attrs
+      const {
+        class: attrClass,
+        style: attrStyle,
+        'aria-label': attrAriaLabel,
+        'aria-labelledby': attrAriaLabelledby,
+        ...restAttrs
+      } = attrs
 
       const gutterDigits = Math.max(
         3,
@@ -431,13 +459,12 @@ export const SyntaxHighlighter = defineComponent({
       if (active) preStyle.overflow = 'auto'
 
       const ariaLabel =
-        typeof restAttrs['aria-label'] === 'string' && restAttrs['aria-label'].length > 0
-          ? restAttrs['aria-label']
+        typeof attrAriaLabel === 'string' && attrAriaLabel.length > 0
+          ? attrAriaLabel
           : undefined
       const ariaLabelledby =
-        typeof restAttrs['aria-labelledby'] === 'string' &&
-        restAttrs['aria-labelledby'].length > 0
-          ? restAttrs['aria-labelledby']
+        typeof attrAriaLabelledby === 'string' && attrAriaLabelledby.length > 0
+          ? attrAriaLabelledby
           : undefined
       const hasAccessibleName = Boolean(ariaLabel || ariaLabelledby)
 

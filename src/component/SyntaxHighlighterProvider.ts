@@ -51,6 +51,7 @@ export const SyntaxHighlighterProvider = defineComponent({
       default: undefined,
     },
     virtualizeAfter: { type: Number, default: undefined },
+    scopeTag: { type: String, default: 'div' },
   },
   setup(props, { slots }) {
     const parent = inject(HIGHLIGHTER_CONTEXT, null) ?? getDefaultContext()
@@ -189,7 +190,7 @@ export const SyntaxHighlighterProvider = defineComponent({
 
     return () =>
       h(
-        'div',
+        props.scopeTag || 'div',
         {
           class: 'vsh-scope',
           style: { display: 'contents', ...resolvedTheme.variables.value },

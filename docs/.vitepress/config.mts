@@ -41,6 +41,10 @@ export default defineConfig({
           { text: 'Live Demo', link: '/demo' },
         ],
       },
+      {
+        text: 'Project',
+        items: [{ text: 'Roadmap', link: '/guide/roadmap' }],
+      },
     ],
     socialLinks: repository
       ? [{ icon: 'github', link: `https://github.com/${repository}` }]

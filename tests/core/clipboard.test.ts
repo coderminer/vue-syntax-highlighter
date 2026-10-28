@@ -33,6 +33,23 @@ describe('clipboard helper', () => {
 
     await expect(copyText('fallback')).resolves.toBe(true)
     expect(execCommand).toHaveBeenCalledWith('copy')
+    expect(document.querySelectorAll('textarea')).toHaveLength(0)
+  })
+
+  it('retries the legacy path when the Clipboard API rejects', async () => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: vi.fn().mockRejectedValue(new Error('denied')) },
+    })
+    const execCommand = vi.fn(() => true)
+    Object.defineProperty(document, 'execCommand', {
+      configurable: true,
+      value: execCommand,
+    })
+
+    await expect(copyText('retry')).resolves.toBe(true)
+    expect(execCommand).toHaveBeenCalledWith('copy')
+    expect(document.querySelectorAll('textarea')).toHaveLength(0)
   })
 
   it('returns false when no clipboard mechanism is available', async () => {

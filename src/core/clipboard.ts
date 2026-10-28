@@ -9,15 +9,18 @@ export async function copyText(text: string): Promise<boolean> {
       await navigator.clipboard.writeText(text)
       return true
     } catch {
-      return false
+      // Permission denied and non-secure contexts both fall through to the
+      // legacy path instead of failing outright.
     }
   }
 
   const doc = typeof document === 'undefined' ? undefined : document
   if (!doc) return false
 
+  let textarea: HTMLTextAreaElement | undefined
+  let active: HTMLElement | null = null
   try {
-    const textarea = doc.createElement('textarea')
+    textarea = doc.createElement('textarea')
     textarea.value = text
     textarea.setAttribute('readonly', '')
     textarea.style.position = 'fixed'
@@ -25,16 +28,24 @@ export async function copyText(text: string): Promise<boolean> {
     textarea.style.left = '-9999px'
     textarea.style.opacity = '0'
 
-    const active = doc.activeElement as HTMLElement | null
+    active = doc.activeElement as HTMLElement | null
     doc.body.appendChild(textarea)
     textarea.focus()
     textarea.select()
     textarea.setSelectionRange(0, textarea.value.length)
-    const copied = typeof doc.execCommand === 'function' ? doc.execCommand('copy') : false
-    textarea.remove()
-    active?.focus?.()
-    return copied
+    return typeof doc.execCommand === 'function' ? doc.execCommand('copy') : false
   } catch {
     return false
+  } finally {
+    try {
+      textarea?.remove()
+    } catch {
+      // Cleanup must not turn a successful copy into a failure.
+    }
+    try {
+      active?.focus?.()
+    } catch {
+      // Focus restoration is best-effort.
+    }
   }
 }

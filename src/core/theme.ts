@@ -7,6 +7,9 @@ import {
 } from '../types.js'
 import { defineTheme, isThemeDefinition } from './define-theme.js'
 import { vshLight } from '../themes/vsh-light.js'
+import { vshDark } from '../themes/vsh-dark.js'
+import { vshPaper } from '../themes/vsh-paper.js'
+import { vshMidnight } from '../themes/vsh-midnight.js'
 
 export { defineTheme, isThemeDefinition }
 
@@ -15,6 +18,9 @@ export const DEFAULT_THEME_NAME = vshLight.name
 
 export const BUILTIN_THEME_REGISTRY: Readonly<Record<string, ThemeDefinition>> = Object.freeze({
   [vshLight.name]: vshLight,
+  [vshDark.name]: vshDark,
+  [vshPaper.name]: vshPaper,
+  [vshMidnight.name]: vshMidnight,
 })
 
 export interface ResolvedTheme {
@@ -76,7 +82,12 @@ export function resolveThemes(options: ThemeResolutionOptions = {}): ResolvedThe
   }
 
   const mode: ColorScheme =
-    options.colorScheme ?? options.fallback?.mode ?? (options.themes ? 'auto' : 'light')
+    options.colorScheme ??
+    (options.themes
+      ? 'auto'
+      : options.theme !== undefined
+        ? light.colorScheme
+        : (options.fallback?.mode ?? 'light'))
   const scopeName = light.name === dark.name ? light.name : `${light.name}/${dark.name}`
   return Object.freeze({ light, dark, mode, scopeName })
 }

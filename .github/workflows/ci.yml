@@ -52,6 +52,9 @@ jobs:
       - name: Static graph assertions
         run: pnpm check:graph
 
+      - name: Entry point assertions
+        run: pnpm check:entries
+
       - name: Documentation checks
         run: pnpm check:docs
 

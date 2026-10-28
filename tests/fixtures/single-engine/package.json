@@ -1,0 +1,8 @@
+{
+  "name": "vsh-single-engine-fixture",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "vue-syntax-highlighter": "0.1.0"
+  }
+}

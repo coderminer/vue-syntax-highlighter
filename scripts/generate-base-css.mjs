@@ -188,14 +188,30 @@ ${tokenRules}
 
 writeFileSync('src/styles/base.css', css)
 
+const FALLBACK_COLORS = {
+  light: {
+    bg: '#ffffff',
+    fg: '#24292f',
+    gutter: '#6e7781',
+    selection: '#b6d7ff',
+  },
+  dark: {
+    bg: '#0d1117',
+    fg: '#e6edf3',
+    gutter: '#7d8590',
+    selection: '#264f78',
+  },
+}
+
 const fallbackAliases = (scheme) => {
   const prefix = `--vsh-${scheme}`
+  const defaults = FALLBACK_COLORS[scheme]
   const declarations = [
-    `--vsh-bg: var(${prefix}-bg, #ffffff);`,
-    `--vsh-fg: var(${prefix}-fg, #24292f);`,
-    `--vsh-gutter: var(${prefix}-gutter, #6e7781);`,
+    `--vsh-bg: var(${prefix}-bg, ${defaults.bg});`,
+    `--vsh-fg: var(${prefix}-fg, ${defaults.fg});`,
+    `--vsh-gutter: var(${prefix}-gutter, ${defaults.gutter});`,
     `--vsh-line-highlight: var(${prefix}-line-highlight, transparent);`,
-    `--vsh-selection: var(${prefix}-selection, #b6d7ff);`,
+    `--vsh-selection: var(${prefix}-selection, ${defaults.selection});`,
     `--vsh-font-family: var(${prefix}-font-family, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);`,
   ]
   for (const type of TOKEN_TYPES) {

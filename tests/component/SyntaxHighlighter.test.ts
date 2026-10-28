@@ -321,7 +321,8 @@ describe('accessibility and attributes', () => {
       'aria-label': 'Example',
     })
     expect(wrapper.classes()).toEqual(expect.arrayContaining(['vsh', 'my-code']))
-    expect(wrapper.attributes('aria-label')).toBe('Example')
+    expect(wrapper.attributes('aria-label')).toBeUndefined()
+    expect(wrapper.find('pre').attributes('aria-label')).toBe('Example')
     expect(wrapper.attributes('data-language')).toBe('js')
     expect(wrapper.find('pre').attributes('tabindex')).toBe('0')
     expect(wrapper.find('pre').attributes('role')).toBe('region')
@@ -339,6 +340,7 @@ describe('accessibility and attributes', () => {
     })
     expect(wrapper.find('pre').attributes('role')).toBe('region')
     expect(wrapper.find('pre').attributes('aria-labelledby')).toBe('code-label')
+    expect(wrapper.attributes('aria-labelledby')).toBeUndefined()
   })
 
   it('honors tabindex=false and forwards data attributes', () => {
@@ -372,6 +374,13 @@ describe('theme and reactivity', () => {
     await wrapper.setProps({ theme: 'missing-theme' })
     expect(wrapper.find('.vsh').attributes('data-vsh-theme')).toBe('vsh-paper')
     expect(spy.mock.calls.some((call) => String(call[0]).includes('Unknown theme'))).toBe(true)
+  })
+
+  it('falls back to the default theme when the theme is removed', async () => {
+    const wrapper = mountWith({ engine: makeEngine(), theme: vshPaper })
+    expect(wrapper.find('.vsh').attributes('data-vsh-theme')).toBe('vsh-paper')
+    await wrapper.setProps({ theme: undefined })
+    expect(wrapper.find('.vsh').attributes('data-vsh-theme')).toBe('vsh-light')
   })
 
   it('does not retry a failed highlight when only the theme changes', async () => {

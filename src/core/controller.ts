@@ -8,6 +8,7 @@ import type {
 } from '../types.js'
 import { type EngineChoice, requestCacheKey } from './engine.js'
 import { selectEngine, type HighlighterContext } from './context.js'
+import { normalizeLanguage } from './props.js'
 import {
   assertHighlightResult,
   freezeResult,
@@ -263,7 +264,7 @@ export function createHighlightController(options: ControllerOptions): Highlight
     }
     const current = getInput()
     const code = normalizeDisplaySource(input.code)
-    const language = input.language ?? current.language
+    const language = normalizeLanguage(input.language ?? current.language)
     const selection = selectEngine(context, current.engine)
     const engine = await selection.manager.resolve(selection.choice)
     const key = requestCacheKey(

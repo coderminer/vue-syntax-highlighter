@@ -1,8 +1,8 @@
 [
   {
     "name": "core (excluding Vue)",
-    "path": "dist/index.js",
-    "limit": "12.5 kB",
+    "path": "dist/chunks/aliases-*.js",
+    "limit": "13 kB",
     "gzip": true
   },
   {

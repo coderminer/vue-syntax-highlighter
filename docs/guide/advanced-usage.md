@@ -33,6 +33,33 @@ const themes = { light: vshLight, dark: vshDark }
 
 A provider renders one `display: contents` theme scope for its subtree. Descendants inherit unspecified values. Nested providers override only their subtree. Loader-owned engines and caches are disposed on provider unmount.
 
+Use `scopeTag` when the provider must sit inside a specific content model, while keeping the default `div.vsh-scope` markup otherwise:
+
+```vue
+<SyntaxHighlighterProvider scope-tag="section" theme="vsh-dark">
+  <SyntaxHighlighter :code="code" language="ts" />
+</SyntaxHighlighterProvider>
+```
+
+`engines`, `themeRegistry`, `cache`, `cacheCapacity`, and `cacheMaxChars` are creation-time provider options. Changing them after mount is ignored with one development warning; recreate the provider scope to apply them. `defer`, `rootMargin`, themes, scheme, engine, and languages remain reactive. Turning `defer` off after mount starts highlighting immediately.
+
+## Minimal build entry
+
+The default entry keeps built-in engines available through lazy chunks. For a build that must not resolve optional engine peers, import `core` and pass an explicit engine object:
+
+```ts
+import { SyntaxHighlighter } from 'vue-syntax-highlighter/core'
+import { createHighlightjsEngine } from 'vue-syntax-highlighter/engines/highlightjs'
+
+const engine = await createHighlightjsEngine({ preload: ['typescript'] })
+```
+
+```vue
+<SyntaxHighlighter :code="code" language="ts" :engine="engine" />
+```
+
+`vue-syntax-highlighter/full` is equivalent to the default entry in `1.1.0`.
+
 ## Plugin installation
 
 Use the plugin for app-wide defaults and global component registration:
