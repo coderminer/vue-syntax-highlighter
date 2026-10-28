@@ -1,11 +1,5 @@
 [
   {
-    "name": "core (excluding Vue)",
-    "path": "dist/chunks/aliases-*.js",
-    "limit": "13 kB",
-    "gzip": true
-  },
-  {
     "name": "adapter: Shiki (excluding Shiki)",
     "path": "dist/engines/shiki.js",
     "limit": "5 kB",

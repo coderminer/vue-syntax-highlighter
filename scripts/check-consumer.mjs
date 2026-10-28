@@ -1,12 +1,15 @@
 import { execFileSync } from 'node:child_process'
 import {
+  cpSync,
   existsSync,
   mkdirSync,
+  mkdtempSync,
   readFileSync,
   readdirSync,
   rmSync,
   writeFileSync,
 } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { gunzipSync } from 'node:zlib'
 
@@ -93,27 +96,71 @@ if (!assets.some((file) => file.endsWith('.js'))) {
 run(process.execPath, ['tests/fixtures/consumer/ssr.mjs'])
 
 for (const name of ['core-consumer', 'single-engine']) {
-  const dir = join(root, `tests/fixtures/${name}`)
-  const destination = join(dir, 'node_modules/vue-syntax-highlighter')
-  rmSync(destination, { recursive: true, force: true })
-  rmSync(join(dir, 'dist'), { recursive: true, force: true })
-  mkdirSync(destination, { recursive: true })
-  extractTarGz(readFileSync(tarball), destination)
+  const source = join(root, `tests/fixtures/${name}`)
+  const isolated = mkdtempSync(join(tmpdir(), `vsh-${name}-`))
+  try {
+    cpSync(join(source, 'index.html'), join(isolated, 'index.html'))
+    cpSync(join(source, 'src'), join(isolated, 'src'), { recursive: true })
+    cpSync(join(source, 'vite.config.mjs'), join(isolated, 'vite.config.mjs'))
 
-  run(process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm', [
-    'exec',
-    'vite',
-    'build',
-    '--config',
-    `tests/fixtures/${name}/vite.config.mjs`,
-  ])
-  const html = readFileSync(join(dir, 'dist/index.html'), 'utf8')
-  if (!html.includes('assets/')) {
-    throw new Error(`${name} browser build did not emit assets`)
-  }
-  const output = readdirSync(join(dir, 'dist/assets'))
-  if (!output.some((file) => file.endsWith('.js'))) {
-    throw new Error(`${name} browser build did not emit JavaScript`)
+    const dependencies = {
+      'vue-syntax-highlighter': `file:${tarball.replace(/\\/g, '/')}`,
+      vue: '^3.5.0',
+      ...(name === 'single-engine'
+        ? { 'highlight.js': '^11.11.1', lowlight: '^3.3.0' }
+        : {}),
+    }
+    writeFileSync(
+      join(isolated, 'package.json'),
+      `${JSON.stringify(
+        {
+          name: `vsh-${name}-isolated`,
+          private: true,
+          type: 'module',
+          dependencies,
+        },
+        null,
+        2,
+      )}\n`,
+    )
+
+    run(process.platform === 'win32' ? 'npm.cmd' : 'npm', [
+      'install',
+      '--no-audit',
+      '--no-fund',
+      '--ignore-scripts',
+    ], { cwd: isolated })
+
+    const forbidden =
+      name === 'core-consumer'
+        ? ['shiki', 'refractor', 'lowlight', 'highlight.js']
+        : ['shiki', 'refractor']
+    for (const peer of forbidden) {
+      if (existsSync(join(isolated, 'node_modules', peer))) {
+        throw new Error(`${name} isolated fixture unexpectedly installed ${peer}`)
+      }
+    }
+
+    run(
+      process.execPath,
+      [
+        join(root, 'node_modules/vite/bin/vite.js'),
+        'build',
+        '--config',
+        join(isolated, 'vite.config.mjs'),
+      ],
+      { cwd: isolated },
+    )
+    const html = readFileSync(join(isolated, 'dist/index.html'), 'utf8')
+    if (!html.includes('assets/')) {
+      throw new Error(`${name} browser build did not emit assets`)
+    }
+    const output = readdirSync(join(isolated, 'dist/assets'))
+    if (!output.some((file) => file.endsWith('.js'))) {
+      throw new Error(`${name} browser build did not emit JavaScript`)
+    }
+  } finally {
+    rmSync(isolated, { recursive: true, force: true })
   }
 }
 

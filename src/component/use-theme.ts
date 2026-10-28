@@ -40,12 +40,10 @@ export function useResolvedTheme(
     selection,
     (next) => {
       try {
-        const hasSelection =
-          next.theme !== undefined ||
-          next.themes !== undefined ||
-          next.colorScheme !== undefined
+        const hasThemeSelection = next.theme !== undefined || next.themes !== undefined
         theme.value = resolveThemes({
-          ...(hasSelection ? { ...next, fallback: theme.value } : {}),
+          ...next,
+          ...(hasThemeSelection ? { fallback: theme.value } : {}),
           registry: context.themeRegistry,
         })
       } catch (error) {

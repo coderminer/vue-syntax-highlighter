@@ -3,6 +3,9 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "vue-syntax-highlighter": "0.1.0"
+    "vue-syntax-highlighter": "1.1.1",
+    "vue": "^3.5.0",
+    "highlight.js": "^11.11.1",
+    "lowlight": "^3.3.0"
   }
 }

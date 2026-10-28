@@ -10,9 +10,9 @@ Every runtime export and public type has a runnable example in [API Examples](/g
 | `vue-syntax-highlighter/core` | The same runtime API without a built-in engine loader. Pass an explicit engine object; no optional engine peer is referenced at build time. |
 | `vue-syntax-highlighter/full` | The same API as the default entry, including all built-in engine loaders. In `1.1.0` it is equivalent to the default entry. |
 | `vue-syntax-highlighter/engines/shiki` | `createShikiEngine`, `ShikiEngine`, `ShikiEngineOptions`, `ShikiLanguageRegistration`, `ShikiLanguageLoader`, `languageLoaders`, `languageAliases`, `supportedLanguages` |
-| `vue-syntax-highlighter/engines/highlightjs` | `createHighlightjsEngine`, `HighlightjsEngine`, `HighlightjsEngineOptions`, `HighlightjsLanguageRegistration`, `HighlightjsLanguageLoader` |
-| `vue-syntax-highlighter/engines/lowlight` | `createLowlightEngine`, `LowlightEngine`, `LowlightEngineOptions`, `LowlightLanguageRegistration`, `LowlightLanguageLoader`, plus `createHighlightjsEngine` |
-| `vue-syntax-highlighter/engines/prism` | `createPrismEngine`, `PrismEngine`, `PrismEngineOptions`, `PrismLanguageRegistration`, `PrismLanguageLoader` |
+| `vue-syntax-highlighter/engines/highlightjs` | `createHighlightjsEngine`, `HighlightjsEngine`, `HighlightjsEngineOptions`, `HighlightjsLanguageRegistration`, `HighlightjsLanguageLoader`, `supportedLanguages` |
+| `vue-syntax-highlighter/engines/lowlight` | `createLowlightEngine`, `LowlightEngine`, `LowlightEngineOptions`, `LowlightLanguageRegistration`, `LowlightLanguageLoader`, `supportedLanguages`, plus `createHighlightjsEngine` |
+| `vue-syntax-highlighter/engines/prism` | `createPrismEngine`, `PrismEngine`, `PrismEngineOptions`, `PrismLanguageRegistration`, `PrismLanguageLoader`, `supportedLanguages` |
 | `vue-syntax-highlighter/themes` | `vshLight`, `vshDark`, `vshPaper`, `vshMidnight` |
 | `vue-syntax-highlighter/themes/default` | `default`, `vshLight` |
 | `vue-syntax-highlighter/themes/vsh-light` | `default`, `vshLight` |

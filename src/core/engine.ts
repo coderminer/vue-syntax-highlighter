@@ -55,6 +55,10 @@ export function setBuiltinEngineLoader(loader: BuiltinEngineLoader | undefined):
   builtinEngineLoader = loader
 }
 
+export function hasBuiltinEngineLoader(): boolean {
+  return builtinEngineLoader !== undefined
+}
+
 /**
  * Loads and owns engines for one provider/application. User-supplied engine
  * objects are never disposed here; only instances this manager created are.

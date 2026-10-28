@@ -19,7 +19,9 @@ export function isDevelopment(): boolean {
   const override = (globalThis as { __VSH_DEV_OVERRIDE__?: unknown }).__VSH_DEV_OVERRIDE__
   if (typeof override === 'boolean') return override
   // Read this through globalThis so library builds do not bake the publisher's
-  // NODE_ENV into the artifact. Consumers can still replace process.env.
+  // NODE_ENV into the artifact. Vite folds globalThis.process?.env?.NODE_ENV;
+  // bundlers that only define process.env.NODE_ENV may keep warnings enabled.
+  // That direction is safe: warnings never suppress functionality.
   const env = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env
   if (env?.NODE_ENV === 'production') return false
   return true

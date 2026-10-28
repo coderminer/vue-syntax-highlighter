@@ -49,6 +49,9 @@ jobs:
       - name: Size budgets
         run: pnpm size
 
+      - name: Core entry size
+        run: pnpm check:core-size
+
       - name: Static graph assertions
         run: pnpm check:graph
 

@@ -1,6 +1,6 @@
 {
   "name": "vue-syntax-highlighter",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A Vue 3 syntax highlighter with pluggable engines, semantic themes, and SSR-first performance.",
   "type": "module",
   "license": "MIT",
@@ -134,13 +134,14 @@
     "docs:preview": "vitepress preview docs --port 4173",
     "bench": "node scripts/bench.mjs",
     "generate:languages": "node scripts/generate-languages.mjs",
-    "verify": "pnpm lint && pnpm build && pnpm typecheck && pnpm test:run && pnpm size && pnpm check:graph && pnpm check:entries && pnpm check:docs && pnpm check:package && pnpm check:consumer && pnpm check:workflow && pnpm docs:build && pnpm test:e2e",
+    "verify": "pnpm lint && pnpm build && pnpm typecheck && pnpm test:run && pnpm size && pnpm check:core-size && pnpm check:graph && pnpm check:entries && pnpm check:docs && pnpm check:package && pnpm check:consumer && pnpm check:workflow && pnpm docs:build && pnpm test:e2e",
     "check:graph": "node scripts/check-graph.mjs",
     "check:entries": "node scripts/check-entries.mjs",
     "check:docs": "node scripts/check-docs.mjs",
     "check:consumer": "node scripts/check-consumer.mjs",
     "check:workflow": "node scripts/check-workflow.mjs",
-    "generate:css": "node scripts/generate-base-css.mjs"
+    "generate:css": "node scripts/generate-base-css.mjs",
+    "check:core-size": "node scripts/check-core-size.mjs"
   },
   "peerDependencies": {
     "highlight.js": "^11.0.0",

@@ -2,6 +2,25 @@
 
 All notable changes to this project are documented here. The format follows Keep a Changelog and the project uses semantic versioning.
 
+## [1.1.1] - 2026-10-28
+
+### Fixed
+
+- Removing a theme while `colorScheme` remains now resolves the default theme instead of retaining the previous pair.
+- Preloading languages in the `core` entry no longer resolves the implicit Shiki default when no engine is configured, avoiding a misleading warning on provider mount.
+- The deferred observer is no longer recreated for unrelated prop updates; only `defer` and `rootMargin` changes reconnect it.
+
+### Added
+
+- `supportedLanguages` is exported from the highlight.js and Prism adapter entries.
+- Isolated core-only and single-engine fixtures now install the packed tarball plus only their allowed peers in the OS temp directory.
+- A bundled core-entry size check measures the actual gzip cost with Vue external.
+
+### Documentation
+
+- Documented the runtime `NODE_ENV` folding caveat for non-Vite bundlers.
+- Corrected the Prism/highlight.js language coverage imports and roadmap release tracking.
+
 ## [1.1.0] - 2026-10-28
 
 ### Added
@@ -13,7 +32,7 @@ All notable changes to this project are documented here. The format follows Keep
 
 ### Fixed
 
-- Development warnings now read `NODE_ENV` at runtime instead of baking `__VSH_DEV__` into the published build.
+- Development warnings now read `NODE_ENV` at runtime instead of baking `__VSH_DEV__` into the published build. Vite folds the check for production; bundlers that only define `process.env.NODE_ENV` may retain warnings.
 - Removing `theme` or `themes` falls back to the provider/default theme instead of retaining the previous theme.
 - A single dark theme derives `data-vsh-scheme="dark"` from its `colorScheme`.
 - All four built-in themes are registered by name, so `vsh-dark`, `vsh-paper`, and `vsh-midnight` work without a separate registration step.

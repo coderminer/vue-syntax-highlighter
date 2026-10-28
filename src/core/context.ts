@@ -9,6 +9,7 @@ import type {
 import { ResultCache } from './cache.js'
 import {
   EngineManager,
+  hasBuiltinEngineLoader,
   isHighlightEngine,
   type EngineChoice,
   type EngineRegistry,
@@ -278,6 +279,21 @@ export function selectTheme(
 
 export async function preloadLanguages(context: HighlighterContext): Promise<void> {
   if (context.disposed || context.languages.length === 0) return
+
+  let configuredEngine = false
+  let current: HighlighterContext | undefined = context
+  while (current) {
+    if (current.engine !== undefined) {
+      configuredEngine = true
+      break
+    }
+    current = current.parent
+  }
+  // The core entry has no default engine. A provider may preload languages for
+  // a child that supplies its own engine later; there is nothing to preload
+  // here, and resolving the implicit Shiki default would only emit a warning.
+  if (!configuredEngine && !hasBuiltinEngineLoader()) return
+
   const selection = selectEngine(context)
   try {
     const engine = await selection.manager.resolve(selection.choice)

@@ -221,3 +221,5 @@ function canonicalLanguage(language: string): string {
   const normalized = language.trim().toLowerCase().replace(/^language-/, '')
   return languageAliases[normalized] ?? normalized
 }
+
+export { supportedLanguages } from './languages.js'

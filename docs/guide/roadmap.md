@@ -1,10 +1,10 @@
 # Roadmap
 
-This page tracks the planned `1.1.0` and `2.0.0` work. It describes intended changes, not shipped behavior. The current release is `1.1.0`.
+This page tracks the planned `1.1.x` and `2.0.0` work. It describes intended changes, not shipped behavior. The repository source is `1.1.1`; the latest npm release is `1.0.3` until the manual publish.
 
 The plan has one hard rule:
 
-> `1.1.0` must keep the default behavior of `1.0.3`. Anything that changes defaults, public contracts, or the rendered DOM structure waits for `2.0.0`.
+> `1.1.x` must keep the default behavior of `1.0.3`. Anything that changes defaults, public contracts, or the rendered DOM structure waits for `2.0.0`.
 
 ## Version policy
 
@@ -118,23 +118,24 @@ const engine = await createShikiEngine({ preload: ['typescript'] })
 ## Release sequence
 
 ```text
-1.1.0        current release, keep the tag
-1.1.0        non-breaking fixes, latest
+1.0.3        latest npm release until publish
+1.1.0        previous source tag
+1.1.1        current source release, latest after publish
 1.1.x        regression fixes only
 2.0.0-beta.1 next tag, migration testing
 2.0.0        latest
 ```
 
-Before `1.1.0` is published:
+1.1.1 release checks (completed):
 
-1. Add regression tests for the fixes above.
-2. Add an isolated consumer fixture that installs only `vue` and verifies the `core` entry does not resolve any engine peer.
-3. Add a single-engine fixture that installs only `highlight.js` and `lowlight`.
-4. Run the full `pnpm verify` gate.
+- [x] Add regression tests for the fixes above.
+- [x] Add an isolated consumer fixture that installs only `vue` and verifies the `core` entry does not resolve any engine peer.
+- [x] Add a single-engine fixture that installs only `highlight.js` and `lowlight`.
+- [x] Run the full `pnpm verify` gate.
 
 Before `2.0.0` is published:
 
-1. Branch from `1.1.0`.
+1. Branch from `1.1.1`.
 2. Publish `2.0.0-beta.1` on the `next` tag.
 3. Verify a Vite app, an SSR render, and a single-engine build against the packed tarball.
 4. Publish `2.0.0` only after the migration guide and compatibility notes are in place.
@@ -152,7 +153,7 @@ Before `2.0.0` is published:
 - [x] Normalize `highlight()` language input
 - [x] Add `core`, `full`, and `scopeTag` as additive APIs
 - [x] Add isolated consumer and single-engine build fixtures
-- [ ] Publish `1.1.0`
+- [ ] Publish `1.1.1`
 - [ ] Switch the default entry to `core`
 - [ ] Make the provider renderless by default
 - [ ] Align the default line height

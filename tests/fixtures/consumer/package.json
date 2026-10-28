@@ -3,6 +3,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "vue-syntax-highlighter": "0.1.0"
+    "vue-syntax-highlighter": "1.1.1"
   }
 }

@@ -175,6 +175,28 @@ describe('provider behavior defaults', () => {
     wrapper.unmount()
   })
 
+  it('does not recreate the deferred observer on unrelated updates', async () => {
+    const observer = mockIntersectionObserver()
+    const code = ref('a')
+    const wrapper = mount(
+      {
+        render: () =>
+          h(SyntaxHighlighterProvider, { defer: true }, () =>
+            h(SyntaxHighlighter, { code: code.value, engine: engine() }),
+          ),
+      },
+      { attachTo: document.body },
+    )
+    await flushPromises()
+    expect(observer.options).toHaveLength(1)
+
+    code.value = 'b'
+    await nextTick()
+    await flushPromises()
+    expect(observer.options).toHaveLength(1)
+    wrapper.unmount()
+  })
+
   it('warns when static provider configuration changes', async () => {
     const spy = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
     const registry = ref<Record<string, typeof vshLight>>({})

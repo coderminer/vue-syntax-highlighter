@@ -362,7 +362,7 @@ export const SyntaxHighlighter = defineComponent({
     })
 
     watch(
-      () => [normalized.value.defer, normalized.value.rootMargin] as const,
+      [() => normalized.value.defer, () => normalized.value.rootMargin],
       () => {
         if (!mounted.value) return
         observeDeferred()

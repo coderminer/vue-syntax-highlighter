@@ -12,6 +12,10 @@ Adapters must agree on line count and concatenated line text, not on token segme
 
 There is no CommonJS build. Consumers must use an ESM bundler or Node-based SSR with ESM. Vue is the only required peer; engines are optional peers and must be installed for the adapter you select.
 
+## Development warnings
+
+Warnings are runtime diagnostics, not a build-time guarantee. Vite folds `globalThis.process?.env?.NODE_ENV` for production builds; bundlers that only replace `process.env.NODE_ENV` may keep warnings enabled in production. The failure direction is safe: warnings never suppress highlighting or change rendered output.
+
 ## Browser support
 
 The runtime targets modern ESM browsers with CSS custom properties. IE11 is not supported.

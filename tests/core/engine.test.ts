@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
-import { EngineManager, requestCacheKey } from '@/core/engine'
+import { EngineManager, requestCacheKey, setBuiltinEngineLoader } from '@/core/engine'
+import { installBuiltinEngines } from '@/core/builtin-engines'
 import {
   createHighlighterContext,
   preloadLanguages,
@@ -62,6 +63,20 @@ describe('EngineManager', () => {
       /Custom engine "broken" failed to load: cannot load/,
     )
     await expect(manager.resolve('broken')).rejects.not.toThrow(/Install it with/)
+  })
+
+  it('does not preload an implicit default in the core entry', async () => {
+    const spy = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    setBuiltinEngineLoader(undefined)
+    try {
+      const context = createHighlighterContext({ languages: ['typescript'] })
+      await preloadLanguages(context)
+      expect(
+        spy.mock.calls.some((call) => String(call[0]).includes('Unable to preload languages')),
+      ).toBe(false)
+    } finally {
+      installBuiltinEngines()
+    }
   })
 
   it('warns once when a preload language fails', async () => {

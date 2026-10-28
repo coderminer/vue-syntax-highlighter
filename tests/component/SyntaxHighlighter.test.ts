@@ -383,6 +383,18 @@ describe('theme and reactivity', () => {
     expect(wrapper.find('.vsh').attributes('data-vsh-theme')).toBe('vsh-light')
   })
 
+  it('does not retain a removed theme when only colorScheme remains', async () => {
+    const wrapper = mountWith({
+      engine: makeEngine(),
+      theme: vshDark,
+      colorScheme: 'dark',
+    })
+    expect(wrapper.find('.vsh').attributes('data-vsh-theme')).toBe('vsh-dark')
+    await wrapper.setProps({ theme: undefined })
+    expect(wrapper.find('.vsh').attributes('data-vsh-theme')).toBe('vsh-light')
+    expect(wrapper.find('.vsh').attributes('data-vsh-scheme')).toBe('dark')
+  })
+
   it('does not retry a failed highlight when only the theme changes', async () => {
     vi.spyOn(console, 'warn').mockImplementation(() => undefined)
     const engine = makeEngine(
