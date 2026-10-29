@@ -17,6 +17,7 @@ All notable changes to this project are documented here. The format follows Keep
 
 ### Changed
 
+- The published tarball no longer includes `.map` files. Source maps are still generated in `dist` for local debugging, but `npm pack` and `npm publish` exclude them.
 - `SyntaxHighlighterProvider`'s `scopeTag` prop now defaults to `undefined` instead of `div`. Rendered markup is unchanged because the provider still falls back to `div`, but the prop default is observable. This lets renderless mode warn whenever `scopeTag` is explicitly set, including `scope-tag="div"`.
 - The release policy is additive-only. Former breaking changes are delivered as opt-ins, and no future breaking release or default change is scheduled.
 

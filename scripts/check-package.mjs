@@ -120,6 +120,7 @@ for (const required of ['README.md', 'CHANGELOG.md', 'LICENSE', 'package.json', 
   if (!files.includes(required)) fail(`packed artifact is missing ${required}`)
 }
 for (const file of files) {
+  if (file.endsWith('.map')) fail(`packed artifact unexpectedly includes source map ${file}`)
   if (/^(src|tests|docs|scripts|openspec)\//.test(file) || /^tsconfig|^vite\.config|^vitest\.|^playwright\./.test(file)) {
     fail(`packed artifact unexpectedly includes ${file}`)
   }
