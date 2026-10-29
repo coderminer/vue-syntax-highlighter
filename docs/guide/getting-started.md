@@ -88,6 +88,14 @@ import 'vue-syntax-highlighter/styles.css'
 import 'vue-syntax-highlighter/styles/fallback.css'
 ```
 
+To load the base and fallback rules in one request, opt in to the prebuilt complete stylesheet instead:
+
+```ts
+import 'vue-syntax-highlighter/styles/complete.css'
+```
+
+`styles/complete.css` is larger than `styles.css`, so use it instead of the other two stylesheets, not in addition to them.
+
 ## Zero-configuration example
 
 ```vue
@@ -118,6 +126,7 @@ The default engine is Shiki, the default theme is `vsh-light`, and each block cr
 | `vue-syntax-highlighter/themes/vsh-*` | One built-in theme's data |
 | `vue-syntax-highlighter/styles.css` | Base stylesheet |
 | `vue-syntax-highlighter/styles/fallback.css` | Pre-`light-dark()` fallback |
+| `vue-syntax-highlighter/styles/complete.css` | Base and fallback rules in one opt-in stylesheet |
 
 ## Next steps
 

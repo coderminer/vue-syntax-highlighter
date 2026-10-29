@@ -116,7 +116,7 @@ const packOutput = execFileSync(
 )
 const packed = JSON.parse(packOutput)
 const files = packed[0]?.files?.map((file) => file.path) ?? []
-for (const required of ['README.md', 'CHANGELOG.md', 'LICENSE', 'package.json', 'dist/index.js', 'dist/index.d.ts', 'dist/styles.css', 'dist/styles/fallback.css']) {
+for (const required of ['README.md', 'CHANGELOG.md', 'LICENSE', 'package.json', 'dist/index.js', 'dist/index.d.ts', 'dist/styles.css', 'dist/styles/fallback.css', 'dist/styles/complete.css']) {
   if (!files.includes(required)) fail(`packed artifact is missing ${required}`)
 }
 for (const file of files) {
@@ -134,7 +134,7 @@ try {
 try {
   execFileSync(
     process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm',
-    ['exec', 'attw', '--pack', '.', '--profile', 'esm-only', '--exclude-entrypoints', 'styles.css', 'styles/fallback.css'],
+    ['exec', 'attw', '--pack', '.', '--profile', 'esm-only', '--exclude-entrypoints', 'styles.css', 'styles/fallback.css', 'styles/complete.css'],
     {
       cwd: root,
       stdio: 'pipe',

@@ -2,6 +2,29 @@
 
 All notable changes to this project are documented here. The format follows Keep a Changelog and the project uses semantic versioning.
 
+## [1.2.0] - 2026-10-29
+
+### Added
+
+- `renderless` on `SyntaxHighlighterProvider`, defaulting to `false`, to remove the wrapper while keeping provider configuration. The default `div.vsh-scope` wrapper is unchanged.
+- `themeScope` on `SyntaxHighlighter`, defaulting to `inherit`, with `self` to emit theme variables and scheme attributes on the `.vsh` root inside a wrapper provider.
+- `lineHeightMode` on `SyntaxHighlighter`, defaulting to `visual`, with `fixed` to emit numeric `min-height` and `line-height` on non-virtual rows. The default line height remains `20`; opt into `21` with `line-height-mode="fixed"`.
+- `preserveTrailingNewline` on the exposed `highlight()` input and as a `useSyntaxHighlighter` default with per-call override. The default false behavior still strips one terminal newline.
+- `cacheEngineIdentity` on the provider and plugin, defaulting to `false`, to partition cached results for distinct engine objects that share an `id`. The default cache key remains byte-identical.
+- `vue-syntax-highlighter/styles/complete.css`, an opt-in concatenation of the minified base stylesheet and fallback rules. `styles.css` and `styles/fallback.css` are unchanged.
+- Public types `ThemeScope`, `LineHeightMode`, `HighlighterScopeMode`, and `HighlightInput`.
+- Frozen-default regression tests for the wrapper, provider-owned theme variables, line height, terminal-newline handling, and cache-key format.
+
+### Changed
+
+- `SyntaxHighlighterProvider`'s `scopeTag` prop now defaults to `undefined` instead of `div`. Rendered markup is unchanged because the provider still falls back to `div`, but the prop default is observable. This lets renderless mode warn whenever `scopeTag` is explicitly set, including `scope-tag="div"`.
+- The release policy is additive-only. Former breaking changes are delivered as opt-ins, and no future breaking release or default change is scheduled.
+
+### Documentation
+
+- Rewrote the roadmap around the additive-only policy and the `1.2.0` opt-in table.
+- Documented every new prop, option, type, and stylesheet, including defaults and opt-in examples.
+
 ## [1.1.1] - 2026-10-28
 
 ### Fixed

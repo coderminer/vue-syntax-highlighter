@@ -12,6 +12,8 @@ const html = await renderToString(
         language: 'javascript',
         engine,
         lineNumbers: true,
+        lineHeight: 21,
+        lineHeightMode: 'fixed',
       }),
   }),
 )
@@ -24,5 +26,8 @@ if (!html.includes('language-javascript')) {
 }
 if (!html.includes('data-vsh-theme="vsh-light"')) {
   throw new Error('consumer SSR did not render the theme scope')
+}
+if (!html.includes('min-height:21px') || !html.includes('line-height:21px')) {
+  throw new Error('consumer SSR did not apply the opt-in fixed line metrics')
 }
 console.log('consumer SSR ok')

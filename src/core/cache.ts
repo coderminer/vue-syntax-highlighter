@@ -66,6 +66,7 @@ export interface CacheKeyInput {
   language: string
   code: string
   options?: EngineOptions
+  engineIdentity?: number
 }
 
 /**
@@ -74,12 +75,14 @@ export interface CacheKeyInput {
  */
 export function buildCacheKey(input: CacheKeyInput): string {
   const options = input.options ?? {}
-  return `v1:${stableStringify([
+  const parts: unknown[] = [
     input.engineId,
     input.language,
     input.code,
     options,
-  ])}`
+  ]
+  if (input.engineIdentity !== undefined) parts.push(input.engineIdentity)
+  return `v1:${stableStringify(parts)}`
 }
 
 export interface ResultCacheOptions {

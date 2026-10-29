@@ -13,6 +13,7 @@ import {
   type VNodeChild,
 } from 'vue'
 import type {
+  HighlightInput,
   HighlightLine,
   HighlightResult,
   HighlightToken,
@@ -24,6 +25,7 @@ import {
   getDefaultContext,
   HIGHLIGHTER_CONTEXT,
   selectHighlighterBehavior,
+  selectScopeMode,
 } from '../core/context.js'
 import { createHighlightController } from '../core/controller.js'
 import { normalizeProps, highlighterProps, type RawHighlighterProps } from '../core/props.js'
@@ -72,21 +74,19 @@ export const SyntaxHighlighter = defineComponent({
       colorScheme: normalized.value.colorScheme,
     }))
 
-    const hasProviderScope = computed(() => {
-      let current: typeof context | undefined = context
-      while (current) {
-        if (current.providesScope) return true
-        current = current.parent
-      }
-      return false
-    })
+    const providerScopeMode = computed(() => selectScopeMode(context))
     const localThemeOverride = computed(
       () =>
         props.theme !== undefined ||
         props.themes !== undefined ||
         props.colorScheme !== undefined,
     )
-    const ownsScope = computed(() => localThemeOverride.value || !hasProviderScope.value)
+    const ownsScope = computed(
+      () =>
+        localThemeOverride.value ||
+        normalized.value.themeScope === 'self' ||
+        providerScopeMode.value !== 'wrapper',
+    )
 
     const plain = computed(() =>
       createPlainResult(normalized.value.code, normalized.value.language),
@@ -278,7 +278,15 @@ export const SyntaxHighlighter = defineComponent({
             },
             extraStyle,
           ]
-        : extraStyle
+        : current.lineHeightMode === 'fixed'
+          ? [
+              {
+                minHeight: `${current.lineHeight}px`,
+                lineHeight: `${current.lineHeight}px`,
+              },
+              extraStyle,
+            ]
+          : extraStyle
 
       return h(
         'span',
@@ -455,7 +463,7 @@ export const SyntaxHighlighter = defineComponent({
 
     expose({
       refresh: () => controller.refresh(),
-      highlight: (input: { code: string; language?: string }) => controller.highlight(input),
+      highlight: (input: HighlightInput) => controller.highlight(input),
       copy,
       getCopyPayload,
     })

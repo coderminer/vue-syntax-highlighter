@@ -141,6 +141,114 @@ describe('server rendering', () => {
     expect(html).toContain('--vsh-dark-bg')
     expect(html).not.toContain('<style')
   })
+
+  it('keeps the default wrapper, theme payload, and line-height markup', async () => {
+    const engine = makeEngine()
+    const render = () =>
+      h(SyntaxHighlighterProvider, { theme: vshDark }, () =>
+        h(SyntaxHighlighter, {
+          code: 'a\nb',
+          language: 'js',
+          engine,
+          lineNumbers: true,
+        }),
+      )
+    const html = await renderToString(createSSRApp({ render }))
+    expect(html).toContain('<div class="vsh-scope"')
+    expect(html).toContain('data-vsh-theme="vsh-dark"')
+    expect(html).toContain('--vsh-dark-bg')
+    expect(html).not.toMatch(/class="vsh"[^>]*data-vsh-theme/)
+    expect(html).toContain('data-line="1"')
+    expect(html).not.toMatch(/class="vsh-line"[^>]*style="[^"]*min-height/)
+    expect(html).not.toContain('<style')
+  })
+
+  it('renders fixed line metrics deterministically without measurement', async () => {
+    const engine = makeEngine()
+    const render = () =>
+      h(SyntaxHighlighter, {
+        code: 'a\nb',
+        language: 'js',
+        engine,
+        lineHeight: 21,
+        lineHeightMode: 'fixed',
+      })
+    const html = await renderToString(createSSRApp({ render }))
+    expect(html).toContain('min-height:21px')
+    expect(html).toContain('line-height:21px')
+    expect(html).not.toMatch(/(?:^|[;\s])height:21px/)
+
+    const warnings = captureWarnings()
+    const container = document.createElement('div')
+    container.innerHTML = html
+    document.body.append(container)
+    const app = createSSRApp({ render })
+    app.mount(container)
+    await flushPromises()
+    expect(warnings.messages.filter((message) => /mismatch/i.test(message))).toHaveLength(0)
+    warnings.restore()
+    app.unmount()
+    container.remove()
+  })
+
+  it('renders a renderless provider without a wrapper and hydrates identically', async () => {
+    const engine = makeEngine()
+    const render = () =>
+      h(SyntaxHighlighterProvider, { renderless: true, theme: vshDark }, () =>
+        h(SyntaxHighlighter, { code: 'a', language: 'js', engine }),
+      )
+    const html = await renderToString(createSSRApp({ render }))
+    expect(html).not.toContain('vsh-scope')
+    expect(html).toContain('data-vsh-theme="vsh-dark"')
+    expect(html).toContain('--vsh-dark-bg')
+    expect(html).not.toContain('<style')
+
+    const warnings = captureWarnings()
+    const container = document.createElement('div')
+    container.innerHTML = html
+    document.body.append(container)
+    const app = createSSRApp({ render })
+    app.mount(container)
+    await flushPromises()
+    expect(warnings.messages.filter((message) => /mismatch/i.test(message))).toHaveLength(0)
+    expect(container.querySelectorAll('.vsh-scope')).toHaveLength(0)
+    expect(container.querySelector('.vsh')?.getAttribute('data-vsh-theme')).toBe('vsh-dark')
+    warnings.restore()
+    app.unmount()
+    container.remove()
+  })
+
+  it('renders a self-scoped theme on the server and hydrates without duplicates', async () => {
+    const engine = makeEngine()
+    const render = () =>
+      h(SyntaxHighlighterProvider, { theme: vshDark }, () =>
+        h(SyntaxHighlighter, {
+          code: 'a',
+          language: 'js',
+          engine,
+          themeScope: 'self',
+        }),
+      )
+    const html = await renderToString(createSSRApp({ render }))
+    expect(html).toContain('class="vsh-scope"')
+    expect(html).toMatch(/<div [^>]*class="vsh"[^>]*style="[^"]*--vsh-dark-bg/)
+    expect(html).not.toContain('<style')
+
+    const warnings = captureWarnings()
+    const container = document.createElement('div')
+    container.innerHTML = html
+    document.body.append(container)
+    const app = createSSRApp({ render })
+    app.mount(container)
+    await flushPromises()
+    expect(warnings.messages.filter((message) => /mismatch/i.test(message))).toHaveLength(0)
+    expect(container.querySelectorAll('.vsh-scope')).toHaveLength(1)
+    expect(container.querySelector('.vsh')?.getAttribute('data-vsh-theme')).toBe('vsh-dark')
+    expect(container.querySelectorAll('style')).toHaveLength(0)
+    warnings.restore()
+    app.unmount()
+    container.remove()
+  })
 })
 
 describe('hydration', () => {

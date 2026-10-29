@@ -1,5 +1,6 @@
 import { EngineManager as CoreEngineManager } from '../dist/core-entry.js'
 import * as core from '../dist/core-entry.js'
+import { existsSync, readFileSync } from 'node:fs'
 
 const failures = []
 
@@ -30,6 +31,37 @@ const coreKeys = Object.keys(core).sort()
 const fullKeys = Object.keys(full).sort()
 if (JSON.stringify(coreKeys) !== JSON.stringify(fullKeys)) {
   failures.push('core and default entries expose different runtime keys')
+}
+
+const declarationFiles = [
+  'dist/api.d.ts',
+  'dist/component/SyntaxHighlighter.d.ts',
+  'dist/component/SyntaxHighlighterProvider.d.ts',
+  'dist/composables/useSyntaxHighlighter.d.ts',
+  'dist/core/context.d.ts',
+]
+const declarations = declarationFiles
+  .filter((file) => existsSync(file))
+  .map((file) => readFileSync(file, 'utf8'))
+  .join('\n')
+for (const file of declarationFiles) {
+  if (!existsSync(file)) failures.push(`missing declaration file ${file}`)
+}
+for (const name of [
+  'ThemeScope',
+  'LineHeightMode',
+  'HighlighterScopeMode',
+  'HighlightInput',
+  'themeScope',
+  'lineHeightMode',
+  'renderless',
+  'cacheEngineIdentity',
+  'preserveTrailingNewline',
+]) {
+  if (!declarations.includes(name)) failures.push(`declarations are missing ${name}`)
+}
+if (!existsSync('dist/styles/complete.css')) {
+  failures.push('missing dist/styles/complete.css')
 }
 
 if (failures.length > 0) {

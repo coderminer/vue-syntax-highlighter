@@ -103,6 +103,40 @@ Four built-in themes ship as individual data entries: `vsh-light` (default), `vs
 
 Theme switching updates CSS custom properties and the scheme attribute only. The token output and engine invocation count do not change.
 
+## Opt-in behavior
+
+`1.2.0` adds capabilities without changing any existing default. Every option below is off unless you ask for it.
+
+```vue
+<!-- Remove the provider wrapper while keeping its configuration -->
+<SyntaxHighlighterProvider renderless :themes="themes">
+  <!-- Emit theme variables on the block even inside a wrapper provider -->
+  <SyntaxHighlighter :code="code" language="ts" theme-scope="self" />
+</SyntaxHighlighterProvider>
+```
+
+```vue
+<!-- Numeric fixed row metrics for deterministic non-virtual rows -->
+<SyntaxHighlighter
+  :code="code"
+  language="ts"
+  :line-height="21"
+  line-height-mode="fixed"
+/>
+```
+
+```ts
+// Keep terminal line breaks in a highlight() result
+const result = await block.value?.highlight({
+  code: 'const x = 1\n',
+  preserveTrailingNewline: true,
+})
+```
+
+Pass `cacheEngineIdentity` to a provider or the plugin when two engine objects share an `id` and must not share cached results. The default cache key remains byte-identical. Import `vue-syntax-highlighter/styles/complete.css` when you want the base and fallback rules in one stylesheet without a second request.
+
+The project follows an additive-only version policy: minor releases add opt-ins, and there is no scheduled breaking release or default flip. See the [Roadmap](https://coderminer.github.io/vue-syntax-highlighter/guide/roadmap).
+
 ## Performance
 
 - Provider/application-scoped LRU cache (100 entries, 8 MiB character budget by default).
@@ -132,6 +166,7 @@ vue-syntax-highlighter/themes/vsh-paper
 vue-syntax-highlighter/themes/vsh-midnight
 vue-syntax-highlighter/styles.css
 vue-syntax-highlighter/styles/fallback.css
+vue-syntax-highlighter/styles/complete.css
 vue-syntax-highlighter/package.json
 ```
 

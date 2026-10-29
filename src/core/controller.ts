@@ -2,11 +2,12 @@ import { shallowRef, type ShallowRef } from 'vue'
 import type {
   EngineOptions,
   HighlightEngine,
+  HighlightInput,
   HighlightLine,
   HighlightRequest,
   HighlightResult,
 } from '../types.js'
-import { type EngineChoice, requestCacheKey } from './engine.js'
+import { engineIdentityFor, type EngineChoice, requestCacheKey } from './engine.js'
 import { selectEngine, type HighlighterContext } from './context.js'
 import { normalizeLanguage } from './props.js'
 import {
@@ -42,7 +43,7 @@ export interface HighlightController {
   attemptInitialSync: () => boolean
   start: () => Promise<HighlightResult | undefined>
   refresh: () => Promise<HighlightResult | undefined>
-  highlight: (input: { code: string; language?: string }) => Promise<HighlightResult>
+  highlight: (input: HighlightInput) => Promise<HighlightResult>
   schedule: () => void
   dispose: () => void
   readonly disposed: () => boolean
@@ -121,6 +122,7 @@ export function createHighlightController(options: ControllerOptions): Highlight
       engine,
       { code: input.code, language: input.language },
       input.engineOptions,
+      context.cacheEngineIdentity ? engineIdentityFor(engine) : undefined,
     )
     if (!force && key === lastAppliedKey && result.value) {
       busy.value = false
@@ -189,7 +191,12 @@ export function createHighlightController(options: ControllerOptions): Highlight
       language: input.language,
       signal: context.abortSignal,
     }
-    const key = requestCacheKey(engine, request, input.engineOptions)
+    const key = requestCacheKey(
+      engine,
+      request,
+      input.engineOptions,
+      context.cacheEngineIdentity ? engineIdentityFor(engine) : undefined,
+    )
     if (key === lastAppliedKey && result.value) return true
 
     try {
@@ -258,12 +265,14 @@ export function createHighlightController(options: ControllerOptions): Highlight
     return runAsync(true)
   }
 
-  async function highlight(input: { code: string; language?: string }): Promise<HighlightResult> {
+  async function highlight(input: HighlightInput): Promise<HighlightResult> {
     if (disposed) {
       throw new Error('[vue-syntax-highlighter] This highlighter scope has been disposed.')
     }
     const current = getInput()
-    const code = normalizeDisplaySource(input.code)
+    const code = input.preserveTrailingNewline
+      ? normalizeSource(input.code)
+      : normalizeDisplaySource(input.code)
     const language = normalizeLanguage(input.language ?? current.language)
     const selection = selectEngine(context, current.engine)
     const engine = await selection.manager.resolve(selection.choice)
@@ -271,6 +280,7 @@ export function createHighlightController(options: ControllerOptions): Highlight
       engine,
       { code, language },
       current.engineOptions,
+      context.cacheEngineIdentity ? engineIdentityFor(engine) : undefined,
     )
     const produced = context.cache.request(key, () => {
       const value = engine.highlight(

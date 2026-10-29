@@ -104,6 +104,18 @@ export interface ThemePair {
 
 export type ColorScheme = 'auto' | 'light' | 'dark'
 
+export type ThemeScope = 'inherit' | 'self'
+
+export type LineHeightMode = 'visual' | 'fixed'
+
+export type HighlighterScopeMode = 'wrapper' | 'renderless' | 'none'
+
+export interface HighlightInput {
+  code: string
+  language?: string
+  preserveTrailingNewline?: boolean
+}
+
 export interface HighlightCacheLike {
   readonly size: number
   get(key: string): HighlightResult | undefined
@@ -127,6 +139,8 @@ export interface HighlighterOptions {
   cache?: HighlightCacheLike
   cacheCapacity?: number
   cacheMaxChars?: number
+  cacheEngineIdentity?: boolean
+  scopeMode?: HighlighterScopeMode
   defer?: boolean
   rootMargin?: string
   virtualized?: boolean | 'auto'
@@ -150,6 +164,8 @@ export interface SyntaxHighlighterProps {
   height?: string | number
   maxHeight?: string | number
   lineHeight?: number
+  lineHeightMode?: LineHeightMode
+  themeScope?: ThemeScope
   overscan?: number
   defer?: boolean
   rootMargin?: string
@@ -201,7 +217,7 @@ export interface SyntaxHighlighterEmits {
 
 export interface SyntaxHighlighterExposed {
   refresh: () => Promise<HighlightResult | undefined>
-  highlight: (input: { code: string; language?: string }) => Promise<HighlightResult>
+  highlight: (input: HighlightInput) => Promise<HighlightResult>
   copy: () => Promise<boolean>
   getCopyPayload: () => string
 }

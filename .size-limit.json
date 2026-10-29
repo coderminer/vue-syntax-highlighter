@@ -70,5 +70,11 @@
     "path": "dist/styles/fallback.css",
     "limit": "5 kB",
     "gzip": true
+  },
+  {
+    "name": "complete styles",
+    "path": "dist/styles/complete.css",
+    "limit": "4 kB",
+    "gzip": true
   }
 ]

@@ -20,15 +20,24 @@ const entries = [CoreHighlighter, FullHighlighter]
 import { ref } from 'vue'
 import { SyntaxHighlighter } from 'vue-syntax-highlighter'
 import type {
+  HighlightInput,
+  HighlighterScopeMode,
+  LineHeightMode,
   LineRenderInfo,
   LineSlotProps,
   SyntaxHighlighterExposed,
   SyntaxHighlighterProps,
+  ThemeScope,
   TokenSlotProps,
 } from 'vue-syntax-highlighter'
 
 const block = ref<SyntaxHighlighterExposed>()
 const code = 'const answer = 42'
+
+const lineHeightMode: LineHeightMode = 'fixed'
+const themeScope: ThemeScope = 'self'
+const scopeMode: HighlighterScopeMode = 'renderless'
+const input: HighlightInput = { code, preserveTrailingNewline: true }
 
 const props: SyntaxHighlighterProps = {
   code,
@@ -37,6 +46,9 @@ const props: SyntaxHighlighterProps = {
   startLine: 1,
   highlightLines: [[1, 2]],
   wrap: false,
+  lineHeight: 21,
+  lineHeightMode,
+  themeScope,
 }
 
 const lineProps = (info: LineRenderInfo) => ({ 'data-source-line': info.lineNumber })
@@ -122,6 +134,7 @@ const themes = { light: vshLight, dark: vshDark }
     color-scheme="auto"
     :languages="['javascript', 'typescript']"
     :cache-capacity="100"
+    cache-engine-identity
     scope-tag="section"
     defer
   >
@@ -129,6 +142,14 @@ const themes = { light: vshLight, dark: vshDark }
     <SyntaxHighlighter :code="two" language="ts" />
   </SyntaxHighlighterProvider>
 </template>
+```
+
+Set `renderless` to drop the wrapper while keeping the same provider configuration:
+
+```vue
+<SyntaxHighlighterProvider renderless :themes="themes" color-scheme="auto">
+  <SyntaxHighlighter :code="one" language="ts" theme-scope="self" />
+</SyntaxHighlighterProvider>
 ```
 
 ## Plugin
@@ -166,6 +187,7 @@ const code = ref('const value = 1')
 const options: UseSyntaxHighlighterOptions = {
   code,
   language: 'typescript',
+  preserveTrailingNewline: true,
 }
 const state: UseSyntaxHighlighterReturn = useSyntaxHighlighter(options)
 
@@ -175,6 +197,7 @@ state.error.value
 state.getCopyPayload()
 await state.copy()
 await state.refresh()
+await state.highlight({ code: 'const next = 2', preserveTrailingNewline: false })
 ```
 
 ## Compatibility aliases
@@ -260,6 +283,7 @@ const keyInput: CacheKeyInput = {
   engineId: 'shiki',
   language: 'typescript',
   code: 'const x = 1',
+  engineIdentity: 1,
 }
 const key = buildCacheKey(keyInput)
 const serialized = stableStringify({ language: 'typescript', options: {} })
@@ -353,7 +377,12 @@ const loaded = await manager.resolve('custom')
 const valid = isHighlightEngine(loaded)
 manager.dispose()
 
-const context: HighlighterContext = createHighlighterContext({ engine: choice })
+const context: HighlighterContext = createHighlighterContext(
+  { engine: choice },
+  undefined,
+  false,
+  'renderless',
+)
 provide(HIGHLIGHTER_CONTEXT, context)
 const injected = inject(HIGHLIGHTER_CONTEXT)
 ```
@@ -495,6 +524,24 @@ import 'vue-syntax-highlighter/styles/fallback.css'
 ```
 
 `fallback.css` is optional and is a no-op in browsers with `light-dark()`.
+
+To ship the base and fallback rules in one request, opt in to the prebuilt complete stylesheet:
+
+```ts
+import 'vue-syntax-highlighter/styles/complete.css'
+```
+
+`styles/complete.css` concatenates the minified base stylesheet before the minified fallback rules. It is larger than `styles.css`, so import it instead of, not in addition to, the other two stylesheets.
+
+## Opt-in options
+
+These options are additive and default to the existing behavior:
+
+- `renderless` on the provider defaults to `false`; enable it to remove the wrapper.
+- `themeScope` on the component defaults to `inherit`; `self` makes the block own its theme.
+- `lineHeightMode` on the component defaults to `visual`; `fixed` emits numeric row metrics.
+- `cacheEngineIdentity` on the provider or plugin defaults to `false`; enable it to partition same-`id` engine objects.
+- `preserveTrailingNewline` defaults to `false` on the exposed `highlight()` input and the composable.
 
 ## Package metadata
 

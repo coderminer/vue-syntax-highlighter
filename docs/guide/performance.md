@@ -58,6 +58,17 @@ Virtualization keeps only the visible window plus overscan in the DOM. Requireme
 - `wrap` disabled. Variable-height wrapped lines cannot be windowed reliably.
 - A fixed numeric `lineHeight` (default 20) for deterministic math.
 
+Use `line-height-mode="fixed"` when you want the same numeric metric on ordinary non-virtual rows. It emits `min-height` and `line-height` without forcing `height`, so wrapped content can still grow. The default `visual` mode keeps font-relative rows and no inline metrics:
+
+```vue
+<SyntaxHighlighter
+  :code="code"
+  language="ts"
+  :line-height="21"
+  line-height-mode="fixed"
+/>
+```
+
 If the configuration is incompatible, virtualization is disabled with one development warning and the block renders normally. `virtualized="auto"` activates above `virtualizeAfter` (default 2000 lines).
 
 Scrolling updates the window using `requestAnimationFrame`; it never invokes the engine again. A `ResizeObserver` updates the measured viewport. Server rendering uses the deterministic height fallback so the same initial window is produced on both sides.

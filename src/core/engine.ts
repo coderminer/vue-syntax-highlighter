@@ -178,10 +178,27 @@ export class EngineManager {
   }
 }
 
+const engineIdentities = new WeakMap<HighlightEngine, number>()
+let nextEngineIdentity = 1
+
+/**
+ * Stable process-local token for one engine object. Used only when the
+ * cacheEngineIdentity option is enabled; the default key never includes it.
+ */
+export function engineIdentityFor(engine: HighlightEngine): number {
+  const existing = engineIdentities.get(engine)
+  if (existing !== undefined) return existing
+  const identity = nextEngineIdentity
+  nextEngineIdentity += 1
+  engineIdentities.set(engine, identity)
+  return identity
+}
+
 export function requestCacheKey(
   engine: HighlightEngine,
   request: HighlightRequest,
   options?: EngineOptions,
+  engineIdentity?: number,
 ): string {
   if (engine.cacheKey) {
     try {
@@ -196,5 +213,6 @@ export function requestCacheKey(
     language: request.language,
     code: request.code,
     options,
+    ...(engineIdentity !== undefined ? { engineIdentity } : {}),
   })
 }

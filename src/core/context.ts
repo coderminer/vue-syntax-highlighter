@@ -3,6 +3,7 @@ import type {
   ColorScheme,
   HighlighterOptions,
   HighlightCacheLike,
+  HighlighterScopeMode,
   ThemeDefinition,
   ThemePair,
 } from '../types.js'
@@ -37,7 +38,9 @@ export interface HighlighterContext {
   rootMargin?: string
   virtualized?: boolean | 'auto'
   virtualizeAfter?: number
+  scopeMode?: HighlighterScopeMode
   providesScope: boolean
+  cacheEngineIdentity?: boolean
   disposed: boolean
 }
 
@@ -73,6 +76,7 @@ export function createHighlighterContext(
   options: HighlighterOptions = {},
   parent?: HighlighterContext,
   providesScope = false,
+  scopeModeOverride?: HighlighterScopeMode,
 ): HighlighterContext {
   assertEngines(options.engines)
 
@@ -115,6 +119,11 @@ export function createHighlighterContext(
     ...(options.themeRegistry ?? {}),
   }
 
+  const scopeMode: HighlighterScopeMode =
+    scopeModeOverride ?? options.scopeMode ?? (providesScope ? 'wrapper' : 'none')
+  const cacheEngineIdentity =
+    options.cacheEngineIdentity ?? parent?.cacheEngineIdentity ?? false
+
   const abortController = new AbortController()
   const context: HighlighterContext = shallowReactive({
     id: nextContextId++,
@@ -128,7 +137,9 @@ export function createHighlighterContext(
     abortController,
     abortSignal: abortController.signal,
     warningSet,
-    providesScope,
+    scopeMode,
+    providesScope: scopeMode === 'wrapper',
+    cacheEngineIdentity,
     disposed: false,
     ...(options.engine !== undefined ? { engine: options.engine } : {}),
     ...(options.theme !== undefined ? { theme: options.theme } : {}),
@@ -232,6 +243,22 @@ export function selectEngine(
     current = current.parent
   }
   return { choice: 'shiki', manager: context.engineManager }
+}
+
+/**
+ * Returns the nearest provider scope mode, skipping plugin/default contexts
+ * that contribute no wrapper. The result decides whether a block must own the
+ * theme payload or can rely on an ancestor wrapper.
+ */
+export function selectScopeMode(context: HighlighterContext): HighlighterScopeMode {
+  let current: HighlighterContext | undefined = context
+  while (current) {
+    const mode =
+      current.scopeMode ?? (current.providesScope ? 'wrapper' : 'none')
+    if (mode !== 'none') return mode
+    current = current.parent
+  }
+  return 'none'
 }
 
 export interface ThemeSelectionFromContext {

@@ -29,7 +29,7 @@ export const VueSyntaxHighlighter: VueSyntaxHighlighterPlugin = {
 
     let context: HighlighterContext
     try {
-      context = createHighlighterContext(options, undefined, false)
+      context = createHighlighterContext({ ...options, scopeMode: 'none' }, undefined, false)
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       // Invalid plugin options should never prevent application startup.

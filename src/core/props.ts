@@ -3,13 +3,18 @@ import type {
   ColorScheme,
   EngineOptions,
   HighlightEngine,
+  LineHeightMode,
   ThemeDefinition,
   ThemePair,
+  ThemeScope,
 } from '../types.js'
 import type { EngineChoice } from './engine.js'
 import type { HighlighterBehavior } from './context.js'
 import { normalizeDisplaySource } from './source.js'
 import { warnOnce, type WarningSet } from './warn.js'
+
+const THEME_SCOPES = ['inherit', 'self'] as const
+const LINE_HEIGHT_MODES = ['visual', 'fixed'] as const
 
 export interface RawHighlighterProps {
   code?: string
@@ -30,6 +35,8 @@ export interface RawHighlighterProps {
   height?: string | number
   maxHeight?: string | number
   lineHeight?: number
+  lineHeightMode?: LineHeightMode
+  themeScope?: ThemeScope
   overscan?: number
   defer?: boolean | null
   rootMargin?: string | null
@@ -60,6 +67,8 @@ export interface NormalizedProps {
   height: string | number | undefined
   maxHeight: string | number | undefined
   lineHeight: number
+  lineHeightMode: LineHeightMode
+  themeScope: ThemeScope
   overscan: number
   defer: boolean
   rootMargin: string
@@ -94,6 +103,8 @@ export const highlighterProps = {
   height: { type: [String, Number] as PropType<string | number>, default: undefined },
   maxHeight: { type: [String, Number] as PropType<string | number>, default: undefined },
   lineHeight: { type: Number, default: 20 },
+  lineHeightMode: { type: String as PropType<LineHeightMode>, default: 'visual' },
+  themeScope: { type: String as PropType<ThemeScope>, default: 'inherit' },
   overscan: { type: Number, default: 10 },
   defer: { type: Boolean, default: null },
   rootMargin: { type: String, default: null },
@@ -202,6 +213,43 @@ export function normalizeProps(
     raw.wrap !== null && raw.wrap !== undefined ? Boolean(raw.wrap) : Boolean(raw.wrapLines)
 
   const language = normalizeLanguage(raw.language)
+
+  let themeScope = raw.themeScope ?? 'inherit'
+  if (!THEME_SCOPES.includes(themeScope)) {
+    warnOnce(
+      'prop-themeScope',
+      `Unknown themeScope "${String(themeScope)}". Expected "inherit" or "self"; using "inherit".`,
+      warningSet,
+    )
+    themeScope = 'inherit'
+  }
+
+  let lineHeightMode = raw.lineHeightMode ?? 'visual'
+  if (!LINE_HEIGHT_MODES.includes(lineHeightMode)) {
+    warnOnce(
+      'prop-lineHeightMode',
+      `Unknown lineHeightMode "${String(lineHeightMode)}". Expected "visual" or "fixed"; using "visual".`,
+      warningSet,
+    )
+    lineHeightMode = 'visual'
+  }
+
+  let lineHeight = normalizeInteger(raw.lineHeight, 20, 1)
+  if (
+    lineHeightMode === 'fixed' &&
+    raw.lineHeight !== undefined &&
+    (!Number.isFinite(raw.lineHeight) || raw.lineHeight <= 0)
+  ) {
+    warnOnce(
+      'prop-lineHeight:fixed',
+      `lineHeightMode="fixed" requires a positive finite lineHeight; received ${String(
+        raw.lineHeight,
+      )}. Using 20px.`,
+      warningSet,
+    )
+    lineHeight = 20
+  }
+
   const virtualized =
     raw.virtualized === 'auto' || raw.virtualized === true
       ? raw.virtualized
@@ -230,7 +278,9 @@ export function normalizeProps(
     ),
     height: raw.height,
     maxHeight: raw.maxHeight,
-    lineHeight: normalizeInteger(raw.lineHeight, 20, 1),
+    lineHeight,
+    lineHeightMode,
+    themeScope,
     overscan: normalizeInteger(raw.overscan, 10, 0),
     defer: raw.defer ?? behavior?.defer ?? false,
     rootMargin: raw.rootMargin?.trim() || behavior?.rootMargin || '200px 0px',

@@ -41,7 +41,35 @@ Use `scopeTag` when the provider must sit inside a specific content model, while
 </SyntaxHighlighterProvider>
 ```
 
-`engines`, `themeRegistry`, `cache`, `cacheCapacity`, and `cacheMaxChars` are creation-time provider options. Changing them after mount is ignored with one development warning; recreate the provider scope to apply them. `defer`, `rootMargin`, themes, scheme, engine, and languages remain reactive. Turning `defer` off after mount starts highlighting immediately.
+`engines`, `themeRegistry`, `cache`, `cacheCapacity`, `cacheMaxChars`, and `cacheEngineIdentity` are creation-time provider options. Changing them after mount is ignored with one development warning; recreate the provider scope to apply them. `defer`, `rootMargin`, `renderless`, `scopeTag`, themes, scheme, engine, and languages remain reactive. Turning `defer` off after mount starts highlighting immediately.
+
+Set `renderless` to keep the provider configuration without rendering the `div.vsh-scope` wrapper:
+
+```vue
+<SyntaxHighlighterProvider renderless :themes="themes">
+  <SyntaxHighlighter :code="code" language="ts" />
+</SyntaxHighlighterProvider>
+```
+
+Without a wrapper, descendant blocks own the theme variables. `scopeTag` is ignored in renderless mode and warns once whenever it is set, including `div`. The default wrapper and theme ownership are unchanged.
+
+Use `theme-scope="self"` on a block to own its theme even inside a wrapper provider:
+
+```vue
+<SyntaxHighlighterProvider theme="vsh-light">
+  <SyntaxHighlighter :code="code" language="ts" theme-scope="self" theme="vsh-dark" />
+</SyntaxHighlighterProvider>
+```
+
+A local `theme`, `themes`, or `colorScheme` already makes the block own its theme. The default `inherit` keeps provider-owned variables on the wrapper.
+
+Pass `cache-engine-identity` when two engine objects share an `id` and must not share cached results:
+
+```vue
+<SyntaxHighlighterProvider cache-engine-identity :engines="engines">
+  <SyntaxHighlighter :code="code" language="ts" />
+</SyntaxHighlighterProvider>
+```
 
 ## Minimal build entry
 

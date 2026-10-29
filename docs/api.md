@@ -21,9 +21,10 @@ Every runtime export and public type has a runnable example in [API Examples](/g
 | `vue-syntax-highlighter/themes/vsh-midnight` | `default`, `vshMidnight` |
 | `vue-syntax-highlighter/styles.css` | Base layout and token stylesheet |
 | `vue-syntax-highlighter/styles/fallback.css` | Optional pre-`light-dark()` scheme fallback |
+| `vue-syntax-highlighter/styles/complete.css` | Base plus fallback rules in one stylesheet; opt-in and larger than `styles.css` |
 | `vue-syntax-highlighter/package.json` | Package metadata |
 
-Public types: `ColorScheme`, `EngineOptions`, `HighlightCacheLike`, `HighlightEngine`, `HighlightLine`, `HighlightRequest`, `HighlightResult`, `HighlightToken`, `HighlighterOptions`, `LineRenderInfo`, `LineSlotProps`, `SyntaxHighlighterEmits`, `SyntaxHighlighterExposed`, `SyntaxHighlighterProps`, `ThemeColorsInput`, `ThemeDefinition`, `ThemeInput`, `ThemePair`, `TokenSlotProps`, `TokenStyle`, `TokenType`, `CacheKeyInput`, `ResultCacheOptions`, `HighlightedEventContext`, `HighlighterContext`, `EngineChoice`, `EngineLoader`, `EngineRegistry`, `BuiltinEngineId`, `VueSyntaxHighlighterOptions`, `VueSyntaxHighlighterPlugin`, `UseSyntaxHighlighterOptions`, `UseSyntaxHighlighterReturn`.
+Public types: `ColorScheme`, `EngineOptions`, `HighlightCacheLike`, `HighlightEngine`, `HighlightInput`, `HighlightLine`, `HighlightRequest`, `HighlightResult`, `HighlightToken`, `HighlighterOptions`, `HighlighterScopeMode`, `LineHeightMode`, `LineRenderInfo`, `LineSlotProps`, `SyntaxHighlighterEmits`, `SyntaxHighlighterExposed`, `SyntaxHighlighterProps`, `ThemeColorsInput`, `ThemeDefinition`, `ThemeInput`, `ThemePair`, `ThemeScope`, `TokenSlotProps`, `TokenStyle`, `TokenType`, `CacheKeyInput`, `ResultCacheOptions`, `HighlightedEventContext`, `HighlighterContext`, `EngineChoice`, `EngineLoader`, `EngineRegistry`, `BuiltinEngineId`, `VueSyntaxHighlighterOptions`, `VueSyntaxHighlighterPlugin`, `UseSyntaxHighlighterOptions`, `UseSyntaxHighlighterReturn`.
 
 Deep imports into `dist/` are blocked by the exports map.
 
@@ -48,7 +49,9 @@ Deep imports into `dist/` are blocked by the exports map.
 | `virtualizeAfter` | `number` | `2000` | Auto threshold in lines. |
 | `height` | `string \| number` | — | Bounded pre height. |
 | `maxHeight` | `string \| number` | — | Bounded pre max height. |
-| `lineHeight` | `number` | `20` | Virtualization line height in px. |
+| `lineHeight` | `number` | `20` | Row line height in px; used by virtualization and `lineHeightMode="fixed"`. |
+| `lineHeightMode` | `'visual' \| 'fixed'` | `'visual'` | Opt in to numeric inline row metrics. `fixed` emits `min-height` and `line-height` without forcing `height` on non-virtual rows. |
+| `themeScope` | `'inherit' \| 'self'` | `'inherit'` | Opt in to emitting theme variables and scheme attributes on the `.vsh` root even when a wrapper provider owns the scope. |
 | `overscan` | `number` | `10` | Extra lines above/below. |
 | `defer` | `boolean` | `false` | Wait for intersection before highlighting. |
 | `rootMargin` | `string` | `'200px 0px'` | Observer root margin. |
@@ -98,17 +101,21 @@ Errors never throw out of render. The component keeps the last valid result or p
 | Method | Description |
 | --- | --- |
 | `refresh()` | Re-run the current highlight. Returns the result or `undefined`. |
-| `highlight({ code, language? })` | Highlight explicit input and return its result. |
+| `highlight({ code, language?, preserveTrailingNewline? })` | Highlight explicit input and return its result. Set `preserveTrailingNewline` to `true` to keep terminal line breaks; the default is `false`. |
 | `copy()` | Copy the complete source without gutter text; resolves `false` on failure. |
 | `getCopyPayload()` | Return the complete normalized source. |
 
 ## `SyntaxHighlighterProvider`
 
-Props: `engine`, `engines`, `theme`, `themes`, `colorScheme`, `themeRegistry`, `languages`, `cache`, `cacheCapacity`, `cacheMaxChars`, `defer`, `rootMargin`, `virtualized`, `virtualizeAfter`, `scopeTag`.
+Props: `engine`, `engines`, `theme`, `themes`, `colorScheme`, `themeRegistry`, `languages`, `cache`, `cacheCapacity`, `cacheMaxChars`, `cacheEngineIdentity`, `renderless`, `defer`, `rootMargin`, `virtualized`, `virtualizeAfter`, `scopeTag`.
 
-The provider renders one `display: contents` theme scope, provides configuration to descendants, preloads languages on mount, and disposes loader-owned engines and caches on unmount. Preloading resolves the provider or ancestor engine; in the `core` entry there is no implicit default, so a provider that preloads `languages` must configure an `engine` itself. The default entry falls back to the built-in Shiki loader. Nested providers inherit unspecified values. `scopeTag` defaults to `div`; set it to `section`, `li`, or another tag when the provider must sit inside a specific content model.
+The provider renders one `display: contents` theme scope, provides configuration to descendants, preloads languages on mount, and disposes loader-owned engines and caches on unmount. Preloading resolves the provider or ancestor engine; in the `core` entry there is no implicit default, so a provider that preloads `languages` must configure an `engine` itself. The default entry falls back to the built-in Shiki loader. Nested providers inherit unspecified values. `scopeTag` renders a `div` by default; set it to `section`, `li`, or another tag when the provider must sit inside a specific content model.
 
-`engines`, `themeRegistry`, `cache`, `cacheCapacity`, and `cacheMaxChars` are read when the provider is created. Changing them after creation is ignored and emits one development warning; recreate the provider or plugin scope to apply a new value. `defer`, `rootMargin`, themes, scheme, engine, and languages remain reactive.
+Set `renderless` to remove the wrapper while keeping the provider configuration. A renderless provider renders its slot children directly, so descendant blocks own the theme variables; `scopeTag` has no visible effect and emits one development warning whenever it is set, including `div`. The default remains a `div.vsh-scope` wrapper.
+
+`cacheEngineIdentity` is a creation-time option, default `false`. When enabled, cache keys include a stable token for each engine object, so two engines with the same `id` no longer share cached results. The default cache key is byte-identical to `1.1.x`.
+
+`engines`, `themeRegistry`, `cache`, `cacheCapacity`, `cacheMaxChars`, and `cacheEngineIdentity` are read when the provider is created. Changing them after creation is ignored and emits one development warning; recreate the provider or plugin scope to apply a new value. `defer`, `rootMargin`, `renderless`, `scopeTag`, themes, scheme, engine, and languages remain reactive.
 
 ## `useSyntaxHighlighter`
 
@@ -130,10 +137,13 @@ const {
   language,
   engine,
   engineOptions,
+  preserveTrailingNewline,
 })
 ```
 
 `code` and the other inputs accept refs or getters. The composable respects the nearest provider/plugin, exposes reactive state, and disposes its controller on scope unmount. `copy()` and `getCopyPayload()` use the same full-source clipboard behavior as the component.
+
+`preserveTrailingNewline` defaults to `false`. Set it on the composable to change the default for every `highlight()` call, or pass `preserveTrailingNewline` per call to override it.
 
 ## `defineTheme`
 
@@ -191,7 +201,7 @@ interface HighlightEngine {
 
 ## Cache helpers
 
-- `buildCacheKey({ engineId, language, code, options })` — stable, theme-independent key.
+- `buildCacheKey({ engineId, language, code, options, engineIdentity? })` — stable, theme-independent key. `engineIdentity` is added only when engine-identity caching is enabled.
 - `stableStringify(value)` — deterministic serialization; functions receive stable identities.
 - `ResultCache` — LRU + character budget + in-flight deduplication; implements `HighlightCacheLike`.
 
@@ -200,5 +210,5 @@ interface HighlightEngine {
 - `EngineManager` — loads/caches adapters per owner; disposes only loader-created engines.
 - `BUILTIN_ENGINE_IDS` — `shiki`, `highlightjs`, `lowlight`, `prism`.
 - `isHighlightEngine(value)` — public contract guard.
-- `createHighlighterContext(options, parent?, providesScope?)` — low-level context factory.
+- `createHighlighterContext(options, parent?, providesScope?, scopeModeOverride?)` — low-level context factory. `scopeModeOverride` selects `wrapper`, `renderless`, or `none`; omitted values derive from `providesScope`.
 - `HIGHLIGHTER_CONTEXT` — injection key for advanced integrations.

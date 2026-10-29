@@ -107,7 +107,7 @@ If you need highlighted server HTML, preload an engine object. See [Server Rende
 | Unstyled block | Import `vue-syntax-highlighter/styles.css` once in the app. |
 | “Shiki engine is unavailable” | Install `shiki`, or set `engine` to an installed adapter. |
 | Plain text only | Check the peer install, browser console, and the requested language. |
-| Theme colors look wrong | Include both `styles.css` and, for older browsers, `styles/fallback.css`. |
+| Theme colors look wrong | Include both `styles.css` and, for older browsers, `styles/fallback.css`, or use `styles/complete.css` instead. |
 | Line numbers cannot be selected? | The gutter is deliberately `aria-hidden` and excluded from copy output. |
 
 ## Next

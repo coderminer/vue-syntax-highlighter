@@ -29,6 +29,8 @@ import 'vue-syntax-highlighter/styles/fallback.css'
 
 `fallback.css` is wrapped in `@supports not (color: light-dark(...))`, so it is a no-op in modern browsers and safe to import unconditionally. Explicit `color-scheme="light"` or `color-scheme="dark"` does not depend on `light-dark()`.
 
+If you prefer one stylesheet request, import `vue-syntax-highlighter/styles/complete.css` instead. It contains the minified base followed by the minified fallback in the same `@supports` guard. It is larger than `styles.css`; do not import it together with the other two stylesheets.
+
 Deferral needs `IntersectionObserver`, and virtualization measurement uses `ResizeObserver` when available. Both features degrade gracefully when the API is absent.
 
 ## Async first paint
@@ -55,6 +57,6 @@ Deferral uses `IntersectionObserver`. When it is unavailable, the component star
 
 ## Planned fixes
 
-Known correctness issues and the planned `1.1.x` / `2.0.0` work are tracked in the [Roadmap](/guide/roadmap). The roadmap describes intended changes; it is not a statement that a fix is already available in the current release.
+Known correctness issues and the additive-only release plan are tracked in the [Roadmap](/guide/roadmap). The roadmap describes intended changes; it is not a statement that a fix is already available in the current release.
 
 

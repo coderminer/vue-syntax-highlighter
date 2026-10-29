@@ -4,7 +4,7 @@ import {
   SyntaxHighlighterProvider,
 } from 'vue-syntax-highlighter'
 import { vshLight } from 'vue-syntax-highlighter/themes/vsh-light'
-import 'vue-syntax-highlighter/styles.css'
+import 'vue-syntax-highlighter/styles/complete.css'
 
 const code = `export function greet(name: string) {
   return \`hello \${name}\`
@@ -17,6 +17,8 @@ const app = createApp({
         code,
         language: 'typescript',
         lineNumbers: true,
+        lineHeight: 21,
+        lineHeightMode: 'fixed',
         'aria-label': 'Consumer fixture code block',
         'data-testid': 'consumer-block',
       }),

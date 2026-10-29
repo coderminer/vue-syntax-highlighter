@@ -103,6 +103,21 @@ for (const name of adapterExports) {
   }
 }
 
+const optInSurface = [
+  'renderless',
+  'themeScope',
+  'lineHeightMode',
+  'cacheEngineIdentity',
+  'preserveTrailingNewline',
+  'styles/complete.css',
+]
+for (const name of optInSurface) {
+  if (!api.includes(name)) failures.push(`docs/api.md is missing opt-in surface ${name}`)
+  if (!examples.includes(name)) {
+    failures.push(`docs/guide/api-examples.md is missing opt-in surface ${name}`)
+  }
+}
+
 if (failures.length > 0) {
   console.error(`docs check failed:\n${failures.map((item) => `  ${item}`).join('\n')}`)
   process.exitCode = 1

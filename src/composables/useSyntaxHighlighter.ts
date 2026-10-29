@@ -12,6 +12,7 @@ import {
 } from 'vue'
 import type {
   EngineOptions,
+  HighlightInput,
   HighlightResult,
   HighlightLine,
 } from '../types.js'
@@ -38,6 +39,7 @@ export interface UseSyntaxHighlighterOptions {
   language?: MaybeRefOrGetter<string | undefined>
   engine?: MaybeRefOrGetter<EngineChoice | undefined>
   engineOptions?: MaybeRefOrGetter<EngineOptions | undefined>
+  preserveTrailingNewline?: MaybeRefOrGetter<boolean | undefined>
   context?: HighlighterContext
 }
 
@@ -49,7 +51,7 @@ export interface UseSyntaxHighlighterReturn {
   readonly busy: ShallowRef<boolean>
   readonly error: ShallowRef<Error | undefined>
   readonly refresh: () => Promise<HighlightResult | undefined>
-  readonly highlight: (input: { code: string; language?: string }) => Promise<HighlightResult>
+  readonly highlight: (input: HighlightInput) => Promise<HighlightResult>
   readonly copy: () => Promise<boolean>
   readonly getCopyPayload: () => string
   readonly controller: HighlightController
@@ -134,7 +136,14 @@ export function useSyntaxHighlighter(
     busy: controller.busy,
     error: controller.error,
     refresh: () => controller.refresh(),
-    highlight: (input) => controller.highlight(input),
+    highlight: (input) =>
+      controller.highlight({
+        ...input,
+        preserveTrailingNewline:
+          input.preserveTrailingNewline ??
+          toValue(options.preserveTrailingNewline) ??
+          false,
+      }),
     copy,
     getCopyPayload,
     controller,

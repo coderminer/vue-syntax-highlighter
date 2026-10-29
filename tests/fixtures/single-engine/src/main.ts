@@ -1,7 +1,7 @@
 import { createApp, h } from 'vue'
 import { SyntaxHighlighter } from 'vue-syntax-highlighter/core'
 import { createHighlightjsEngine } from 'vue-syntax-highlighter/engines/highlightjs'
-import 'vue-syntax-highlighter/styles.css'
+import 'vue-syntax-highlighter/styles/complete.css'
 
 const code = 'export const single = true'
 

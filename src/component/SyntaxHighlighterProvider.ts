@@ -44,6 +44,8 @@ export const SyntaxHighlighterProvider = defineComponent({
     cache: { type: Object as PropType<HighlightCacheLike>, default: undefined },
     cacheCapacity: { type: Number, default: undefined },
     cacheMaxChars: { type: Number, default: undefined },
+    cacheEngineIdentity: { type: Boolean, default: undefined },
+    renderless: { type: Boolean, default: false },
     defer: { type: Boolean, default: undefined },
     rootMargin: { type: String, default: undefined },
     virtualized: {
@@ -51,7 +53,7 @@ export const SyntaxHighlighterProvider = defineComponent({
       default: undefined,
     },
     virtualizeAfter: { type: Number, default: undefined },
-    scopeTag: { type: String, default: 'div' },
+    scopeTag: { type: String, default: undefined },
   },
   setup(props, { slots }) {
     const parent = inject(HIGHLIGHTER_CONTEXT, null) ?? getDefaultContext()
@@ -67,6 +69,10 @@ export const SyntaxHighlighterProvider = defineComponent({
         ...(props.cache !== undefined ? { cache: props.cache } : {}),
         ...(props.cacheCapacity !== undefined ? { cacheCapacity: props.cacheCapacity } : {}),
         ...(props.cacheMaxChars !== undefined ? { cacheMaxChars: props.cacheMaxChars } : {}),
+        ...(props.cacheEngineIdentity !== undefined
+          ? { cacheEngineIdentity: props.cacheEngineIdentity }
+          : {}),
+        scopeMode: props.renderless ? 'renderless' : 'wrapper',
         ...(props.defer !== undefined ? { defer: props.defer } : {}),
         ...(props.rootMargin !== undefined ? { rootMargin: props.rootMargin } : {}),
         ...(props.virtualized !== undefined ? { virtualized: props.virtualized } : {}),
@@ -75,10 +81,32 @@ export const SyntaxHighlighterProvider = defineComponent({
           : {}),
       },
       parent,
-      true,
+      !props.renderless,
     )
 
     provide(HIGHLIGHTER_CONTEXT, context)
+
+    watch(
+      () => props.renderless,
+      (renderless) => {
+        context.scopeMode = renderless ? 'renderless' : 'wrapper'
+        context.providesScope = !renderless
+      },
+    )
+
+    watch(
+      [() => props.renderless, () => props.scopeTag],
+      ([renderless, scopeTag]) => {
+        if (renderless && scopeTag !== undefined) {
+          warnOnce(
+            'provider-renderless-scope-tag',
+            'The "scopeTag" prop is ignored when "renderless" is enabled because no wrapper element is rendered.',
+            context.warningSet,
+          )
+        }
+      },
+      { immediate: true },
+    )
 
     const resolvedTheme = useResolvedTheme(context, () => ({
       theme: props.theme,
@@ -170,11 +198,12 @@ export const SyntaxHighlighterProvider = defineComponent({
         props.cache,
         props.cacheCapacity,
         props.cacheMaxChars,
+        props.cacheEngineIdentity,
       ],
       () => {
         warnOnce(
           'provider-static-config',
-          'Changes to provider engines, themeRegistry, cache, cacheCapacity, or cacheMaxChars after creation are ignored. Recreate the provider or plugin scope to apply them.',
+          'Changes to provider engines, themeRegistry, cache, cacheCapacity, cacheMaxChars, or cacheEngineIdentity after creation are ignored. Recreate the provider or plugin scope to apply them.',
           context.warningSet,
         )
       },
@@ -188,16 +217,19 @@ export const SyntaxHighlighterProvider = defineComponent({
       disposeContext(context)
     })
 
-    return () =>
-      h(
+    return () => {
+      const children = slots.default?.()
+      if (props.renderless) return children
+      return h(
         props.scopeTag || 'div',
         {
           class: 'vsh-scope',
           style: { display: 'contents', ...resolvedTheme.variables.value },
           ...resolvedTheme.attributes.value,
         },
-        slots.default?.(),
+        children,
       )
+    }
   },
 })
 
