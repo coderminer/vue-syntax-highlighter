@@ -11,7 +11,7 @@ import { SyntaxHighlighter as FullHighlighter } from 'vue-syntax-highlighter/ful
 const entries = [CoreHighlighter, FullHighlighter]
 ```
 
-`core` has no built-in engine loader; pass an explicit engine object. `full` is equivalent to the default entry in `1.1.x`.
+`core` has no built-in engine loader; pass an explicit engine object. `full` is equivalent to the default entry.
 
 ## Component
 
