@@ -1,6 +1,6 @@
 {
   "name": "vue-syntax-highlighter",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A Vue 3 syntax highlighter with pluggable engines, semantic themes, and SSR-first performance.",
   "type": "module",
   "license": "MIT",

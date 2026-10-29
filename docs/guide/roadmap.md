@@ -1,6 +1,6 @@
 # Roadmap
 
-This page describes the additive-only release policy and the opt-in capabilities shipped in `1.2.0`. It describes intended and shipped behavior in the current minor line. The repository source is `1.2.0`; the latest npm release is `1.1.1` until the manual `1.2.0` publish.
+This page describes the additive-only release policy and the opt-in capabilities shipped in `1.2.0`. It describes intended and shipped behavior in the current minor line. The repository source is `1.2.1`; the latest npm release is `1.2.0` until the manual `1.2.1` publish.
 
 The plan has one hard rule:
 
@@ -15,6 +15,7 @@ There is no scheduled major release. Ideas that would formerly have required a m
 | `1.0.x` | Initial stable line                                                 | Existing users stay on their current minor        |
 | `1.1.x` | Non-breaking fixes, `core`/`full` entries, and `scopeTag`           | `^1.0.3` users upgrade without code changes       |
 | `1.2.0` | Opt-in APIs for provider scope, theme ownership, row metrics, newlines, engine identity, and styles | Additive only; imports and defaults stay unchanged |
+| `1.2.1` | Packaging fix: exclude source maps from the published tarball | No API or rendered-output changes |
 | `1.x.y` | Future minors                                                       | Opt-in additions only; no breaking default flips  |
 
 The project does not accept a future release that changes defaults under the same package name. New behavior is introduced behind an explicit prop, option, entry point, or stylesheet.
@@ -66,8 +67,8 @@ The `1.2.0` release keeps regression tests for all of these:
 ## Release sequence
 
 ```text
-1.1.1    latest npm release until 1.2.0 publish
-1.2.0    current source release, additive opt-ins, latest after manual publish
+1.2.0    latest npm release until 1.2.1 publish
+1.2.1    current source release, packaging fix, latest after manual publish
 ```
 
 `1.2.0` release checks:
@@ -76,7 +77,12 @@ The `1.2.0` release keeps regression tests for all of these:
 - [x] Add opt-in tests for every new prop, option, composable default, and stylesheet.
 - [x] Add isolated consumer and single-engine build fixtures.
 - [x] Run the full `pnpm verify` gate.
-- [ ] Publish `1.2.0` manually after a successful tarball install; create the tag only after npm accepts the version.
+- [x] Publish `1.2.0` manually after a successful tarball install.
+
+`1.2.1` release checks:
+
+- [x] Exclude source maps from the packed tarball while keeping them in local `dist`.
+- [ ] Publish `1.2.1` manually after a successful tarball install.
 
 ## Tracking
 
@@ -98,4 +104,6 @@ The `1.2.0` release keeps regression tests for all of these:
 - [x] Add `preserveTrailingNewline` without changing the default strip behavior
 - [x] Add `cacheEngineIdentity` without changing the default cache key
 - [x] Add `styles/complete.css` without changing `styles.css`
-- [ ] Publish `1.2.0`
+- [x] Publish `1.2.0`
+- [x] Exclude source maps from the published tarball
+- [ ] Publish `1.2.1`
