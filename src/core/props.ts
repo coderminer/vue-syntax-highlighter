@@ -37,7 +37,7 @@ export interface RawHighlighterProps {
   codeTag?: string | Component
   lineProps?: (info: unknown) => Record<string, unknown> | undefined
   tokenProps?: (info: unknown) => Record<string, unknown> | undefined
-  tabindex?: number | string | false | null
+  tabindex?: number | string | boolean | null
   customStyle?: string | Record<string, unknown>
   codeTagProps?: Record<string, unknown>
 }
@@ -108,7 +108,7 @@ export const highlighterProps = {
     default: undefined,
   },
   tabindex: {
-    type: [Number, String, Boolean] as PropType<number | string | false | null>,
+    type: [Number, String, Boolean] as PropType<number | string | boolean | null>,
     default: 0,
   },
   customStyle: {
@@ -239,7 +239,15 @@ export function normalizeProps(
     lineProps: raw.lineProps,
     tokenProps: raw.tokenProps,
     tabindex:
-      raw.tabindex === undefined ? 0 : raw.tabindex === null ? undefined : raw.tabindex,
+      raw.tabindex === undefined
+        ? 0
+        : raw.tabindex === null
+          ? undefined
+          : raw.tabindex === false
+            ? false
+            : raw.tabindex === true
+              ? 0
+              : raw.tabindex,
     customStyle: raw.customStyle,
     codeTagProps: raw.codeTagProps,
   }

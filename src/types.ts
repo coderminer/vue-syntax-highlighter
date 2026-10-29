@@ -157,7 +157,7 @@ export interface SyntaxHighlighterProps {
   codeTag?: string | Component
   lineProps?: (info: LineRenderInfo) => Record<string, unknown> | undefined
   tokenProps?: (info: TokenRenderInfo) => Record<string, unknown> | undefined
-  tabindex?: number | string | false
+  tabindex?: number | string | boolean
   showLineNumbers?: boolean
   wrapLines?: boolean
   customStyle?: string | Record<string, unknown>

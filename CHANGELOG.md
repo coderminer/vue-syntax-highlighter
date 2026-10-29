@@ -9,6 +9,11 @@ All notable changes to this project are documented here. The format follows Keep
 - Removing a theme while `colorScheme` remains now resolves the default theme instead of retaining the previous pair.
 - Preloading languages in the `core` entry no longer resolves the implicit Shiki default when no engine is configured, avoiding a misleading warning on provider mount.
 - The deferred observer is no longer recreated for unrelated prop updates; only `defer` and `rootMargin` changes reconnect it.
+- Virtualized rows now pin `min-height` to the numeric `lineHeight`, so the rendered row height matches the spacer math and scrolling no longer drifts.
+- Virtualization spacers are `span` elements with `display: block`, keeping `pre > code` valid phrasing content.
+- `tabindex` boolean `true` normalizes to `0` instead of emitting the invalid `tabindex="true"`.
+- Changing an outer provider's engine re-highlights descendants in nested providers, and the composable reacts to inherited engine changes too.
+- Changing `preTag` after mount moves the `ResizeObserver` and deferred `IntersectionObserver` to the new scroll element.
 
 ### Added
 

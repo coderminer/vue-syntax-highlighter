@@ -92,6 +92,21 @@ export const SyntaxHighlighter = defineComponent({
       createPlainResult(normalized.value.code, normalized.value.language),
     )
 
+    // Engine selection walks the provider chain. Track ancestors so a block
+    // inside a nested provider re-highlights when an outer provider changes
+    // its engine, not only when its nearest context changes.
+    const inheritedEngine = computed(() => {
+      let current: typeof context | undefined = context
+      while (current) {
+        if (current.engine !== undefined) return current.engine
+        current = current.parent
+      }
+      return undefined
+    })
+    const selectedEngine = computed(() =>
+      props.engine !== undefined ? props.engine : inheritedEngine.value,
+    )
+
     const controller = createHighlightController({
       context,
       getInput: () => {
@@ -251,8 +266,18 @@ export const SyntaxHighlighter = defineComponent({
       const slotContent = slots.line?.(linePayload)
       const content = slotContent ?? renderTokens()
 
+      // Virtualization positions rows with padding computed from lineHeight.
+      // The base `.vsh-line` min-height (1.5em) can be taller than the numeric
+      // lineHeight, so it must not participate in the virtual row box.
       const lineStyle = virtualActiveNow
-        ? [{ height: `${current.lineHeight}px`, lineHeight: `${current.lineHeight}px` }, extraStyle]
+        ? [
+            {
+              height: `${current.lineHeight}px`,
+              minHeight: '0px',
+              lineHeight: `${current.lineHeight}px`,
+            },
+            extraStyle,
+          ]
         : extraStyle
 
       return h(
@@ -300,6 +325,7 @@ export const SyntaxHighlighter = defineComponent({
 
     let observer: IntersectionObserver | undefined
     let resizeObserver: ResizeObserver | undefined
+    let observedPre: HTMLElement | undefined
 
     function disconnectDeferred(): void {
       observer?.disconnect()
@@ -351,6 +377,7 @@ export const SyntaxHighlighter = defineComponent({
     onMounted(() => {
       mounted.value = true
       measure()
+      observedPre = preEl.value
       if (typeof ResizeObserver !== 'undefined' && preEl.value) {
         resizeObserver = new ResizeObserver(() => measure())
         resizeObserver.observe(preEl.value)
@@ -359,6 +386,26 @@ export const SyntaxHighlighter = defineComponent({
         window.addEventListener('resize', measure)
       }
       observeDeferred()
+    })
+
+    // preTag can change after mount. Move both observers to the new element so
+    // sizing stays fresh and deferral still waits for the visible block. The
+    // initial element is handled by onMounted above; the identity check keeps
+    // this watcher from attaching a second observer during the first flush.
+    watch(preEl, (element, previous) => {
+      if (!mounted.value) return
+      if (previous && previous !== element) resizeObserver?.unobserve(previous)
+      if (element && element !== observedPre) {
+        if (!resizeObserver && typeof ResizeObserver !== 'undefined') {
+          resizeObserver = new ResizeObserver(() => measure())
+        }
+        resizeObserver?.observe(element)
+        observedPre = element
+        measure()
+      } else if (!element) {
+        observedPre = undefined
+      }
+      if (previous) observeDeferred()
     })
 
     watch(
@@ -370,6 +417,7 @@ export const SyntaxHighlighter = defineComponent({
     )
 
     onBeforeUnmount(() => {
+      mounted.value = false
       if (frame && typeof cancelAnimationFrame !== 'undefined') cancelAnimationFrame(frame)
       frame = 0
       disconnectDeferred()
@@ -380,7 +428,7 @@ export const SyntaxHighlighter = defineComponent({
     })
 
     watch(
-      () => [props.code, props.language, props.engine, props.engineOptions, context.engine],
+      () => [props.code, props.language, props.engine, props.engineOptions, selectedEngine.value],
       () => controller.schedule(),
     )
 
@@ -495,10 +543,10 @@ export const SyntaxHighlighter = defineComponent({
           [
             ...(active
               ? [
-                  h('div', {
+                  h('span', {
                     class: 'vsh-spacer',
                     'aria-hidden': 'true',
-                    style: { height: `${window.topPadding}px` },
+                    style: { display: 'block', height: `${window.topPadding}px` },
                   }),
                 ]
               : []),
@@ -507,10 +555,10 @@ export const SyntaxHighlighter = defineComponent({
             ),
             ...(active
               ? [
-                  h('div', {
+                  h('span', {
                     class: 'vsh-spacer',
                     'aria-hidden': 'true',
-                    style: { height: `${window.bottomPadding}px` },
+                    style: { display: 'block', height: `${window.bottomPadding}px` },
                   }),
                 ]
               : []),

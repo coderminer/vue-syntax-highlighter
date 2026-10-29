@@ -118,6 +118,7 @@ describe('prop normalization', () => {
 
   it('keeps tabindex=false and normalizes language classes', () => {
     expect(normalizeProps({ tabindex: false }, new Set()).tabindex).toBe(false)
+    expect(normalizeProps({ tabindex: true }, new Set()).tabindex).toBe(0)
     expect(normalizeLanguage('  Language-JS ')).toBe('js')
     expect(normalizeLanguage('')).toBe('text')
     expect(languageClassName('c++')).toBe('language-c++')

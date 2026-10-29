@@ -63,6 +63,14 @@ export function useSyntaxHighlighter(
   const instance = getCurrentInstance()
 
   const language = computed(() => normalizeLanguage(toValue(options.language)))
+  const inheritedEngine = computed(() => {
+    let current: HighlighterContext | undefined = context
+    while (current) {
+      if (current.engine !== undefined) return current.engine
+      current = current.parent
+    }
+    return undefined
+  })
   const controller = createHighlightController({
     context,
     getInput: () => ({
@@ -86,6 +94,7 @@ export function useSyntaxHighlighter(
       language.value,
       toValue(options.engine),
       toValue(options.engineOptions),
+      inheritedEngine.value,
     ],
     () => {
       if (controller.started()) controller.schedule()

@@ -56,7 +56,7 @@ Deep imports into `dist/` are blocked by the exports map.
 | `codeTag` | `string \| Component` | `'code'` | Code element. |
 | `lineProps` | `(info: LineRenderInfo) => attrs` | — | Per-line attributes. |
 | `tokenProps` | `(info: TokenRenderInfo) => attrs` | — | Per-token attributes. |
-| `tabindex` | `number \| string \| false` | `0` | Focusable scroll region. |
+| `tabindex` | `number \| string \| boolean` | `0` | Focusable scroll region. `true` becomes `0`; `false` omits the attribute. |
 | `showLineNumbers` | `boolean` | — | Deprecated alias for `lineNumbers`. |
 | `wrapLines` | `boolean` | — | Deprecated alias for `wrap`. |
 | `customStyle` | `string \| object` | — | Deprecated; native `style` wins. |

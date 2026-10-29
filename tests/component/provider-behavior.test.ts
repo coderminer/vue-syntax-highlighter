@@ -240,4 +240,30 @@ describe('provider behavior defaults', () => {
     expect(second.highlight).toHaveBeenCalledTimes(1)
     wrapper.unmount()
   })
+
+  it('re-highlights when an inherited outer provider engine changes', async () => {
+    const first = engine()
+    const second = engine()
+    const current = ref<HighlightEngine>(first)
+    const wrapper = mount(
+      {
+        render: () =>
+          h(SyntaxHighlighterProvider, { engine: current.value }, () =>
+            h(SyntaxHighlighterProvider, {}, () =>
+              h(SyntaxHighlighter, { code: 'const x = 1' }),
+            ),
+          ),
+      },
+      { attachTo: document.body },
+    )
+    await flushPromises()
+    expect(first.highlight).toHaveBeenCalledTimes(1)
+    expect(second.highlight).not.toHaveBeenCalled()
+
+    current.value = second
+    await nextTick()
+    await flushPromises()
+    expect(second.highlight).toHaveBeenCalledTimes(1)
+    wrapper.unmount()
+  })
 })

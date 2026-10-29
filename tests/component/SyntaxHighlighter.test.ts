@@ -1,6 +1,6 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi, type Mock } from 'vitest'
-import { h, nextTick } from 'vue'
+import { h, nextTick, ref } from 'vue'
 import { SyntaxHighlighter } from '@/component/SyntaxHighlighter'
 import { SyntaxHighlighterProvider } from '@/component/SyntaxHighlighterProvider'
 import { normalizeSource, splitSource } from '@/core/source'
@@ -352,6 +352,11 @@ describe('accessibility and attributes', () => {
     expect(wrapper.find('pre').attributes('tabindex')).toBeUndefined()
     expect(wrapper.attributes('data-testid')).toBe('block')
   })
+
+  it('normalizes a boolean tabindex into a valid value', () => {
+    const wrapper = mountWith({ engine: makeEngine(), tabindex: true })
+    expect(wrapper.find('pre').attributes('tabindex')).toBe('0')
+  })
 })
 
 describe('theme and reactivity', () => {
@@ -515,6 +520,49 @@ describe('deferral', () => {
     expect(wrapper.find('.vsh-token-keyword').exists()).toBe(true)
   })
 
+  it('re-observes the deferred block when preTag changes', async () => {
+    const callbacks: IntersectionObserverCallback[] = []
+    class MockObserver {
+      constructor(callback: IntersectionObserverCallback) {
+        callbacks.push(callback)
+      }
+      observe = vi.fn()
+      disconnect = vi.fn()
+      unobserve = vi.fn()
+      takeRecords = () => []
+      root = null
+      rootMargin = ''
+      thresholds = []
+    }
+    vi.stubGlobal('IntersectionObserver', MockObserver)
+    const preTag = ref<'pre' | 'section'>('pre')
+    const engine = makeEngine()
+    const wrapper = mount(
+      {
+        setup: () => () =>
+          h(SyntaxHighlighter, { code: 'x', engine, defer: true, preTag: preTag.value }),
+      },
+      { attachTo: document.body },
+    )
+    expect(wrapper.find('pre.vsh-pre').exists()).toBe(true)
+    expect(callbacks).toHaveLength(1)
+    expect(engine.highlight).not.toHaveBeenCalled()
+
+    preTag.value = 'section'
+    await nextTick()
+    expect(wrapper.find('section.vsh-pre').exists()).toBe(true)
+    expect(callbacks).toHaveLength(2)
+    expect(engine.highlight).not.toHaveBeenCalled()
+
+    callbacks[1]?.(
+      [{ isIntersecting: true } as IntersectionObserverEntry],
+      {} as IntersectionObserver,
+    )
+    await flushPromises()
+    expect(engine.highlight).toHaveBeenCalledTimes(1)
+    wrapper.unmount()
+  })
+
   it('falls back to immediate highlighting without IntersectionObserver', async () => {
     vi.stubGlobal('IntersectionObserver', undefined)
     const engine = makeEngine()
@@ -555,6 +603,26 @@ describe('virtualization', () => {
       (wrapper.vm as unknown as { getCopyPayload: () => string }).getCopyPayload().split('\n'),
     ).toHaveLength(3_000)
     expect(engine.highlight).toHaveBeenCalledTimes(1)
+  })
+
+  it('pins virtual rows to the numeric line height', async () => {
+    const code = Array.from({ length: 3_000 }, (_, index) => `line ${index + 1}`).join('\n')
+    const wrapper = mountWith({
+      code,
+      engine: makeEngine(),
+      virtualized: true,
+      height: 400,
+      lineHeight: 20,
+    })
+    await nextTick()
+    const first = wrapper.find('.vsh-line')
+    expect(first.attributes('style')).toContain('height: 20px')
+    expect(first.attributes('style')).toContain('min-height: 0')
+    expect(first.attributes('style')).toContain('line-height: 20px')
+    const spacers = wrapper.findAll('.vsh-spacer')
+    expect(spacers.length).toBe(2)
+    expect(spacers.every((spacer) => spacer.element.tagName === 'SPAN')).toBe(true)
+    expect(spacers[0]?.attributes('style')).toContain('display: block')
   })
 
   it('warns and disables virtualization with wrapping', async () => {
