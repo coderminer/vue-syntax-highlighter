@@ -27,6 +27,11 @@ export type TokenType = (typeof TOKEN_TYPES)[number]
 export interface HighlightToken {
   readonly text: string
   readonly type: TokenType
+  /**
+   * Raw engine scopes for this token. Present only when the engine was called
+   * with `engineOptions: { tokenScopes: true }`.
+   */
+  readonly scopes?: readonly string[]
 }
 
 export interface HighlightLine {
@@ -220,4 +225,9 @@ export interface SyntaxHighlighterExposed {
   highlight: (input: HighlightInput) => Promise<HighlightResult>
   copy: () => Promise<boolean>
   getCopyPayload: () => string
+  /**
+   * Scroll the block to a rendered line. Returns `false` when the instance is
+   * unmounted or the line is not part of the rendered document.
+   */
+  scrollToLine: (line: number, options?: { behavior?: ScrollBehavior }) => boolean
 }

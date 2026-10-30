@@ -72,6 +72,32 @@ describe('Shiki adapter', () => {
       /disposed/,
     )
   })
+
+  it('passes raw TextMate scopes only when tokenScopes is enabled', async () => {
+    const engine = await createShikiEngine({ preload: ['javascript'] })
+    dispose.push(() => engine.dispose?.())
+
+    const plain = await engine.highlight({ code: 'const x = 1', language: 'javascript' })
+    expect(
+      plain.lines.flatMap((line) => line.tokens).every((token) => token.scopes === undefined),
+    ).toBe(true)
+
+    const scoped = await engine.highlight(
+      { code: 'const x = 1', language: 'javascript' },
+      { tokenScopes: true },
+    )
+    const tokens = scoped.lines.flatMap((line) => line.tokens)
+    expect(
+      tokens.every(
+        (token) =>
+          token.scopes === undefined || token.scopes.every((scope) => typeof scope === 'string'),
+      ),
+    ).toBe(true)
+    expect(tokens.some((token) => token.scopes?.includes('source.js'))).toBe(true)
+    expect(
+      tokens.some((token) => token.scopes?.some((scope) => scope.startsWith('storage'))),
+    ).toBe(true)
+  })
 })
 
 describe('highlight.js adapter', () => {
@@ -115,6 +141,26 @@ describe('highlight.js adapter', () => {
     engine.registerLanguage('my-hljs', module.default)
     const result = engine.highlight({ code: 'const a = 1', language: 'my-hljs' })
     expect(resultToSource(await result)).toBe('const a = 1')
+  })
+
+  it('passes normalized class scopes only when tokenScopes is enabled', async () => {
+    const engine = await createHighlightjsEngine({ preload: ['javascript'] })
+    dispose.push(() => engine.dispose?.())
+
+    const plain = await engine.highlight({ code: 'const x = 1', language: 'javascript' })
+    expect(
+      plain.lines.flatMap((line) => line.tokens).every((token) => token.scopes === undefined),
+    ).toBe(true)
+
+    const scoped = await engine.highlight(
+      { code: 'const x = 1', language: 'javascript' },
+      { tokenScopes: true },
+    )
+    const keyword = scoped.lines
+      .flatMap((line) => line.tokens)
+      .find((token) => token.text === 'const')
+    expect(keyword?.scopes).toContain('keyword')
+    expect(keyword?.scopes?.some((scope) => scope.startsWith('hljs-'))).toBe(false)
   })
 })
 
@@ -167,6 +213,26 @@ describe('Prism adapter', () => {
     engine.registerLanguage('my-prism', module.default)
     const result = engine.highlight({ code: 'puts "hi"', language: 'my-prism' })
     expect(resultToSource(await result)).toBe('puts "hi"')
+  })
+
+  it('passes normalized class scopes only when tokenScopes is enabled', async () => {
+    const engine = await createPrismEngine({ preload: ['javascript'] })
+    dispose.push(() => engine.dispose?.())
+
+    const plain = await engine.highlight({ code: 'const x = 1', language: 'javascript' })
+    expect(
+      plain.lines.flatMap((line) => line.tokens).every((token) => token.scopes === undefined),
+    ).toBe(true)
+
+    const scoped = await engine.highlight(
+      { code: 'const x = 1', language: 'javascript' },
+      { tokenScopes: true },
+    )
+    const keyword = scoped.lines
+      .flatMap((line) => line.tokens)
+      .find((token) => token.text === 'const')
+    expect(keyword?.scopes).toContain('keyword')
+    expect(keyword?.scopes).not.toContain('token')
   })
 })
 

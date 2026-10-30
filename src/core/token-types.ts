@@ -139,19 +139,27 @@ function stripPrefix(name: string, prefix: string): string {
   return name.startsWith(prefix) ? name.slice(prefix.length) : name
 }
 
-export function mapHljsClasses(classes: unknown): TokenType {
-  const normalized = normalizeClassNames(classes)
+export function hljsScopeNames(classes: unknown): string[] {
+  return normalizeClassNames(classes)
     .map((name) => stripPrefix(name, 'hljs-').replace(/_$/, ''))
     .flatMap((name) => name.split('.'))
     .filter(Boolean)
+}
+
+export function mapHljsClasses(classes: unknown): TokenType {
+  const normalized = hljsScopeNames(classes)
   return normalized.length > 0 ? matchRules(normalized, HLJS_RULES) : 'plain'
 }
 
-export function mapPrismClasses(classes: unknown): TokenType {
-  const normalized = normalizeClassNames(classes)
+export function prismScopeNames(classes: unknown): string[] {
+  return normalizeClassNames(classes)
     .map((name) => stripPrefix(name, 'token-'))
     .flatMap((name) => name.split('.'))
     .filter((name) => name !== 'token')
+}
+
+export function mapPrismClasses(classes: unknown): TokenType {
+  const normalized = prismScopeNames(classes)
   return normalized.length > 0 ? matchRules(normalized, PRISM_RULES) : 'plain'
 }
 

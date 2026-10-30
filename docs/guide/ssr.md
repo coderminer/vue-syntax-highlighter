@@ -48,6 +48,23 @@ This is intentional: starting async work during SSR can resolve before hydration
 
 Components without a provider or plugin get one default context per Vue application. In SSR, create one application per request (the standard `createSSRApp` flow) so caches and engines are not shared between requests. Plugin and provider contexts are also scoped to their application/subtree.
 
+For build scripts or request-scoped warm-up, `createHighlighter()` creates an owned context and cache without a Vue app:
+
+```ts
+import { createHighlighter } from 'vue-syntax-highlighter'
+
+const highlighter = createHighlighter({
+  engine,
+  languages: [language],
+  cacheCapacity: 20,
+})
+await highlighter.preload()
+const result = await highlighter.highlight({ code, language })
+highlighter.dispose()
+```
+
+Each call to `createHighlighter()` owns its cache and abort signal. Create one per request (or reuse one per build) and dispose it when the request finishes; never hoist it to module scope in a server process.
+
 ## Theme markup
 
 Every scope carries:

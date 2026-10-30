@@ -11,6 +11,8 @@ export type {
   UseSyntaxHighlighterOptions,
   UseSyntaxHighlighterReturn,
 } from './composables/useSyntaxHighlighter.js'
+export { createHighlighter } from './core/highlighter.js'
+export type { CreateHighlighterOptions, Highlighter } from './core/highlighter.js'
 export { Light, LightAsync, PrismLight, PrismAsync } from './aliases.js'
 export {
   defineTheme,

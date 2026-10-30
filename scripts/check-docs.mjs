@@ -109,6 +109,7 @@ const optInSurface = [
   'lineHeightMode',
   'cacheEngineIdentity',
   'preserveTrailingNewline',
+  'tokenScopes',
   'styles/complete.css',
 ]
 for (const name of optInSurface) {

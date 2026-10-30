@@ -141,30 +141,40 @@ class ShikiEngineImpl implements ShikiEngine {
     return this.loadLanguage(lang).then(() => this.highlightSync(request, options))
   }
 
-  private highlightSync(request: HighlightRequest, _options?: EngineOptions): HighlightResult {
+  private highlightSync(request: HighlightRequest, options?: EngineOptions): HighlightResult {
     if (this.disposed) {
       throw new Error('[vue-syntax-highlighter] The Shiki engine was disposed.')
     }
+    const includeScopes = options?.tokenScopes === true
     const code = normalizeSource(request.code)
     const lang = canonicalLanguage(request.language)
-    const options = {
+    const shikiOptions = {
       lang: lang as never,
       theme: NEUTRAL_THEME.name,
       includeExplanation: true as const,
     }
     let result: ReturnType<HighlighterCore['codeToTokens']>
     try {
-      result = this.highlighter.codeToTokens(code, options)
+      result = this.highlighter.codeToTokens(code, shikiOptions)
     } catch {
       // Shiki 4.5 can throw while building explanations for a grammar that
       // has dependencies loaded later (observed with C++). Tokenization still
       // works without explanations; the numeric token types are a safe,
       // coarser fallback.
       result = this.highlighter.codeToTokens(code, {
-        ...options,
+        ...shikiOptions,
         includeExplanation: false,
       })
     }
+
+    const makeToken = (
+      text: string,
+      type: HighlightToken['type'],
+      scopes?: readonly string[],
+    ): HighlightToken =>
+      includeScopes && scopes && scopes.length > 0
+        ? { text, type, scopes }
+        : { text, type }
 
     const lines = result.tokens.map((line) => {
       const tokens: HighlightToken[] = []
@@ -173,21 +183,21 @@ class ShikiEngineImpl implements ShikiEngine {
           .explanation
         if (!explanation || explanation.length === 0) {
           if (token.content.length > 0) {
-            tokens.push({ text: token.content, type: mapNumericType(token.type) })
+            tokens.push(makeToken(token.content, mapNumericType(token.type)))
           }
           continue
         }
         const joined = explanation.map((entry) => entry.content).join('')
         if (joined !== token.content) {
           if (token.content.length > 0) {
-            tokens.push({ text: token.content, type: 'plain' })
+            tokens.push(makeToken(token.content, 'plain'))
           }
           continue
         }
         for (const entry of explanation) {
           if (entry.content.length === 0) continue
           const scopes = (entry.scopes ?? []).map((scope) => scope.scopeName)
-          tokens.push({ text: entry.content, type: mapShikiScopes(scopes) })
+          tokens.push(makeToken(entry.content, mapShikiScopes(scopes), scopes))
         }
       }
       return { tokens }

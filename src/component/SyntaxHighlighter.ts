@@ -226,6 +226,9 @@ export const SyntaxHighlighter = defineComponent({
           'span',
           {
             ...rest,
+            ...(token.scopes && token.scopes.length > 0
+              ? { 'data-vsh-scope': token.scopes.join(' ') }
+              : {}),
             class: mergeClass(['vsh-token', `vsh-token-${token.type}`], extraClass),
           },
           token.text,
@@ -329,6 +332,51 @@ export const SyntaxHighlighter = defineComponent({
         frame = 0
         if (preEl.value) scrollTop.value = preEl.value.scrollTop
       })
+    }
+
+    function scrollToLine(
+      line: number,
+      options?: { behavior?: ScrollBehavior },
+    ): boolean {
+      const element = preEl.value
+      if (!element || !Number.isInteger(line)) return false
+      const current = normalized.value
+      const index = line - current.startLine
+      if (index < 0 || index >= renderedLines.value.length) return false
+
+      let top: number
+      if (virtualActive.value) {
+        // Virtual rows use the same numeric line height as the spacers, so the
+        // offset is exact and needs no measurement.
+        top = index * current.lineHeight
+      } else {
+        const row = element.querySelector<HTMLElement>(`[data-line="${line}"]`)
+        if (!row) return false
+        // Visual rows are font-relative; measure the rendered row instead of
+        // estimating from lineHeight. `clientTop` is the scroll element's
+        // border, which is outside the scroll coordinate origin.
+        top =
+          element.scrollTop +
+          row.getBoundingClientRect().top -
+          element.getBoundingClientRect().top -
+          element.clientTop
+      }
+
+      const maxScroll = element.scrollHeight - element.clientHeight
+      if (Number.isFinite(maxScroll) && maxScroll > 0) {
+        top = Math.min(top, maxScroll)
+      }
+      top = Math.max(0, top)
+
+      const behavior = options?.behavior ?? 'auto'
+      if (typeof element.scrollTo === 'function') {
+        element.scrollTo({ top, behavior })
+      } else {
+        element.scrollTop = top
+        scrollTop.value = top
+      }
+      if (behavior !== 'smooth') scrollTop.value = top
+      return true
     }
 
     let observer: IntersectionObserver | undefined
@@ -466,6 +514,7 @@ export const SyntaxHighlighter = defineComponent({
       highlight: (input: HighlightInput) => controller.highlight(input),
       copy,
       getCopyPayload,
+      scrollToLine,
     })
 
     return () => {

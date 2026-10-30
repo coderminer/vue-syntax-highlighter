@@ -39,7 +39,12 @@ export function resultToSource(result: HighlightResult): string {
 export function countResultChars(result: HighlightResult): number {
   let count = result.language.length
   for (const line of result.lines) {
-    for (const token of line.tokens) count += token.text.length
+    for (const token of line.tokens) {
+      count += token.text.length
+      if (token.scopes) {
+        for (const scope of token.scopes) count += scope.length + 1
+      }
+    }
   }
   return count
 }
@@ -55,6 +60,12 @@ export function isHighlightResult(value: unknown): value is HighlightResult {
       if (!token || typeof token !== 'object') return false
       if (typeof token.text !== 'string') return false
       if (!isTokenType(token.type)) return false
+      if (token.scopes !== undefined) {
+        if (!Array.isArray(token.scopes)) return false
+        for (const scope of token.scopes) {
+          if (typeof scope !== 'string') return false
+        }
+      }
     }
   }
   return true
@@ -62,7 +73,16 @@ export function isHighlightResult(value: unknown): value is HighlightResult {
 
 export function freezeResult(result: HighlightResult): HighlightResult {
   const lines: HighlightLine[] = result.lines.map((line) => {
-    const tokens = line.tokens.map((token) => Object.freeze({ text: token.text, type: token.type }))
+    const tokens = line.tokens.map((token) => {
+      if (!token.scopes) {
+        return Object.freeze({ text: token.text, type: token.type })
+      }
+      return Object.freeze({
+        text: token.text,
+        type: token.type,
+        scopes: Object.freeze([...token.scopes]),
+      })
+    })
     return Object.freeze({ tokens: Object.freeze(tokens) })
   })
   return Object.freeze({

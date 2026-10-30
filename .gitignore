@@ -153,4 +153,7 @@ test-results/
 playwright-report/
 bench-report.md
 
+# Local agent configuration
+.opencode/
+
 .tmp/

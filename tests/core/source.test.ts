@@ -74,4 +74,42 @@ describe('source normalization', () => {
     expect(isHighlightResult(result)).toBe(true)
     expect(freezeResult(result).meta).toEqual({ engine: 'fake' })
   })
+
+  it('preserves and freezes engine scopes', () => {
+    const result: HighlightResult = {
+      lines: [
+        {
+          tokens: [
+            {
+              text: 'const',
+              type: 'keyword',
+              scopes: ['source.ts', 'storage.type.ts'],
+            },
+          ],
+        },
+      ],
+      language: 'ts',
+    }
+
+    expect(isHighlightResult(result)).toBe(true)
+    const frozen = freezeResult(result)
+    const token = frozen.lines[0]!.tokens[0]!
+    expect(token.scopes).toEqual(['source.ts', 'storage.type.ts'])
+    expect(Object.isFrozen(token.scopes)).toBe(true)
+  })
+
+  it('rejects malformed scopes', () => {
+    expect(() =>
+      assertHighlightResult({
+        lines: [{ tokens: [{ text: 'x', type: 'plain', scopes: 'source.ts' }] }],
+        language: 'ts',
+      }),
+    ).toThrow(/invalid result/i)
+    expect(() =>
+      assertHighlightResult({
+        lines: [{ tokens: [{ text: 'x', type: 'plain', scopes: [1] }] }],
+        language: 'ts',
+      }),
+    ).toThrow(/invalid result/i)
+  })
 })

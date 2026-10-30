@@ -58,6 +58,9 @@ const tokenPayload = (payload: TokenSlotProps) => payload.renderToken()
 
 <template>
   <button type="button" @click="block?.copy()">Copy</button>
+  <button type="button" @click="block?.scrollToLine(42, { behavior: 'smooth' })">
+    Jump to line 42
+  </button>
   <SyntaxHighlighter ref="block" v-bind="props" :line-props="lineProps">
     <template #line="{ lineNumber, highlighted, renderTokens }">
       <span :data-source-line="lineNumber" :class="{ highlighted }">
@@ -199,6 +202,31 @@ await state.copy()
 await state.refresh()
 await state.highlight({ code: 'const next = 2', preserveTrailingNewline: false })
 ```
+
+## Headless highlighter
+
+```ts
+import { createHighlighter, ResultCache } from 'vue-syntax-highlighter'
+import type { CreateHighlighterOptions, Highlighter } from 'vue-syntax-highlighter'
+
+const options: CreateHighlighterOptions = {
+  engine: 'shiki',
+  engineOptions: { flavor: 'semantic' },
+  languages: ['typescript'],
+  cache: new ResultCache({ capacity: 20 }),
+}
+const highlighter: Highlighter = createHighlighter(options)
+
+await highlighter.preload()
+const result = await highlighter.highlight({
+  code: 'const answer = 42',
+  language: 'typescript',
+})
+result.lines
+highlighter.dispose()
+```
+
+Every instance owns its context and cache; pass the same `cache` explicitly to share results. `dispose()` rejects pending calls and disposes loader-created engines.
 
 ## Compatibility aliases
 
@@ -542,6 +570,15 @@ These options are additive and default to the existing behavior:
 - `lineHeightMode` on the component defaults to `visual`; `fixed` emits numeric row metrics.
 - `cacheEngineIdentity` on the provider or plugin defaults to `false`; enable it to partition same-`id` engine objects.
 - `preserveTrailingNewline` defaults to `false` on the exposed `highlight()` input and the composable.
+- `tokenScopes` on `engineOptions` defaults to `false`; enable it to keep raw engine scopes and render `data-vsh-scope`.
+
+```vue
+<SyntaxHighlighter
+  :code="code"
+  language="ts"
+  :engine-options="{ tokenScopes: true }"
+/>
+```
 
 ## Package metadata
 

@@ -1,6 +1,6 @@
 # Roadmap
 
-This page describes the additive-only release policy and the opt-in capabilities shipped in `1.2.0`. It describes intended and shipped behavior in the current minor line. The repository source is `1.2.1`; the latest npm release is `1.2.0` until the manual `1.2.1` publish.
+This page describes the additive-only release policy and the opt-in capabilities shipped in `1.2.0`. It describes intended and shipped behavior in the current minor line. The repository source is `1.2.1`, and `1.2.1` is the latest npm release.
 
 The plan has one hard rule:
 
@@ -67,8 +67,8 @@ The `1.2.0` release keeps regression tests for all of these:
 ## Release sequence
 
 ```text
-1.2.0    latest npm release until 1.2.1 publish
-1.2.1    current source release, packaging fix, latest after manual publish
+1.2.0    published
+1.2.1    published packaging fix, current source release
 ```
 
 `1.2.0` release checks:
@@ -82,7 +82,7 @@ The `1.2.0` release keeps regression tests for all of these:
 `1.2.1` release checks:
 
 - [x] Exclude source maps from the packed tarball while keeping them in local `dist`.
-- [ ] Publish `1.2.1` manually after a successful tarball install.
+- [x] Publish `1.2.1` manually after a successful tarball install.
 
 ## Tracking
 
@@ -106,4 +106,4 @@ The `1.2.0` release keeps regression tests for all of these:
 - [x] Add `styles/complete.css` without changing `styles.css`
 - [x] Publish `1.2.0`
 - [x] Exclude source maps from the published tarball
-- [ ] Publish `1.2.1`
+- [x] Publish `1.2.1`

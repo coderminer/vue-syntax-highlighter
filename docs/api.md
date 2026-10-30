@@ -6,7 +6,7 @@ Every runtime export and public type has a runnable example in [API Examples](/g
 
 | Entry | Public values |
 | --- | --- |
-| `vue-syntax-highlighter` | `SyntaxHighlighter`, `SyntaxHighlighterProvider`, `VueSyntaxHighlighter` (default and named), `useSyntaxHighlighter`, `Light`, `LightAsync`, `PrismLight`, `PrismAsync`, `defineTheme`, `DEFAULT_THEME`, `DEFAULT_THEME_NAME`, `BUILTIN_THEME_REGISTRY`, `isColorScheme`, `ResultCache`, `buildCacheKey`, `stableStringify`, `createHighlighterContext`, `HIGHLIGHTER_CONTEXT`, `HighlighterContext`, `EngineManager`, `isHighlightEngine`, `BUILTIN_ENGINE_IDS` |
+| `vue-syntax-highlighter` | `SyntaxHighlighter`, `SyntaxHighlighterProvider`, `VueSyntaxHighlighter` (default and named), `useSyntaxHighlighter`, `createHighlighter`, `Light`, `LightAsync`, `PrismLight`, `PrismAsync`, `defineTheme`, `DEFAULT_THEME`, `DEFAULT_THEME_NAME`, `BUILTIN_THEME_REGISTRY`, `isColorScheme`, `ResultCache`, `buildCacheKey`, `stableStringify`, `createHighlighterContext`, `HIGHLIGHTER_CONTEXT`, `HighlighterContext`, `EngineManager`, `isHighlightEngine`, `BUILTIN_ENGINE_IDS` |
 | `vue-syntax-highlighter/core` | The same runtime API without a built-in engine loader. Pass an explicit engine object; no optional engine peer is referenced at build time. |
 | `vue-syntax-highlighter/full` | The same API as the default entry, including all built-in engine loaders. It is equivalent to the default entry in the current release. |
 | `vue-syntax-highlighter/engines/shiki` | `createShikiEngine`, `ShikiEngine`, `ShikiEngineOptions`, `ShikiLanguageRegistration`, `ShikiLanguageLoader`, `languageLoaders`, `languageAliases`, `supportedLanguages` |
@@ -24,7 +24,7 @@ Every runtime export and public type has a runnable example in [API Examples](/g
 | `vue-syntax-highlighter/styles/complete.css` | Base plus fallback rules in one stylesheet; opt-in and larger than `styles.css` |
 | `vue-syntax-highlighter/package.json` | Package metadata |
 
-Public types: `ColorScheme`, `EngineOptions`, `HighlightCacheLike`, `HighlightEngine`, `HighlightInput`, `HighlightLine`, `HighlightRequest`, `HighlightResult`, `HighlightToken`, `HighlighterOptions`, `HighlighterScopeMode`, `LineHeightMode`, `LineRenderInfo`, `LineSlotProps`, `SyntaxHighlighterEmits`, `SyntaxHighlighterExposed`, `SyntaxHighlighterProps`, `ThemeColorsInput`, `ThemeDefinition`, `ThemeInput`, `ThemePair`, `ThemeScope`, `TokenSlotProps`, `TokenStyle`, `TokenType`, `CacheKeyInput`, `ResultCacheOptions`, `HighlightedEventContext`, `HighlighterContext`, `EngineChoice`, `EngineLoader`, `EngineRegistry`, `BuiltinEngineId`, `VueSyntaxHighlighterOptions`, `VueSyntaxHighlighterPlugin`, `UseSyntaxHighlighterOptions`, `UseSyntaxHighlighterReturn`.
+Public types: `ColorScheme`, `CreateHighlighterOptions`, `EngineOptions`, `HighlightCacheLike`, `HighlightEngine`, `HighlightInput`, `HighlightLine`, `HighlightRequest`, `HighlightResult`, `HighlightToken`, `Highlighter`, `HighlighterOptions`, `HighlighterScopeMode`, `LineHeightMode`, `LineRenderInfo`, `LineSlotProps`, `SyntaxHighlighterEmits`, `SyntaxHighlighterExposed`, `SyntaxHighlighterProps`, `ThemeColorsInput`, `ThemeDefinition`, `ThemeInput`, `ThemePair`, `ThemeScope`, `TokenSlotProps`, `TokenStyle`, `TokenType`, `CacheKeyInput`, `ResultCacheOptions`, `HighlightedEventContext`, `HighlighterContext`, `EngineChoice`, `EngineLoader`, `EngineRegistry`, `BuiltinEngineId`, `VueSyntaxHighlighterOptions`, `VueSyntaxHighlighterPlugin`, `UseSyntaxHighlighterOptions`, `UseSyntaxHighlighterReturn`.
 
 Deep imports into `dist/` are blocked by the exports map.
 
@@ -37,7 +37,7 @@ Deep imports into `dist/` are blocked by the exports map.
 | `code` | `string` | `''` | Source text. Never HTML. One terminal line break is not rendered as an extra row; `copy()` still returns it. |
 | `language` | `string` | `'text'` | Engine language; exposed as `language-<id>`. |
 | `engine` | `string \| HighlightEngine` | inherits | Engine identifier or adapter object. |
-| `engineOptions` | `EngineOptions` | `{}` | Serialized into the cache key. |
+| `engineOptions` | `EngineOptions` | `{}` | Serialized into the cache key. Set `{ tokenScopes: true }` to attach raw engine scopes to tokens. |
 | `theme` | `ThemeDefinition \| string` | inherits | Single theme. |
 | `themes` | `ThemePair` | inherits | Light/dark pair. |
 | `colorScheme` | `'auto' \| 'light' \| 'dark'` | inherits | Scheme mode. |
@@ -104,6 +104,16 @@ Errors never throw out of render. The component keeps the last valid result or p
 | `highlight({ code, language?, preserveTrailingNewline? })` | Highlight explicit input and return its result. Set `preserveTrailingNewline` to `true` to keep terminal line breaks; the default is `false`. |
 | `copy()` | Copy the complete source without gutter text; resolves `false` on failure. |
 | `getCopyPayload()` | Return the complete normalized source. |
+| `scrollToLine(line, { behavior? })` | Scroll to a rendered line and return `true`. Uses the `startLine` offset, measures rows in visual mode, and clamps to the scrollable range. Returns `false` when unmounted or out of range. `behavior` accepts `auto` (default) or `smooth`. |
+
+### Token scopes
+
+Tokens normally carry only `text` and `type`. Pass `engineOptions: { tokenScopes: true }` to the component, composable, or `createHighlighter()` to keep the engine's raw scopes on each token as `scopes`. The option is forwarded to the engine and included in the cache key, so scoped and unscoped results never share a cache entry.
+
+- The Shiki adapter returns the TextMate scope stack, for example `['source.ts', 'storage.type.ts']`.
+- The highlight.js and prism adapters return normalized class names without the `hljs-` or `token` prefix, for example `['keyword']`.
+
+When a token has scopes, the default token span renders `data-vsh-scope="scope-a scope-b"`. Tokens without scopes emit no attribute, so the default markup is unchanged. Scopes are also available on the `token` slot payload. They are not generated for plain-text languages.
 
 ## `SyntaxHighlighterProvider`
 
@@ -144,6 +154,27 @@ const {
 `code` and the other inputs accept refs or getters. The composable respects the nearest provider/plugin, exposes reactive state, and disposes its controller on scope unmount. `copy()` and `getCopyPayload()` use the same full-source clipboard behavior as the component.
 
 `preserveTrailingNewline` defaults to `false`. Set it on the composable to change the default for every `highlight()` call, or pass `preserveTrailingNewline` per call to override it.
+
+## `createHighlighter`
+
+```ts
+import { createHighlighter } from 'vue-syntax-highlighter'
+
+const highlighter = createHighlighter({
+  engine,
+  engineOptions,
+  languages: ['typescript'],
+  cacheCapacity: 50,
+})
+
+await highlighter.preload()
+const result = await highlighter.highlight({ code, language: 'typescript' })
+highlighter.dispose()
+```
+
+`createHighlighter` is the component-free entry point for build scripts and per-request SSR. Every instance owns its context, cache, and abort signal, so it never falls back to the module-level default context that `useSyntaxHighlighter` uses outside a component setup. Two instances share nothing unless they are given the same `cache`.
+
+`highlight()` accepts the same `HighlightInput` as the component's exposed method, including `preserveTrailingNewline`, and returns a validated result. `engineOptions` is forwarded to every engine call and included in the cache key. `preload()` loads the languages supplied at creation through the selected engine and rejects with the disposed-scope error if disposal happens before it settles. `dispose()` rejects pending `highlight()` and `preload()` calls with the disposed-scope error, aborts the signal, clears the owned cache, and disposes loader-created engines; calling it twice is safe.
 
 ## `defineTheme`
 
@@ -193,7 +224,7 @@ interface HighlightEngine {
 }
 ```
 
-`HighlightResult` contains `lines`, `language`, and optional `meta`. Each line has tokens `{ text, type }`; concatenating line text with `\n` reproduces the normalized source. Engines must not return HTML, colors, or access the DOM.
+`HighlightResult` contains `lines`, `language`, and optional `meta`. Each line has tokens `{ text, type, scopes? }`; concatenating line text with `\n` reproduces the normalized source. `scopes` is optional and only present when `engineOptions.tokenScopes` is enabled. Engines must not return HTML, colors, or access the DOM.
 
 ## Token types
 

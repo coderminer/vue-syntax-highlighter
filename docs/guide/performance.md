@@ -75,6 +75,8 @@ Scrolling updates the window using `requestAnimationFrame`; it never invokes the
 
 For example, a long document with a 400 px viewport, 20 px lines, and 10 overscan keeps at most 41 line elements in the DOM at once.
 
+Use the exposed `scrollToLine(line, { behavior })` method to jump to a permalink, search hit, or review comment. Virtualized blocks use `(line - startLine) * lineHeight`; non-virtualized blocks measure the rendered row, so visual and fixed metrics are both exact. The call returns `false` when the line is outside the rendered document or the block is unmounted.
+
 ## Copying virtualized content
 
 `copy()` and `getCopyPayload()` always use the complete source, never the rendered window or the gutter:

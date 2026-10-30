@@ -9,7 +9,7 @@ import type {
   HighlightToken,
 } from '../../types.js'
 import { createPlainResult, normalizeSource, resultToSource } from '../../core/source.js'
-import { mapPrismClasses } from '../../core/token-types.js'
+import { mapPrismClasses, prismScopeNames } from '../../core/token-types.js'
 import { languageAliases, languageLoaders, supportedLanguages } from './languages.js'
 
 const PLAIN_LANGUAGES = new Set(['text', 'plain', 'plaintext', 'txt'])
@@ -139,40 +139,55 @@ class PrismEngineImpl implements PrismEngine {
 
   highlight(
     request: HighlightRequest,
-    _options?: EngineOptions,
+    options?: EngineOptions,
   ): HighlightResult | Promise<HighlightResult> {
     const lang = canonicalLanguage(request.language)
     if (PLAIN_LANGUAGES.has(lang)) {
       return createPlainResult(request.code, request.language)
     }
     if (this.loaded.has(lang) || refractor.registered(lang)) {
-      return this.highlightSync(request)
+      return this.highlightSync(request, options)
     }
-    return this.loadLanguage(lang).then(() => this.highlightSync(request))
+    return this.loadLanguage(lang).then(() => this.highlightSync(request, options))
   }
 
-  private highlightSync(request: HighlightRequest): HighlightResult {
+  private highlightSync(request: HighlightRequest, options?: EngineOptions): HighlightResult {
     if (this.disposed) {
       throw new Error('[vue-syntax-highlighter] The Prism engine was disposed.')
     }
+    const includeScopes = options?.tokenScopes === true
     const code = normalizeSource(request.code)
     const lang = canonicalLanguage(request.language)
     const tree = refractor.highlight(code, lang) as HastNode
 
     const lines: HighlightToken[][] = [[]]
-    const push = (text: string, type: HighlightToken['type']): void => {
+    const push = (
+      text: string,
+      type: HighlightToken['type'],
+      scopes?: readonly string[],
+    ): void => {
       if (text.length === 0) return
       const parts = text.split('\n')
       for (let index = 0; index < parts.length; index += 1) {
         if (index > 0) lines.push([])
         const part = parts[index] ?? ''
-        if (part.length > 0) lines[lines.length - 1]!.push({ text: part, type })
+        if (part.length > 0) {
+          const token: HighlightToken =
+            includeScopes && scopes && scopes.length > 0
+              ? { text: part, type, scopes }
+              : { text: part, type }
+          lines[lines.length - 1]!.push(token)
+        }
       }
     }
 
     const walk = (node: HastNode, classes: unknown): void => {
       if (node.type === 'text') {
-        push((node as HastText).value, mapPrismClasses(classes))
+        push(
+          (node as HastText).value,
+          mapPrismClasses(classes),
+          includeScopes ? prismScopeNames(classes) : undefined,
+        )
         return
       }
       const element = node as HastElement
